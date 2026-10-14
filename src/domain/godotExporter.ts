@@ -1,12 +1,33 @@
-import { SkeletonData } from './types.js';
+import { SkeletonData, BoneDefinition } from './types.js';
 
 /**
- * Godot 4 Scene (.tscn) Exporter
- * Generates a native Godot 4 2D Scene containing:
- * - Node2D (Root)
- * - Skeleton2D with hierarchical Bone2D nodes
- * - AnimationPlayer with tracks for position and rotation
+ * Topologically sorts bones so parents are always emitted before their children.
+ * This is a strict requirement for Godot 4 .tscn scene parser.
  */
+export function sortBonesTopologically(bones: BoneDefinition[]): BoneDefinition[] {
+  const result: BoneDefinition[] = [];
+  const added = new Set<string>();
+  const map = new Map(bones.map((b) => [b.id, b]));
+  const remaining = [...bones];
+
+  let progress = true;
+  while (remaining.length > 0 && progress) {
+    progress = false;
+    for (let i = 0; i < remaining.length; i++) {
+      const b = remaining[i];
+      if (!b.parentId || added.has(b.parentId) || !map.has(b.parentId)) {
+        result.push(b);
+        added.add(b.id);
+        remaining.splice(i, 1);
+        progress = true;
+        break;
+      }
+    }
+  }
+
+  result.push(...remaining);
+  return result;
+}
 
 export function exportToGodot4Tscn(data: SkeletonData): string {
   const lines: string[] = [];
@@ -18,8 +39,8 @@ export function exportToGodot4Tscn(data: SkeletonData): string {
   lines.push('[node name="Skeleton2D" type="Skeleton2D" parent="."]');
   lines.push('');
 
-  // Map bones into a hierarchy
-  const boneMap = new Map(data.bones.map((b) => [b.id, b]));
+  const sortedBones = sortBonesTopologically(data.bones);
+  const boneMap = new Map(sortedBones.map((b) => [b.id, b]));
 
   function getParentPath(boneId: string): string {
     const b = boneMap.get(boneId);
@@ -27,7 +48,7 @@ export function exportToGodot4Tscn(data: SkeletonData): string {
     return getParentPath(b.parentId) + '/' + b.parentId;
   }
 
-  for (const bone of data.bones) {
+  for (const bone of sortedBones) {
     const parentPath = getParentPath(bone.id);
     lines.push(`[node name="${bone.name}" type="Bone2D" parent="${parentPath}"]`);
     lines.push(`position = Vector2(${bone.x}, ${bone.y})`);
@@ -41,7 +62,6 @@ export function exportToGodot4Tscn(data: SkeletonData): string {
     lines.push('');
   }
 
-  // AnimationPlayer
   if (data.animations && Object.keys(data.animations).length > 0) {
     lines.push('[node name="AnimationPlayer" type="AnimationPlayer" parent="."]');
     lines.push('');
