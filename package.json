@@ -1,0 +1,36 @@
+{
+  "name": "bone-forge",
+  "version": "1.0.0",
+  "description": "Autonomous 2D Skeletal Animation & Inverse Kinematics Engine. Free open-source Spine 2D alternative for Indie Game Devs with Godot 4 & WebGPU export.",
+  "main": "dist/cli.js",
+  "bin": {
+    "bone-forge": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "test": "node --test dist/tests/*.test.js",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "skeletal-animation",
+    "spine-2d",
+    "inverse-kinematics",
+    "godot4",
+    "webgpu",
+    "game-dev",
+    "mesh-skinning",
+    "mcp-server",
+    "clean-room"
+  ],
+  "author": "Rs179988",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.0",
+    "commander": "^13.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "typescript": "^5.7.3"
+  }
+}
