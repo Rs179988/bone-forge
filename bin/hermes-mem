@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+[ -f /.env.sh ] && source /.env.sh
+
+CMD="${1:-status}"
+HERMES_DIR="${HERMES_HOME:-/workspace/.hermes}"
+DB_PATH="$HERMES_DIR/state.db"
+USER_MD="$HERMES_DIR/memories/USER.md"
+MEM_MD="$HERMES_DIR/memories/MEMORY.md"
+SKILLS_DIR="$HERMES_DIR/skills"
+STUDIOS_DIR="/workspace/studios"
+
+case "$CMD" in
+  status)
+    echo "=== HERMES MEMORY & WORKSPACE STATUS ==="
+    if [ -f "$DB_PATH" ]; then
+      SESS_COUNT=$(python3 -c "import sqlite3; conn=sqlite3.connect('$DB_PATH'); cur=conn.cursor(); cur.execute('SELECT COUNT(*) FROM sessions'); print(cur.fetchone()[0]); conn.close()" 2>/dev/null || echo "0")
+      JMODE=$(python3 -c "import sqlite3; conn=sqlite3.connect('$DB_PATH'); cur=conn.cursor(); cur.execute('PRAGMA journal_mode;'); print(cur.fetchone()[0]); conn.close()" 2>/dev/null || echo "unknown")
+      echo "SQLite DB       : ONLINE ($DB_PATH | journal_mode=$JMODE | sessions=$SESS_COUNT)"
+    else
+      echo "SQLite DB       : OFFLINE (Missing $DB_PATH)"
+    fi
+    USER_CHARS=$( [ -f "$USER_MD" ] && wc -m < "$USER_MD" | tr -d ' ' || echo "0" )
+    MEM_CHARS=$( [ -f "$MEM_MD" ] && wc -m < "$MEM_MD" | tr -d ' ' || echo "0" )
+    echo "Memory Usage    : USER.md (${USER_CHARS} chars) | MEMORY.md (${MEM_CHARS} chars)"
+    if [ -d "$SKILLS_DIR" ]; then
+      SKILL_COUNT=$(find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')
+      SKILL_NAMES=$(find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d -printf "%f, " | sed 's/, $//')
+      echo "Active Skills   : ${SKILL_COUNT} [${SKILL_NAMES}]"
+    else
+      echo "Active Skills   : 0"
+    fi
+    if [ -d "$STUDIOS_DIR" ]; then
+      STUDIO_COUNT=$(find "$STUDIOS_DIR" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')
+      STUDIO_NAMES=$(find "$STUDIOS_DIR" -mindepth 1 -maxdepth 1 -type d -printf "%f, " | sed 's/, $//')
+      echo "Active Studios  : ${STUDIO_COUNT} [${STUDIO_NAMES:-none}]"
+    else
+      echo "Active Studios  : 0"
+    fi
+    ;;
+  bootstrap)
+    echo "=== [1/4] USER.md ==="
+    [ -f "$USER_MD" ] && cat "$USER_MD" || echo "(empty)"
+    echo ""
+    echo "=== [2/4] MEMORY.md ==="
+    [ -f "$MEM_MD" ] && cat "$MEM_MD" || echo "(empty)"
+    echo ""
+    echo "=== [3/4] INSTALLED SKILLS ==="
+    [ -d "$SKILLS_DIR" ] && ls -1 "$SKILLS_DIR" || echo "(none)"
+    echo ""
+    echo "=== [4/4] ACTIVE STUDIOS ==="
+    [ -d "$STUDIOS_DIR" ] && ls -1 "$STUDIOS_DIR" || echo "(none)"
+    ;;
+  *)
+    echo "Usage: hermes-mem {status|bootstrap}"
+    exit 1
+    ;;
+esac

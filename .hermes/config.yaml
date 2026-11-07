@@ -1,0 +1,5 @@
+memory_enabled: true
+session_search_enabled: true
+skills:
+  auto_create: false
+  write_approval: true

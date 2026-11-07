@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+[ -f /.env.sh ] && source /.env.sh
+
+CMD="${1:-status}"
+MSG="${2:-Auto-sync workspace state}"
+
+if [ -z "${GITHUB_REPO_URL:-}" ]; then
+  echo "Error: GITHUB_REPO_URL is not set in /.env.sh" >&2
+  exit 1
+fi
+
+export GIT_TERMINAL_PROMPT=0
+
+case "$CMD" in
+  push)
+    mkdir -p /workspace/bin
+    cp -f /usr/local/bin/hermes-mem /workspace/bin/hermes-mem
+    cp -f /usr/local/bin/hermes-git-sync /workspace/bin/hermes-git-sync
+
+    cd /workspace
+    if [ ! -d "/workspace/.git" ]; then
+      git init -b main
+    fi
+
+    cat << 'GITEORES' > /workspace/.gitignore
+.env*
+*.env
+__pycache__/
+*.pyc
+.DS_Store
+GITEORES
+
+    for dir in /workspace/memory /workspace/studios /workspace/.hermes/sessions; do
+      mkdir -p "$dir"
+      if [ -z "$(ls -A "$dir" 2>/dev/null)" ]; then
+        touch "$dir/.gitkeep"
+      fi
+    done
+
+    find /workspace -mindepth 2 -name ".git" -type d -exec rm -rf {} + 2>/dev/null || true
+
+    git remote remove origin 2>/dev/null || true
+    git remote add origin "$GITHUB_REPO_URL"
+
+    git add .gitignore .hermes memory studios hermes-agent bin
+    if ! git diff --cached --quiet; then
+      git commit -m "$MSG"
+    fi
+    git branch -M main
+    git push -u origin main --force
+    echo "GitHub Sync Push : SUCCESS -> ${GITHUB_USER}/${GITHUB_REPO} (main)"
+    ;;
+  pull)
+    TMP_SYNC="/tmp/hermes-git-pull-$$"
+    rm -rf "$TMP_SYNC"
+    git clone --depth 1 --branch main "$GITHUB_REPO_URL" "$TMP_SYNC"
+    mkdir -p /workspace
+    rsync -a "$TMP_SYNC/" /workspace/
+    rm -rf "$TMP_SYNC"
+    if [ -d "/workspace/bin" ]; then
+      cp -f /workspace/bin/hermes-mem /usr/local/bin/hermes-mem 2>/dev/null || true
+      cp -f /workspace/bin/hermes-git-sync /usr/local/bin/hermes-git-sync 2>/dev/null || true
+      chmod +x /usr/local/bin/hermes-mem /usr/local/bin/hermes-git-sync 2>/dev/null || true
+    fi
+    mkdir -p /.agents
+    ln -sfn /workspace/.hermes/skills /.agents/skills
+    echo "GitHub Sync Pull : SUCCESS <- ${GITHUB_USER}/${GITHUB_REPO} (main)"
+    ;;
+  *)
+    echo "Usage: hermes-git-sync {push [msg]|pull}"
+    exit 1
+    ;;
+esac
