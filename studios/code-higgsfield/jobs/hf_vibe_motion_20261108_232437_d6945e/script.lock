@@ -1,0 +1,10 @@
+{
+  "sha256": "739fc5b879ebd7ab1afbaaf974562ac64968b915e78fac953c6c891e3dea964a",
+  "job_id": "hf_vibe_motion_20261108_232437_d6945e",
+  "script_path": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/script.json",
+  "shot_count": 5,
+  "duration_sec": 10.0,
+  "fps": 60,
+  "status": "LOCKED",
+  "locked_at": "2026-11-08T23:24:37Z"
+}

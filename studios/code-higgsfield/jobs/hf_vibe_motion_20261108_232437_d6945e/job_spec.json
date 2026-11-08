@@ -1,0 +1,39 @@
+{
+  "job_id": "hf_vibe_motion_20261108_232437_d6945e",
+  "job_dir": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e",
+  "status": "QA_ACCEPTED",
+  "created_at": "2026-11-08T23:24:37Z",
+  "studio_mode": "vibe_motion",
+  "prompt": "Launching Matcha Craft Cold Brew with 320% morning energy boost, zero sugar, and organic Kyoto leaves",
+  "title": "Launching Matcha Craft",
+  "aspect_ratio": "9:16",
+  "width": 1080,
+  "height": 1920,
+  "fps": 60,
+  "duration_sec": 10.0,
+  "total_frames": 600,
+  "palette_id": "wizardz_editorial_light",
+  "camera_preset": "dynamic_cinema",
+  "physics": {
+    "stiffness": 220.0,
+    "damping": 18.0
+  },
+  "script_lock_sha256": "739fc5b879ebd7ab1afbaaf974562ac64968b915e78fac953c6c891e3dea964a",
+  "artifacts": {
+    "script_json": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/script.json",
+    "script_lock": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/script.lock",
+    "story_mjs": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/shots/story.mjs",
+    "film_mjs": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/shots/film.mjs",
+    "render_job_mjs": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/shots/render_job.mjs",
+    "beatmap_json": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/audio/beatmap.json",
+    "narration_json": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/audio/narration_timing.json",
+    "master_audio_wav": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/audio/master_mix.wav",
+    "master_mp4": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/master_60fps.mp4",
+    "contact_sheet_png": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/qa/contact_sheet.png",
+    "qa_report_json": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/qa/qa_report.json"
+  },
+  "warnings": [],
+  "last_render_sec": 47.2,
+  "qa_verdict": "ACCEPT",
+  "qa_score": 98
+}

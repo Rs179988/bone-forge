@@ -1,8 +1,8 @@
 {
   "id": "higgsfield_obsidian_lime",
-  "name": "Higgsfield Obsidian & Acid Lime",
+  "name": "Obsidian Studio & Acid Lime (Dark)",
   "typography": {
-    "heading": "Inter",
+    "heading": "Space Grotesk",
     "mono": "JetBrains Mono"
   },
   "motion_physics": {
@@ -11,11 +11,17 @@
     "primary_curve": "backOut"
   },
   "palette": {
+    "theme_mode": "dark",
     "bg_primary": "#09090B",
     "bg_secondary": "#121318",
-    "accent_primary": "#D4FF00",
+    "accent_primary": "#B9FF66",
     "accent_secondary": "#00F5D4",
+    "alert_color": "#FF3366",
     "text_primary": "#F8FAFC",
+    "text_muted": "#94A3B8",
+    "surface_card": "#14161F",
+    "surface_dark": "#09090B",
+    "border_ink": "#B9FF00",
     "texture": "brushed_metal"
   }
 }

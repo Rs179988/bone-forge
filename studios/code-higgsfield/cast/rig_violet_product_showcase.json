@@ -1,0 +1,9 @@
+{
+  "id": "rig_violet_product_showcase",
+  "name": "Prism // Daylight Product Showcase Card",
+  "kind": "saas_3d_card",
+  "blurb": "High-contrast daylight & royal violet interactive UI showcase rig with smooth cursor choreography.",
+  "accent_color": "#7C3AED",
+  "default_stiffness": 200.0,
+  "default_damping": 20.0
+}

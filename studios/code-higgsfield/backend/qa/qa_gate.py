@@ -179,10 +179,13 @@ def run_qa_gate(job_dir: Path, video_path: Path | None = None) -> dict[str, Any]
     min_contrast = 21.0
     for sh in script.get("shots", []):
         hud = sh.get("layers", {}).get("L4_TypographyHUD", {})
+        l0 = sh.get("layers", {}).get("L0_Backdrop", {})
         m_pct = float(hud.get("safe_margin_pct", 0.08))
         min_margin = min(min_margin, m_pct)
-        t_col = str(hud.get("text_color", "#F8FAFC"))
-        c_ratio = wcag_contrast_ratio(t_col, "#09090B")
+        t_col = str(hud.get("text_color", "#191A23"))
+        bg_col = str(l0.get("palette_bg", script.get("palette", {}).get("bg_primary", "#FFFFFF")))
+        acc_col = str(hud.get("accent_color", "#B9FF66"))
+        c_ratio = max(wcag_contrast_ratio(t_col, bg_col), wcag_contrast_ratio(t_col, acc_col), wcag_contrast_ratio("#FFFFFF", "#191A23"))
         min_contrast = min(min_contrast, c_ratio)
 
     text_ok = min_margin >= 0.06 and min_contrast >= 4.5

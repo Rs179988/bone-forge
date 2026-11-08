@@ -2,22 +2,23 @@
   "job_id": "hf_flagship_demo_v1",
   "job_dir": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1",
   "status": "QA_ACCEPTED",
-  "created_at": "2026-11-08T21:33:06Z",
+  "created_at": "2026-11-08T23:20:24Z",
   "studio_mode": "vibe_motion",
-  "prompt": "Quantum Fintech & Cyber-Director Studio Engine launch with 3D glass telemetry cards, spring overshoot physics, and 99.8% frame accuracy.",
+  "prompt": "Navigating the digital landscape for success with search engine optimization, pay per click campaigns, social media marketing, and 240% organic traffic growth.",
+  "title": "Navigating Digital Landscape",
   "aspect_ratio": "9:16",
   "width": 1080,
   "height": 1920,
   "fps": 60,
   "duration_sec": 10.0,
   "total_frames": 600,
-  "palette_id": "higgsfield_obsidian_lime",
+  "palette_id": "wizardz_editorial_light",
   "camera_preset": "dynamic_cinema",
   "physics": {
     "stiffness": 220.0,
-    "damping": 17.0
+    "damping": 18.0
   },
-  "script_lock_sha256": "bcc6298620991ef7e9203543b69a939bd9d68a35927b6bb828a3e271246bfe93",
+  "script_lock_sha256": "c076f01dfbd2c788bd42612707d7bc7a348a63caf10b869973d28197021bd196",
   "artifacts": {
     "script_json": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/script.json",
     "script_lock": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/script.lock",
@@ -32,7 +33,7 @@
     "qa_report_json": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/qa/qa_report.json"
   },
   "warnings": [],
-  "last_render_sec": 75.59,
+  "last_render_sec": 49.36,
   "qa_verdict": "ACCEPT",
   "qa_score": 98
 }

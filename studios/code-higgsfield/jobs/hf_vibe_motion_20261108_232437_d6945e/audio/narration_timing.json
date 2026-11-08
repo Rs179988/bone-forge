@@ -1,0 +1,494 @@
+{
+  "job_id": "hf_vibe_motion_20261108_232437_d6945e",
+  "duration_sec": 10.0,
+  "fps": 60,
+  "master_mix_wav": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/audio/master_mix.wav",
+  "beatmap_json": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/audio/beatmap.json",
+  "sfx_events": [
+    {
+      "shot_id": "S1",
+      "type": "whoosh",
+      "time_sec": 0.08
+    },
+    {
+      "shot_id": "S2",
+      "type": "ui_pop",
+      "time_sec": 1.88
+    },
+    {
+      "shot_id": "S3",
+      "type": "mechanical_click",
+      "time_sec": 3.98
+    },
+    {
+      "shot_id": "S4",
+      "type": "bass_sub_drop",
+      "time_sec": 5.88
+    },
+    {
+      "shot_id": "S5",
+      "type": "tada",
+      "time_sec": 8.08
+    }
+  ],
+  "shots": [
+    {
+      "shot_id": "S1",
+      "in_sec": 0.0,
+      "out_sec": 1.8,
+      "spoken_line": "Here is how Launching Matcha Craft transforms the entire landscape.",
+      "word_count": 10,
+      "words_per_sec": 6.31,
+      "words": [
+        {
+          "word": "Here",
+          "index": 0,
+          "start_sec": 0.06,
+          "end_sec": 0.169,
+          "start_frame": 4,
+          "end_frame": 10
+        },
+        {
+          "word": "is",
+          "index": 1,
+          "start_sec": 0.169,
+          "end_sec": 0.224,
+          "start_frame": 10,
+          "end_frame": 13
+        },
+        {
+          "word": "how",
+          "index": 2,
+          "start_sec": 0.224,
+          "end_sec": 0.306,
+          "start_frame": 13,
+          "end_frame": 18
+        },
+        {
+          "word": "Launching",
+          "index": 3,
+          "start_sec": 0.306,
+          "end_sec": 0.552,
+          "start_frame": 18,
+          "end_frame": 33
+        },
+        {
+          "word": "Matcha",
+          "index": 4,
+          "start_sec": 0.552,
+          "end_sec": 0.715,
+          "start_frame": 33,
+          "end_frame": 43
+        },
+        {
+          "word": "Craft",
+          "index": 5,
+          "start_sec": 0.715,
+          "end_sec": 0.852,
+          "start_frame": 43,
+          "end_frame": 51
+        },
+        {
+          "word": "transforms",
+          "index": 6,
+          "start_sec": 0.852,
+          "end_sec": 1.125,
+          "start_frame": 51,
+          "end_frame": 68
+        },
+        {
+          "word": "the",
+          "index": 7,
+          "start_sec": 1.125,
+          "end_sec": 1.207,
+          "start_frame": 68,
+          "end_frame": 72
+        },
+        {
+          "word": "entire",
+          "index": 8,
+          "start_sec": 1.207,
+          "end_sec": 1.371,
+          "start_frame": 72,
+          "end_frame": 82
+        },
+        {
+          "word": "landscape.",
+          "index": 9,
+          "start_sec": 1.371,
+          "end_sec": 1.644,
+          "start_frame": 82,
+          "end_frame": 99
+        }
+      ]
+    },
+    {
+      "shot_id": "S2",
+      "in_sec": 1.8,
+      "out_sec": 3.9,
+      "spoken_line": "We focus on craft and cold with clean, unmistakable clarity.",
+      "word_count": 10,
+      "words_per_sec": 5.41,
+      "words": [
+        {
+          "word": "We",
+          "index": 0,
+          "start_sec": 1.86,
+          "end_sec": 1.932,
+          "start_frame": 112,
+          "end_frame": 116
+        },
+        {
+          "word": "focus",
+          "index": 1,
+          "start_sec": 1.932,
+          "end_sec": 2.114,
+          "start_frame": 116,
+          "end_frame": 127
+        },
+        {
+          "word": "on",
+          "index": 2,
+          "start_sec": 2.114,
+          "end_sec": 2.186,
+          "start_frame": 127,
+          "end_frame": 131
+        },
+        {
+          "word": "craft",
+          "index": 3,
+          "start_sec": 2.186,
+          "end_sec": 2.367,
+          "start_frame": 131,
+          "end_frame": 142
+        },
+        {
+          "word": "and",
+          "index": 4,
+          "start_sec": 2.367,
+          "end_sec": 2.476,
+          "start_frame": 142,
+          "end_frame": 149
+        },
+        {
+          "word": "cold",
+          "index": 5,
+          "start_sec": 2.476,
+          "end_sec": 2.621,
+          "start_frame": 149,
+          "end_frame": 157
+        },
+        {
+          "word": "with",
+          "index": 6,
+          "start_sec": 2.621,
+          "end_sec": 2.766,
+          "start_frame": 157,
+          "end_frame": 166
+        },
+        {
+          "word": "clean,",
+          "index": 7,
+          "start_sec": 2.766,
+          "end_sec": 2.983,
+          "start_frame": 166,
+          "end_frame": 179
+        },
+        {
+          "word": "unmistakable",
+          "index": 8,
+          "start_sec": 2.983,
+          "end_sec": 3.418,
+          "start_frame": 179,
+          "end_frame": 205
+        },
+        {
+          "word": "clarity.",
+          "index": 9,
+          "start_sec": 3.418,
+          "end_sec": 3.708,
+          "start_frame": 205,
+          "end_frame": 222
+        }
+      ]
+    },
+    {
+      "shot_id": "S3",
+      "in_sec": 3.9,
+      "out_sec": 5.8,
+      "spoken_line": "Every detail of craft is built for real measurable growth.",
+      "word_count": 10,
+      "words_per_sec": 5.98,
+      "words": [
+        {
+          "word": "Every",
+          "index": 0,
+          "start_sec": 3.96,
+          "end_sec": 4.131,
+          "start_frame": 238,
+          "end_frame": 248
+        },
+        {
+          "word": "detail",
+          "index": 1,
+          "start_sec": 4.131,
+          "end_sec": 4.335,
+          "start_frame": 248,
+          "end_frame": 260
+        },
+        {
+          "word": "of",
+          "index": 2,
+          "start_sec": 4.335,
+          "end_sec": 4.404,
+          "start_frame": 260,
+          "end_frame": 264
+        },
+        {
+          "word": "craft",
+          "index": 3,
+          "start_sec": 4.404,
+          "end_sec": 4.574,
+          "start_frame": 264,
+          "end_frame": 274
+        },
+        {
+          "word": "is",
+          "index": 4,
+          "start_sec": 4.574,
+          "end_sec": 4.642,
+          "start_frame": 274,
+          "end_frame": 279
+        },
+        {
+          "word": "built",
+          "index": 5,
+          "start_sec": 4.642,
+          "end_sec": 4.813,
+          "start_frame": 279,
+          "end_frame": 289
+        },
+        {
+          "word": "for",
+          "index": 6,
+          "start_sec": 4.813,
+          "end_sec": 4.915,
+          "start_frame": 289,
+          "end_frame": 295
+        },
+        {
+          "word": "real",
+          "index": 7,
+          "start_sec": 4.915,
+          "end_sec": 5.052,
+          "start_frame": 295,
+          "end_frame": 303
+        },
+        {
+          "word": "measurable",
+          "index": 8,
+          "start_sec": 5.052,
+          "end_sec": 5.393,
+          "start_frame": 303,
+          "end_frame": 324
+        },
+        {
+          "word": "growth.",
+          "index": 9,
+          "start_sec": 5.393,
+          "end_sec": 5.632,
+          "start_frame": 324,
+          "end_frame": 338
+        }
+      ]
+    },
+    {
+      "shot_id": "S4",
+      "in_sec": 5.8,
+      "out_sec": 8.0,
+      "spoken_line": "Watch how fast Launching Matcha Craft scales from concept to execution.",
+      "word_count": 11,
+      "words_per_sec": 5.68,
+      "words": [
+        {
+          "word": "Watch",
+          "index": 0,
+          "start_sec": 5.86,
+          "end_sec": 6.019,
+          "start_frame": 352,
+          "end_frame": 361
+        },
+        {
+          "word": "how",
+          "index": 1,
+          "start_sec": 6.019,
+          "end_sec": 6.114,
+          "start_frame": 361,
+          "end_frame": 367
+        },
+        {
+          "word": "fast",
+          "index": 2,
+          "start_sec": 6.114,
+          "end_sec": 6.241,
+          "start_frame": 367,
+          "end_frame": 374
+        },
+        {
+          "word": "Launching",
+          "index": 3,
+          "start_sec": 6.241,
+          "end_sec": 6.526,
+          "start_frame": 374,
+          "end_frame": 392
+        },
+        {
+          "word": "Matcha",
+          "index": 4,
+          "start_sec": 6.526,
+          "end_sec": 6.717,
+          "start_frame": 392,
+          "end_frame": 403
+        },
+        {
+          "word": "Craft",
+          "index": 5,
+          "start_sec": 6.717,
+          "end_sec": 6.876,
+          "start_frame": 403,
+          "end_frame": 413
+        },
+        {
+          "word": "scales",
+          "index": 6,
+          "start_sec": 6.876,
+          "end_sec": 7.066,
+          "start_frame": 413,
+          "end_frame": 424
+        },
+        {
+          "word": "from",
+          "index": 7,
+          "start_sec": 7.066,
+          "end_sec": 7.193,
+          "start_frame": 424,
+          "end_frame": 432
+        },
+        {
+          "word": "concept",
+          "index": 8,
+          "start_sec": 7.193,
+          "end_sec": 7.415,
+          "start_frame": 432,
+          "end_frame": 445
+        },
+        {
+          "word": "to",
+          "index": 9,
+          "start_sec": 7.415,
+          "end_sec": 7.479,
+          "start_frame": 445,
+          "end_frame": 449
+        },
+        {
+          "word": "execution.",
+          "index": 10,
+          "start_sec": 7.479,
+          "end_sec": 7.796,
+          "start_frame": 449,
+          "end_frame": 468
+        }
+      ]
+    },
+    {
+      "shot_id": "S5",
+      "in_sec": 8.0,
+      "out_sec": 10.0,
+      "spoken_line": "Let's make Launching Matcha Craft happen today with zero compromise.",
+      "word_count": 10,
+      "words_per_sec": 5.68,
+      "words": [
+        {
+          "word": "Let's",
+          "index": 0,
+          "start_sec": 8.06,
+          "end_sec": 8.209,
+          "start_frame": 484,
+          "end_frame": 493
+        },
+        {
+          "word": "make",
+          "index": 1,
+          "start_sec": 8.209,
+          "end_sec": 8.328,
+          "start_frame": 493,
+          "end_frame": 500
+        },
+        {
+          "word": "Launching",
+          "index": 2,
+          "start_sec": 8.328,
+          "end_sec": 8.597,
+          "start_frame": 500,
+          "end_frame": 516
+        },
+        {
+          "word": "Matcha",
+          "index": 3,
+          "start_sec": 8.597,
+          "end_sec": 8.776,
+          "start_frame": 516,
+          "end_frame": 527
+        },
+        {
+          "word": "Craft",
+          "index": 4,
+          "start_sec": 8.776,
+          "end_sec": 8.925,
+          "start_frame": 527,
+          "end_frame": 536
+        },
+        {
+          "word": "happen",
+          "index": 5,
+          "start_sec": 8.925,
+          "end_sec": 9.104,
+          "start_frame": 536,
+          "end_frame": 546
+        },
+        {
+          "word": "today",
+          "index": 6,
+          "start_sec": 9.104,
+          "end_sec": 9.253,
+          "start_frame": 546,
+          "end_frame": 555
+        },
+        {
+          "word": "with",
+          "index": 7,
+          "start_sec": 9.253,
+          "end_sec": 9.373,
+          "start_frame": 555,
+          "end_frame": 562
+        },
+        {
+          "word": "zero",
+          "index": 8,
+          "start_sec": 9.373,
+          "end_sec": 9.492,
+          "start_frame": 562,
+          "end_frame": 570
+        },
+        {
+          "word": "compromise.",
+          "index": 9,
+          "start_sec": 9.492,
+          "end_sec": 9.82,
+          "start_frame": 570,
+          "end_frame": 589
+        }
+      ]
+    }
+  ]
+}

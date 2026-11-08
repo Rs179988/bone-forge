@@ -1,0 +1,27 @@
+{
+  "id": "wizardz_editorial_light",
+  "name": "WizardZ Editorial Light & Acid Lime (Default)",
+  "typography": {
+    "heading": "Space Grotesk",
+    "mono": "JetBrains Mono"
+  },
+  "motion_physics": {
+    "stiffness": 220.0,
+    "damping": 18.0,
+    "primary_curve": "backOut"
+  },
+  "palette": {
+    "theme_mode": "light",
+    "bg_primary": "#FFFFFF",
+    "bg_secondary": "#F3F3F3",
+    "accent_primary": "#B9FF66",
+    "accent_secondary": "#191A23",
+    "alert_color": "#FF4D4D",
+    "text_primary": "#191A23",
+    "text_muted": "#595A66",
+    "surface_card": "#FFFFFF",
+    "surface_dark": "#191A23",
+    "border_ink": "#191A23",
+    "texture": "paper_a"
+  }
+}

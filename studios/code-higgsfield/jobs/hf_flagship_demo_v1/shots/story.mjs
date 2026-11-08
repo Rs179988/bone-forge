@@ -1,24 +1,27 @@
 // Auto-generated & Agent-Editable Story Timeline (story.mjs)
-// Job ID: hf_flagship_demo_v1 | Genre: vibe_motion_tech
+// Job ID: hf_flagship_demo_v1 | Genre: editorial_motion
 // Pure functions of time t (seconds) using Higgsfield pre-built curve primitives.
 
 import { clamp, lerp, smooth, easeIn, easeOut, easeInOut, backOut, ring, springDamper, keys, evaluateCurve } from '/backend/engine/core/curves.mjs';
 
 export const JOB_ID = "hf_flagship_demo_v1";
 export const PALETTE = {
-  "name": "Higgsfield Obsidian & Acid Lime",
-  "bg_primary": "#09090B",
-  "bg_secondary": "#121318",
-  "accent_primary": "#D4FF00",
-  "accent_secondary": "#00F5D4",
-  "alert_color": "#FF3366",
-  "text_primary": "#F8FAFC",
-  "text_muted": "#94A3B8",
-  "surface_glass": "rgba(24, 26, 34, 0.78)",
-  "texture": "brushed_metal"
+  "name": "WizardZ Editorial Light & Acid Lime",
+  "theme_mode": "light",
+  "bg_primary": "#FFFFFF",
+  "bg_secondary": "#F3F3F3",
+  "accent_primary": "#B9FF66",
+  "accent_secondary": "#191A23",
+  "alert_color": "#FF4D4D",
+  "text_primary": "#191A23",
+  "text_muted": "#595A66",
+  "surface_card": "#FFFFFF",
+  "surface_dark": "#191A23",
+  "border_ink": "#191A23",
+  "texture": "paper_a"
 };
-export const ENERGY_ENVELOPE = [0.356, 0.414, 0.329, 0.148, 0.354, 0.233, 0.377, 0.253, 0.369, 0.147, 0.539, 0.349, 0.432, 0.129, 0.333, 0.142, 0.364, 0.201, 0.328, 0.166, 0.314, 0.497, 0.394, 0.325, 0.27, 0.256, 0.275, 0.331, 0.269, 0.283, 0.42, 0.263, 0.391, 0.251, 0.095, 0.077, 0.169, 0.168, 0.26, 0.117, 0.382, 0.501, 0.273, 0.32, 0.273, 0.202, 0.325, 0.276, 0.244, 0.314, 0.351, 0.524, 0.408, 0.255, 0.321, 0.238, 0.196, 0.349, 0.212, 0.195, 0.423, 0.502, 0.449, 0.317, 0.176, 0.321, 0.305, 0.214, 0.342, 0.245, 0.457, 0.619, 0.29, 0.146, 0.127, 0.083, 0.165, 0.163, 0.162, 0.058, 0.428, 0.578, 0.42, 0.285, 0.241, 0.314, 0.213, 0.275, 0.235, 0.141, 0.346, 0.609, 0.408, 0.315, 0.184, 0.286, 0.23, 0.233, 0.311, 0.134, 0.426, 0.59, 0.336, 0.394, 0.153, 0.244, 0.245, 0.177, 0.297, 0.201, 0.311, 0.426, 0.51, 0.344, 0.165, 0.109, 0.155, 0.154, 0.497, 0.413, 0.387, 0.694, 0.277, 0.444, 0.278, 0.277, 0.318, 0.28, 0.34, 0.189, 0.366, 0.659, 0.455, 0.27, 0.305, 0.169, 0.302, 0.174, 0.312, 0.177, 0.339, 0.398, 0.415, 0.228, 0.315, 0.154, 0.265, 0.146, 0.296, 0.164, 0.297, 0.504, 0.362, 0.191, 0.154, 0.088, 0.154, 0.154, 0.148, 0.066, 0.723, 0.605, 0.449, 0.222, 0.356, 0.255, 0.353, 0.291, 0.326, 0.237, 0.545, 0.494, 0.408, 0.298, 0.175, 0.3, 0.158, 0.277, 0.225, 0.251, 0.593, 0.593, 0.451, 0.27, 0.319, 0.131, 0.225, 0.18, 0.221, 0.235, 0.503, 0.412, 0.406, 0.362, 0.131, 0.113, 0.154, 0.153, 0.151, 0.05];
-export const DROP_SEC = 8.0179;
+export const ENERGY_ENVELOPE = [0.257, 0.299, 0.276, 0.107, 0.141, 0.16, 0.268, 0.36, 0.296, 0.265, 0.388, 0.353, 0.218, 0.268, 0.101, 0.505, 0.365, 0.239, 0.327, 0.221, 0.359, 0.525, 0.229, 0.21, 0.15, 0.322, 0.104, 0.198, 0.117, 0.425, 0.282, 0.278, 0.257, 0.222, 0.161, 0.055, 0.122, 0.122, 0.207, 0.062, 0.315, 0.441, 0.218, 0.221, 0.34, 0.353, 0.475, 0.335, 0.219, 0.079, 0.257, 0.403, 0.311, 0.214, 0.191, 0.361, 0.468, 0.301, 0.164, 0.371, 0.336, 0.444, 0.284, 0.102, 0.13, 0.172, 0.376, 0.117, 0.116, 0.257, 0.464, 0.493, 0.306, 0.254, 0.409, 0.151, 0.123, 0.12, 0.12, 0.043, 0.375, 0.561, 0.353, 0.109, 0.132, 0.098, 0.134, 0.308, 0.385, 0.35, 0.305, 0.523, 0.35, 0.16, 0.341, 0.109, 0.123, 0.125, 0.114, 0.126, 0.45, 0.505, 0.358, 0.271, 0.119, 0.207, 0.169, 0.163, 0.118, 0.136, 0.248, 0.36, 0.372, 0.257, 0.15, 0.084, 0.12, 0.119, 0.481, 0.398, 0.365, 0.801, 0.212, 0.38, 0.353, 0.368, 0.361, 0.18, 0.167, 0.35, 0.31, 0.476, 0.386, 0.289, 0.192, 0.097, 0.218, 0.282, 0.283, 0.18, 0.203, 0.402, 0.373, 0.186, 0.129, 0.149, 0.13, 0.123, 0.111, 0.052, 0.169, 0.559, 0.275, 0.117, 0.093, 0.072, 0.122, 0.122, 0.117, 0.052, 0.573, 0.481, 0.419, 0.206, 0.222, 0.246, 0.385, 0.281, 0.262, 0.143, 0.469, 0.363, 0.331, 0.172, 0.289, 0.253, 0.113, 0.121, 0.344, 0.236, 0.38, 0.494, 0.351, 0.264, 0.237, 0.073, 0.162, 0.187, 0.2, 0.092, 0.464, 0.414, 0.323, 0.205, 0.107, 0.297, 0.203, 0.202, 0.184, 0.04];
+export const DROP_SEC = 4.0166;
 
 export const SHOT_SPECS = [
   {
@@ -32,53 +35,65 @@ export const SHOT_SPECS = [
     "subject": "hero_primary_angle_1",
     "camera_move": "dolly_in",
     "primary_curve": "backOut",
-    "spoken_line": "Look closely at Quantum. Every frame is engineered with zero latency.",
+    "spoken_line": "Navigating the digital landscape for success.",
     "sfx_trigger": {
       "type": "whoosh",
       "offset_sec": 0.08
     },
     "layers": {
       "L0_Backdrop": {
-        "palette_bg": "#09090B",
-        "palette_secondary": "#121318",
-        "texture": "brushed_metal",
-        "ray_intensity": 0.35
+        "theme_mode": "light",
+        "palette_bg": "#FFFFFF",
+        "palette_secondary": "#F3F3F3",
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23",
+        "texture": "paper_a",
+        "ray_intensity": 0.28
       },
       "L1_Environment": {
-        "grid_mode": "perspective_vault",
+        "grid_mode": "editorial_dots",
         "parallax_depth": 1.0,
-        "accent_color": "#00F5D4"
+        "accent_color": "#191A23",
+        "highlight_color": "#B9FF66"
       },
       "L2_HeroSubject": {
         "cast_id": "hero_primary",
         "kind": "saas_3d_card",
+        "card_variant": "white",
         "pose_mode": "establish_rise",
-        "metric_value": 128.4,
-        "metric_unit": "MS",
+        "card_title": "NAVIGATING DIGITAL LANDSCAPE SUCCE",
+        "metric_value": 240.0,
+        "metric_unit": "%",
+        "metric_label": "NAVIGATING DIGITAL IMPACT",
         "stiffness": 220.0,
-        "damping": 17.0,
-        "accent_color": "#D4FF00"
+        "damping": 18.0,
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23"
       },
       "L3_MotionProps": {
         "through_line_id": "telemetry_orb",
         "through_line_state": 0,
         "cursor_active": false,
         "floating_badges": [
-          "QUANTUM",
-          "SHOT 01 // WIDE"
-        ]
+          "NAVIGATING",
+          "01 // DIGITAL"
+        ],
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23"
       },
       "L4_TypographyHUD": {
-        "headline": "QUANTUM // ZERO SLOP",
-        "sub_caption": "Look closely at Quantum. Every frame is engineered with zero latency.",
+        "headline": "NAVIGATING DIGITAL LANDSCAPE SUCCE",
+        "sub_caption": "Navigating the digital landscape for success.",
         "safe_margin_pct": 0.08,
-        "text_color": "#F8FAFC",
-        "accent_color": "#D4FF00",
-        "badge_tag": "S1 \u2022 WIDE \u2022 DOLLY_IN"
+        "theme_mode": "light",
+        "text_color": "#191A23",
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23",
+        "badge_tag": "01 \u2022 NAVIGATING"
       },
       "L5_PostFX": {
-        "bloom_intensity": 0.42,
-        "vignette": 0.22,
+        "bloom_intensity": 0.18,
+        "vignette": 0.06,
         "chromatic_aberration": 0.001,
         "beat_flash": true
       }
@@ -95,53 +110,65 @@ export const SHOT_SPECS = [
     "subject": "hero_primary_angle_2",
     "camera_move": "orbital_arc",
     "primary_curve": "ring",
-    "spoken_line": "Inside the middle layer, deterministic curves lock motion to the exact millisecond.",
+    "spoken_line": "search engine optimization.",
     "sfx_trigger": {
       "type": "ui_pop",
       "offset_sec": 0.08
     },
     "layers": {
       "L0_Backdrop": {
-        "palette_bg": "#09090B",
-        "palette_secondary": "#121318",
-        "texture": "brushed_metal",
-        "ray_intensity": 0.47
+        "theme_mode": "light",
+        "palette_bg": "#FFFFFF",
+        "palette_secondary": "#F3F3F3",
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23",
+        "texture": "paper_a",
+        "ray_intensity": 0.36
       },
       "L1_Environment": {
-        "grid_mode": "radial_matrix",
-        "parallax_depth": 1.35,
-        "accent_color": "#00F5D4"
+        "grid_mode": "editorial_dots",
+        "parallax_depth": 1.28,
+        "accent_color": "#191A23",
+        "highlight_color": "#B9FF66"
       },
       "L2_HeroSubject": {
         "cast_id": "hero_primary",
-        "kind": "character_rig",
+        "kind": "saas_3d_card",
+        "card_variant": "dark",
         "pose_mode": "close_inspect",
-        "metric_value": 492.0,
-        "metric_unit": "FPS",
-        "stiffness": 310.0,
-        "damping": 14.0,
-        "accent_color": "#00FF66"
+        "card_title": "SEARCH ENGINE OPTIMIZATION",
+        "metric_value": 240.0,
+        "metric_unit": "%",
+        "metric_label": "LANDSCAPE SUCCESS IMPACT",
+        "stiffness": 220.0,
+        "damping": 18.0,
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23"
       },
       "L3_MotionProps": {
         "through_line_id": "telemetry_orb",
         "through_line_state": 1,
         "cursor_active": true,
         "floating_badges": [
-          "FINTECH",
-          "SHOT 02 // CU"
-        ]
+          "LANDSCAPE",
+          "02 // SUCCESS"
+        ],
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23"
       },
       "L4_TypographyHUD": {
-        "headline": "SPRING LOCKED: 220 N/m",
-        "sub_caption": "Inside the middle layer, deterministic curves lock motion to the exact millisecond.",
+        "headline": "SEARCH ENGINE OPTIMIZATION",
+        "sub_caption": "search engine optimization.",
         "safe_margin_pct": 0.08,
-        "text_color": "#F8FAFC",
-        "accent_color": "#00FF66",
-        "badge_tag": "S2 \u2022 CU \u2022 ORBITAL_ARC"
+        "theme_mode": "light",
+        "text_color": "#191A23",
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23",
+        "badge_tag": "02 \u2022 DIGITAL"
       },
       "L5_PostFX": {
-        "bloom_intensity": 0.42,
-        "vignette": 0.22,
+        "bloom_intensity": 0.18,
+        "vignette": 0.06,
         "chromatic_aberration": 0.001,
         "beat_flash": false
       }
@@ -158,53 +185,65 @@ export const SHOT_SPECS = [
     "subject": "hero_primary_angle_3",
     "camera_move": "macro_rack_focus",
     "primary_curve": "springDamper",
-    "spoken_line": "Watch the real-time telemetry spike past ninety-nine point eight percent precision.",
+    "spoken_line": "pay per click campaigns.",
     "sfx_trigger": {
       "type": "mechanical_click",
       "offset_sec": 0.08
     },
     "layers": {
       "L0_Backdrop": {
-        "palette_bg": "#09090B",
-        "palette_secondary": "#121318",
-        "texture": "brushed_metal",
-        "ray_intensity": 0.59
+        "theme_mode": "light",
+        "palette_bg": "#FFFFFF",
+        "palette_secondary": "#F3F3F3",
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23",
+        "texture": "paper_a",
+        "ray_intensity": 0.44
       },
       "L1_Environment": {
-        "grid_mode": "perspective_vault",
-        "parallax_depth": 1.7,
-        "accent_color": "#00F5D4"
+        "grid_mode": "editorial_dots",
+        "parallax_depth": 1.56,
+        "accent_color": "#191A23",
+        "highlight_color": "#B9FF66"
       },
       "L2_HeroSubject": {
         "cast_id": "hero_primary",
         "kind": "saas_3d_card",
+        "card_variant": "lime",
         "pose_mode": "macro_pulse",
-        "metric_value": 99.8,
+        "card_title": "PAY PER CLICK",
+        "metric_value": 99.4,
         "metric_unit": "%",
+        "metric_label": "SEARCH ENGINE IMPACT",
         "stiffness": 220.0,
-        "damping": 17.0,
-        "accent_color": "#00F5D4"
+        "damping": 18.0,
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23"
       },
       "L3_MotionProps": {
         "through_line_id": "telemetry_orb",
         "through_line_state": 2,
         "cursor_active": true,
         "floating_badges": [
-          "CYBER-DIRECTOR",
-          "SHOT 03 // DETAIL"
-        ]
+          "SEARCH",
+          "03 // ENGINE"
+        ],
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23"
       },
       "L4_TypographyHUD": {
-        "headline": "99.8% FRAME ACCURACY",
-        "sub_caption": "Watch the real-time telemetry spike past ninety-nine point eight percent precision.",
+        "headline": "PAY PER CLICK",
+        "sub_caption": "pay per click campaigns.",
         "safe_margin_pct": 0.08,
-        "text_color": "#F8FAFC",
-        "accent_color": "#D4FF00",
-        "badge_tag": "S3 \u2022 DETAIL \u2022 MACRO_RACK_FOCUS"
+        "theme_mode": "light",
+        "text_color": "#191A23",
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23",
+        "badge_tag": "03 \u2022 LANDSCAPE"
       },
       "L5_PostFX": {
-        "bloom_intensity": 0.42,
-        "vignette": 0.22,
+        "bloom_intensity": 0.18,
+        "vignette": 0.06,
         "chromatic_aberration": 0.001,
         "beat_flash": false
       }
@@ -221,54 +260,66 @@ export const SHOT_SPECS = [
     "subject": "hero_primary_angle_4",
     "camera_move": "whip_pan",
     "primary_curve": "backOut",
-    "spoken_line": "Click any isolated layer to patch physics, lighting, or typography on the fly.",
+    "spoken_line": "social media marketing.",
     "sfx_trigger": {
       "type": "bass_sub_drop",
       "offset_sec": 0.08
     },
     "layers": {
       "L0_Backdrop": {
-        "palette_bg": "#09090B",
-        "palette_secondary": "#121318",
-        "texture": "brushed_metal",
-        "ray_intensity": 0.35
+        "theme_mode": "light",
+        "palette_bg": "#FFFFFF",
+        "palette_secondary": "#F3F3F3",
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23",
+        "texture": "paper_a",
+        "ray_intensity": 0.28
       },
       "L1_Environment": {
-        "grid_mode": "radial_matrix",
-        "parallax_depth": 2.05,
-        "accent_color": "#00F5D4"
+        "grid_mode": "editorial_dots",
+        "parallax_depth": 1.84,
+        "accent_color": "#191A23",
+        "highlight_color": "#B9FF66"
       },
       "L2_HeroSubject": {
         "cast_id": "hero_primary",
         "kind": "saas_3d_card",
+        "card_variant": "white",
         "pose_mode": "action_turn",
-        "metric_value": 1024.0,
-        "metric_unit": "OPS",
+        "card_title": "SOCIAL MEDIA MARKETING",
+        "metric_value": 50.0,
+        "metric_unit": "+",
+        "metric_label": "OPTIMIZATION PAY IMPACT",
         "stiffness": 220.0,
-        "damping": 17.0,
-        "accent_color": "#D4FF00"
+        "damping": 18.0,
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23"
       },
       "L3_MotionProps": {
         "through_line_id": "telemetry_orb",
         "through_line_state": 3,
         "cursor_active": true,
         "floating_badges": [
-          "STUDIO",
-          "SHOT 04 // MEDIUM"
-        ]
+          "OPTIMIZATION",
+          "04 // PAY"
+        ],
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23"
       },
       "L4_TypographyHUD": {
-        "headline": "6-LAYER SURGICAL AST",
-        "sub_caption": "Click any isolated layer to patch physics, lighting, or typography on the fly.",
+        "headline": "SOCIAL MEDIA MARKETING",
+        "sub_caption": "social media marketing.",
         "safe_margin_pct": 0.08,
-        "text_color": "#F8FAFC",
-        "accent_color": "#D4FF00",
-        "badge_tag": "S4 \u2022 MEDIUM \u2022 WHIP_PAN"
+        "theme_mode": "light",
+        "text_color": "#191A23",
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23",
+        "badge_tag": "04 \u2022 SUCCESS"
       },
       "L5_PostFX": {
-        "bloom_intensity": 0.58,
-        "vignette": 0.22,
-        "chromatic_aberration": 0.0025,
+        "bloom_intensity": 0.18,
+        "vignette": 0.06,
+        "chromatic_aberration": 0.001,
         "beat_flash": true
       }
     }
@@ -284,54 +335,65 @@ export const SHOT_SPECS = [
     "subject": "hero_primary_angle_5",
     "camera_move": "dutch_tilt",
     "primary_curve": "easeInOut",
-    "spoken_line": "Code Higgsfield Studio. Pure procedural cinema at sixty frames per second.",
+    "spoken_line": "240% organic traffic growth.",
     "sfx_trigger": {
       "type": "tada",
       "offset_sec": 0.08
     },
     "layers": {
       "L0_Backdrop": {
-        "palette_bg": "#09090B",
-        "palette_secondary": "#121318",
-        "texture": "brushed_metal",
-        "ray_intensity": 0.47,
-        "accent_color": "#00FF66"
+        "theme_mode": "light",
+        "palette_bg": "#FFFFFF",
+        "palette_secondary": "#F3F3F3",
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23",
+        "texture": "paper_a",
+        "ray_intensity": 0.36
       },
       "L1_Environment": {
-        "grid_mode": "perspective_vault",
-        "parallax_depth": 2.4,
-        "accent_color": "#00F5D4"
+        "grid_mode": "editorial_dots",
+        "parallax_depth": 2.12,
+        "accent_color": "#191A23",
+        "highlight_color": "#B9FF66"
       },
       "L2_HeroSubject": {
         "cast_id": "hero_primary",
         "kind": "saas_3d_card",
+        "card_variant": "dark",
         "pose_mode": "hero_lock",
-        "metric_value": 60.0,
-        "metric_unit": "FPS",
+        "card_title": "NAVIGATING DIGITAL // NEXT LEVEL",
+        "metric_value": 100.0,
+        "metric_unit": "%",
+        "metric_label": "PER CLICK IMPACT",
         "stiffness": 220.0,
-        "damping": 17.0,
-        "accent_color": "#D4FF00"
+        "damping": 18.0,
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23"
       },
       "L3_MotionProps": {
         "through_line_id": "telemetry_orb",
         "through_line_state": 4,
         "cursor_active": false,
         "floating_badges": [
-          "ENGINE",
-          "SHOT 05 // OTS"
-        ]
+          "PER",
+          "05 // CLICK"
+        ],
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23"
       },
       "L4_TypographyHUD": {
-        "headline": "CODE-HIGGSFIELD // 9:16",
-        "sub_caption": "Code Higgsfield Studio. Pure procedural cinema at sixty frames per second.",
+        "headline": "NAVIGATING DIGITAL // NEXT LEVEL",
+        "sub_caption": "240% organic traffic growth.",
         "safe_margin_pct": 0.08,
-        "text_color": "#F8FAFC",
-        "accent_color": "#D4FF00",
-        "badge_tag": "S5 \u2022 OTS \u2022 DUTCH_TILT"
+        "theme_mode": "light",
+        "text_color": "#191A23",
+        "accent_color": "#B9FF66",
+        "ink_color": "#191A23",
+        "badge_tag": "05 \u2022 SEARCH"
       },
       "L5_PostFX": {
-        "bloom_intensity": 0.42,
-        "vignette": 0.22,
+        "bloom_intensity": 0.18,
+        "vignette": 0.06,
         "chromatic_aberration": 0.001,
         "beat_flash": false
       }

@@ -84,46 +84,76 @@ def synthesize_shot_tts(
     use_cloud_tts: bool = True,
     seed: int = 1,
 ) -> np.ndarray:
-    if use_cloud_tts and HAS_GENAI and text.strip():
-        try:
-            client = genai.Client(http_options=types.HttpOptions(api_version="v1alpha", timeout=15000))
-            resp = client.models.generate_content(
-                model="gemini-2.5-flash-preview-tts",
-                contents=f"Read in a crisp, energetic, authoritative studio director voice: {text}",
-                config={"response_modalities": ["AUDIO"]},
-            )
-            pcm_bytes = resp.candidates[0].content.parts[0].inline_data.data
-            raw_24k = out_wav.with_suffix(".24k.wav")
-            with wave.open(str(raw_24k), "wb") as wf:
-                wf.setnchannels(1)
-                wf.setsampwidth(2)
-                wf.setframerate(24000)
-                wf.writeframes(pcm_bytes)
+    import base64
+    import urllib.request
 
-            subprocess.run(
-                [
-                    "ffmpeg",
-                    "-y",
-                    "-v",
-                    "error",
-                    "-i",
-                    str(raw_24k),
-                    "-af",
-                    f"atempo=1.12,apad=pad_dur={max_dur:.3f}",
-                    "-t",
-                    f"{max_dur * 0.92:.3f}",
-                    "-ar",
-                    str(SR),
-                    "-ac",
-                    "2",
-                    str(out_wav),
-                ],
-                check=True,
-            )
-            raw_24k.unlink(missing_ok=True)
-            return load_wav_stereo_48k(out_wav)
-        except Exception:
-            pass
+    if use_cloud_tts and text.strip():
+        for tts_model in ("gemini-3.8-flash-tts", "gemini-3.8-flash-lite-tts"):
+            try:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{tts_model}:generateContent"
+                payload = json.dumps(
+                    {
+                        "contents": [{"parts": [{"text": text.strip()}]}],
+                        "generationConfig": {
+                            "responseModalities": ["AUDIO"],
+                            "speechConfig": {
+                                "voiceConfig": {"prebuiltVoiceConfig": {"voiceName": "Kore"}}
+                            },
+                        },
+                    }
+                ).encode("utf-8")
+                req = urllib.request.Request(
+                    url,
+                    data=payload,
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                )
+                with urllib.request.urlopen(req, timeout=7) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                inline = (
+                    data.get("candidates", [{}])[0]
+                    .get("content", {})
+                    .get("parts", [{}])[0]
+                    .get("inlineData", {})
+                )
+                b64_data = inline.get("data", "")
+                mime_type = str(inline.get("mimeType", "")).lower()
+                if b64_data:
+                    raw_bytes = base64.b64decode(b64_data)
+                    raw_tmp = out_wav.with_suffix(".raw_tts.wav")
+                    if "wav" in mime_type:
+                        raw_tmp.write_bytes(raw_bytes)
+                    else:
+                        with wave.open(str(raw_tmp), "wb") as wf:
+                            wf.setnchannels(1)
+                            wf.setsampwidth(2)
+                            wf.setframerate(24000)
+                            wf.writeframes(raw_bytes)
+
+                    subprocess.run(
+                        [
+                            "ffmpeg",
+                            "-y",
+                            "-v",
+                            "error",
+                            "-i",
+                            str(raw_tmp),
+                            "-af",
+                            f"atempo=1.15,apad=pad_dur={max_dur:.3f}",
+                            "-t",
+                            f"{max_dur * 0.92:.3f}",
+                            "-ar",
+                            str(SR),
+                            "-ac",
+                            "2",
+                            str(out_wav),
+                        ],
+                        check=True,
+                    )
+                    raw_tmp.unlink(missing_ok=True)
+                    return load_wav_stereo_48k(out_wav)
+            except Exception:
+                continue
 
     audio = synthesize_vocal_cadence_fallback(text, max_dur * 0.86, seed=seed)
     save_wav_stereo(out_wav, audio, sr=SR)
@@ -132,7 +162,7 @@ def synthesize_shot_tts(
 
 def build_job_audio_pipeline(
     job_dir: Path,
-    use_cloud_tts: bool = False,
+    use_cloud_tts: bool = True,
 ) -> dict[str, Any]:
     """
     Build the complete audio-first timing & stems for a job:

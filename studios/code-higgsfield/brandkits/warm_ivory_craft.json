@@ -1,0 +1,27 @@
+{
+  "id": "warm_ivory_craft",
+  "name": "Warm Ivory & Tactile Coral Craft",
+  "typography": {
+    "heading": "Space Grotesk",
+    "mono": "JetBrains Mono"
+  },
+  "motion_physics": {
+    "stiffness": 235.0,
+    "damping": 16.0,
+    "primary_curve": "ring"
+  },
+  "palette": {
+    "theme_mode": "light",
+    "bg_primary": "#FFFDF9",
+    "bg_secondary": "#F5EFE6",
+    "accent_primary": "#FF6B4A",
+    "accent_secondary": "#10B981",
+    "alert_color": "#EF4444",
+    "text_primary": "#1C1917",
+    "text_muted": "#57534E",
+    "surface_card": "#FFFFFF",
+    "surface_dark": "#1C1917",
+    "border_ink": "#1C1917",
+    "texture": "felt_a"
+  }
+}

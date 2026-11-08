@@ -176,22 +176,23 @@ def dispatch_mcp_tool(name: str, args: dict[str, Any]) -> dict[str, Any]:
 
     if name == "higgsfield_compile_brief":
         spec = compile_brief_to_job(
-            prompt=str(args.get("prompt", "Quantum Fintech Engine Launch")),
+            prompt=str(args.get("prompt", "Navigating the digital landscape for growth with clean editorial design and real results")),
             studio_mode=str(args.get("studio_mode", "vibe_motion")),
             aspect_ratio=str(args.get("aspect_ratio", "9:16")),
             duration_sec=float(args.get("duration_sec", 10.0)),
             fps=int(args.get("fps", 60)),
-            palette_id=str(args.get("palette_id", "higgsfield_obsidian_lime")),
+            palette_id=str(args.get("palette_id", "wizardz_editorial_light")),
             camera_preset=str(args.get("camera_preset", "dynamic_cinema")),
-            stiffness=float(args.get("stiffness", 210.0)),
+            stiffness=float(args.get("stiffness", 220.0)),
             damping=float(args.get("damping", 18.0)),
             brandkit_id=args.get("brandkit_id"),
             cast_ids=args.get("cast_ids"),
             katana_blueprint=args.get("katana_blueprint"),
             job_id=args.get("job_id"),
+            custom_shots=args.get("custom_shots"),
         )
         job_dir = Path(spec["job_dir"])
-        audio_info = build_job_audio_pipeline(job_dir, use_cloud_tts=bool(args.get("use_cloud_tts", False)))
+        audio_info = build_job_audio_pipeline(job_dir, use_cloud_tts=bool(args.get("use_cloud_tts", True)))
         scene_files = generate_3file_scene_graph(job_dir)
         return {
             "tool": name,

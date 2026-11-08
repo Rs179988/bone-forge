@@ -1,5 +1,10 @@
 {
-  "sha256": "bcc6298620991ef7e9203543b69a939bd9d68a35927b6bb828a3e271246bfe93",
-  "status": "PATCH_LOCKED",
-  "patched_shot": "S5"
+  "sha256": "c076f01dfbd2c788bd42612707d7bc7a348a63caf10b869973d28197021bd196",
+  "job_id": "hf_flagship_demo_v1",
+  "script_path": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/script.json",
+  "shot_count": 5,
+  "duration_sec": 10.0,
+  "fps": 60,
+  "status": "LOCKED",
+  "locked_at": "2026-11-08T23:20:24Z"
 }

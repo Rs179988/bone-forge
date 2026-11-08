@@ -1,0 +1,43 @@
+{
+  "job_id": "hf_vibe_motion_20261108_232437_d6945e",
+  "video_path": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/master_60fps.mp4",
+  "contact_sheet_png": "/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/qa/contact_sheet.png",
+  "verdict": "ACCEPT",
+  "overall_passed": true,
+  "score_100": 98,
+  "gates": {
+    "1_integrity_and_spec": {
+      "passed": true,
+      "width": 1080,
+      "height": 1920,
+      "fps": 60.0,
+      "duration_sec": 10.0,
+      "nb_frames": 600,
+      "pix_fmt": "yuv420p",
+      "audio_present": true
+    },
+    "2_holds_and_density": {
+      "passed": true,
+      "freeze_count": 0,
+      "black_frame_spans": 0,
+      "shot_density_per_10s": 5.0
+    },
+    "3_hook_and_motion": {
+      "passed": true,
+      "first_0_5s_motion_score": 1.413,
+      "mean_frame_diff": 1.174,
+      "max_cut_diff": 52.62
+    },
+    "4_text_and_wcag": {
+      "passed": true,
+      "min_safe_margin_pct": 8.0,
+      "min_wcag_contrast": 17.31
+    },
+    "5_sound_ebur128": {
+      "passed": true,
+      "integrated_lufs": -13.3,
+      "true_peak_dbfs": -1.2
+    }
+  },
+  "flags": []
+}

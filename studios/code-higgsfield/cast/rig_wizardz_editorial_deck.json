@@ -1,0 +1,9 @@
+{
+  "id": "rig_wizardz_editorial_deck",
+  "name": "WizardZ // Neo-Brutalist Editorial Deck",
+  "kind": "saas_3d_card",
+  "blurb": "Crisp white & charcoal neo-brutalist card rig with #B9FF66 lime highlight pills, live metric odometer, and vector megaphone/starburst geometry.",
+  "accent_color": "#B9FF66",
+  "default_stiffness": 220.0,
+  "default_damping": 18.0
+}

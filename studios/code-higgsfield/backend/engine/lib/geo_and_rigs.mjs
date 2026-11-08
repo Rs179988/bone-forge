@@ -1,22 +1,34 @@
 /**
- * Layer 2C: Pre-Built Procedural Component Kit, 3D UI Cards & 2.5D Character Rigs
+ * Layer 2C: Pre-Built Procedural Component Kit, Neo-Brutalist Editorial Cards & 2.5D Character Rigs
  * Implements the 6 Isolated Studio Layers:
  *   L0_Backdrop, L1_Environment, L2_HeroSubject, L3_MotionProps, L4_TypographyHUD, L5_PostFX
+ * First-class support for WizardZ Editorial Light (#FFFFFF, #F3F3F3, #191A23, #B9FF66),
+ * Royal Violet Daylight, Warm Ivory Craft, and Obsidian Dark themes.
  */
 
-import { clamp, lerp, smooth, easeOut, easeInOut, backOut, ring, springDamper, evaluateCurve } from '../core/curves.mjs';
-import { CameraRig } from '../core/camera.mjs';
+import { clamp, lerp, smooth, easeOut, easeInOut, backOut, ring, springDamper } from '../core/curves.mjs';
 
 function hexToRgba(hex, alpha = 1.0) {
-  if (!hex || typeof hex !== 'string') return `rgba(212, 255, 0, ${alpha})`;
+  if (!hex || typeof hex !== 'string') return `rgba(185, 255, 102, ${alpha})`;
   if (hex.startsWith('rgba') || hex.startsWith('rgb')) return hex;
   const clean = hex.replace('#', '');
   const full = clean.length === 3 ? clean.split('').map((c) => c + c).join('') : clean;
-  const num = parseInt(full, 16) || 0xd4ff00;
+  const num = parseInt(full, 16) || 0xb9ff66;
   const r = (num >> 16) & 255;
   const g = (num >> 8) & 255;
   const b = num & 255;
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function isLightHex(hex) {
+  if (!hex || typeof hex !== 'string' || !hex.startsWith('#')) return true;
+  const clean = hex.replace('#', '');
+  const full = clean.length === 3 ? clean.split('').map((c) => c + c).join('') : clean;
+  const num = parseInt(full, 16) || 0xffffff;
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  return (0.299 * r + 0.587 * g + 0.114 * b) > 150;
 }
 
 function roundRectPath(ctx, x, y, w, h, r) {
@@ -30,356 +42,351 @@ function roundRectPath(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
+function drawFourPointStar(ctx, cx, cy, outerR, innerR, fillStyle, strokeStyle = null, rot = 0) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(rot);
+  ctx.beginPath();
+  for (let i = 0; i < 8; i++) {
+    const r = i % 2 === 0 ? outerR : innerR;
+    const ang = (i * Math.PI) / 4;
+    const px = Math.cos(ang) * r;
+    const py = Math.sin(ang) * r;
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.fillStyle = fillStyle;
+  ctx.fill();
+  if (strokeStyle) {
+    ctx.strokeStyle = strokeStyle;
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 /**
- * L0_Backdrop: Deep obsidian/studio atmosphere, volumetric god-rays & procedural surface grain
+ * L0_Backdrop: Editorial Light Paper / Pastel Daylight OR Obsidian Studio Atmosphere
  */
 export function renderL0Backdrop(ctx, W, H, layerProps = {}, tGlobal = 0, tLocal = 0) {
   ctx.save();
-  const bg1 = layerProps.palette_bg || '#09090B';
-  const bg2 = layerProps.palette_secondary || '#121318';
-  const accent = layerProps.accent_color || '#D4FF00';
-  const rayIntensity = layerProps.ray_intensity ?? 0.42;
+  const bg1 = layerProps.palette_bg || '#FFFFFF';
+  const bg2 = layerProps.palette_secondary || '#F3F3F3';
+  const accent = layerProps.accent_color || '#B9FF66';
+  const ink = layerProps.ink_color || '#191A23';
+  const isLight = isLightHex(bg1);
 
-  const grad = ctx.createLinearGradient(0, 0, W * 0.35, H);
+  const grad = ctx.createLinearGradient(0, 0, W, H);
   grad.addColorStop(0, bg1);
   grad.addColorStop(0.55, bg2);
   grad.addColorStop(1, bg1);
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
-  // Volumetric atmospheric glow core
-  const cx = W * (0.5 + 0.08 * Math.sin(tGlobal * 0.9));
-  const cy = H * (0.42 + 0.05 * Math.cos(tGlobal * 0.7));
-  const radGrad = ctx.createRadialGradient(cx, cy, W * 0.04, cx, cy, W * 0.85);
-  radGrad.addColorStop(0, hexToRgba(accent, 0.22 * rayIntensity));
-  radGrad.addColorStop(0.45, hexToRgba('#38BDF8', 0.09 * rayIntensity));
-  radGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-  ctx.fillStyle = radGrad;
-  ctx.fillRect(0, 0, W, H);
+  if (isLight) {
+    // Soft editorial lime/violet ambient wash + clean diagonal geometric rings (like WizardZ reference)
+    const cx = W * (0.68 + 0.05 * Math.sin(tGlobal * 0.9));
+    const cy = H * (0.34 + 0.04 * Math.cos(tGlobal * 0.7));
+    const radGrad = ctx.createRadialGradient(cx, cy, W * 0.02, cx, cy, W * 0.55);
+    radGrad.addColorStop(0, hexToRgba(accent, 0.32));
+    radGrad.addColorStop(0.6, hexToRgba(accent, 0.08));
+    radGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = radGrad;
+    ctx.fillRect(0, 0, W, H);
 
-  // Volumetric diagonal studio light shafts
-  ctx.globalCompositeOperation = 'screen';
-  for (let i = 0; i < 4; i++) {
-    const beamX = W * (0.18 + i * 0.24) + Math.sin(tGlobal * 0.6 + i) * 35;
-    const beamGrad = ctx.createLinearGradient(beamX - 90, 0, beamX + 140, H * 0.85);
-    beamGrad.addColorStop(0, hexToRgba(accent, 0.07 * rayIntensity));
-    beamGrad.addColorStop(0.6, hexToRgba('#FFFFFF', 0.02 * rayIntensity));
-    beamGrad.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = beamGrad;
-    ctx.beginPath();
-    ctx.moveTo(beamX - 70, 0);
-    ctx.lineTo(beamX + 70, 0);
-    ctx.lineTo(beamX + 260, H);
-    ctx.lineTo(beamX - 180, H);
-    ctx.closePath();
-    ctx.fill();
-  }
-
-  // Procedural micro-texture weave (felt / brushed-metal / paper lines)
-  ctx.globalCompositeOperation = 'source-over';
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.024)';
-  ctx.lineWidth = 1;
-  const step = 24;
-  const offset = (tGlobal * 18) % step;
-  for (let y = offset; y < H; y += step) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(W, y);
-    ctx.stroke();
-  }
-  ctx.restore();
-}
-
-/**
- * L1_Environment: 3D Perspective Horizon Grid, Radial Telemetry Matrix & Depth Parallax Nodes
- */
-export function renderL1Environment(ctx, W, H, layerProps = {}, cam = {}, tGlobal = 0, tLocal = 0) {
-  ctx.save();
-  const accent = layerProps.accent_color || '#00F5D4';
-  const gridMode = layerProps.grid_mode || 'perspective_vault';
-  const depthScale = layerProps.parallax_depth || 1.15;
-
-  const panX = (cam.panX || 0) * 0.45 * depthScale;
-  const panY = (cam.panY || 0) * 0.45 * depthScale;
-  ctx.translate(W / 2 + panX, H / 2 + panY);
-  ctx.scale(cam.zoom ? 1 + (cam.zoom - 1) * 0.4 : 1, cam.zoom ? 1 + (cam.zoom - 1) * 0.4 : 1);
-  ctx.translate(-W / 2, -H / 2);
-
-  const horizonY = H * 0.56;
-
-  if (gridMode === 'perspective_vault') {
-    // Perspective floor & ceiling grid
-    ctx.strokeStyle = hexToRgba(accent, 0.16);
-    ctx.lineWidth = 1.5;
-    const vanishX = W * 0.5;
-    for (let i = -10; i <= 10; i++) {
+    // Subtle editorial architectural grid lines
+    ctx.strokeStyle = hexToRgba(ink, 0.05);
+    ctx.lineWidth = 1;
+    const step = 64;
+    for (let x = step; x < W; x += step) {
       ctx.beginPath();
-      ctx.moveTo(vanishX + i * 28, horizonY);
-      ctx.lineTo(vanishX + i * 210, H * 1.05);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(vanishX + i * 28, horizonY - 120);
-      ctx.lineTo(vanishX + i * 190, -H * 0.05);
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, H);
       ctx.stroke();
     }
-
-    // Moving depth Z-bars
-    const zPhase = (tGlobal * 0.85) % 1;
-    for (let j = 0; j < 9; j++) {
-      const u = ((j + zPhase) / 9) ** 1.85;
-      const y = lerp(horizonY, H * 0.98, u);
-      ctx.strokeStyle = hexToRgba(accent, 0.06 + 0.22 * u);
+    for (let y = step; y < H; y += step) {
       ctx.beginPath();
-      ctx.moveTo(W * 0.04, y);
-      ctx.lineTo(W * 0.96, y);
+      ctx.moveTo(0, y);
+      ctx.lineTo(W, y);
       ctx.stroke();
     }
   } else {
-    // Radial sonar / orbital studio rings
-    const cx = W * 0.5;
-    const cy = H * 0.46;
-    for (let r = 1; r <= 6; r++) {
-      const radius = r * (Math.min(W, H) * 0.085) + 8 * Math.sin(tGlobal * 2 + r);
-      ctx.strokeStyle = hexToRgba(accent, 0.22 - r * 0.025);
-      ctx.lineWidth = r === 3 ? 2.2 : 1.2;
-      ctx.setLineDash(r % 2 === 0 ? [10, 8] : []);
-      ctx.beginPath();
-      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    ctx.setLineDash([]);
-  }
-
-  // Parallax floating architectural nodes
-  for (let k = 0; k < 14; k++) {
-    const px = ((k * 197 + Math.sin(tGlobal * 0.8 + k) * 45) % (W * 0.88)) + W * 0.06;
-    const py = ((k * 311 + tGlobal * 38 * (1 + (k % 3) * 0.3)) % (H * 0.78)) + H * 0.1;
-    const sz = 2.5 + (k % 4) * 1.6;
-    ctx.fillStyle = hexToRgba(accent, 0.28);
-    ctx.beginPath();
-    ctx.arc(px, py, sz, 0, Math.PI * 2);
-    ctx.fill();
+    // Dark cinema mode
+    const cx = W * (0.5 + 0.08 * Math.sin(tGlobal * 0.9));
+    const cy = H * (0.42 + 0.05 * Math.cos(tGlobal * 0.7));
+    const radGrad = ctx.createRadialGradient(cx, cy, W * 0.04, cx, cy, W * 0.85);
+    radGrad.addColorStop(0, hexToRgba(accent, 0.20));
+    radGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = radGrad;
+    ctx.fillRect(0, 0, W, H);
   }
 
   ctx.restore();
 }
 
 /**
- * L2_HeroSubject: Supports both High-Craft 3D SaaS/Fintech Cards AND Articulated 2.5D Character Rigs
+ * L1_Environment: Orbital Ellipses, Editorial Dot Matrix & Floating Starbursts (WizardZ Style)
+ */
+export function renderL1Environment(ctx, W, H, layerProps = {}, cam = {}, tGlobal = 0, tLocal = 0) {
+  ctx.save();
+  const accent = layerProps.accent_color || '#191A23';
+  const highlight = layerProps.highlight_color || '#B9FF66';
+  const depthScale = layerProps.parallax_depth || 1.1;
+
+  const panX = (cam.panX || 0) * 0.4 * depthScale;
+  const panY = (cam.panY || 0) * 0.4 * depthScale;
+  ctx.translate(W / 2 + panX, H / 2 + panY);
+  ctx.scale(cam.zoom ? 1 + (cam.zoom - 1) * 0.35 : 1, cam.zoom ? 1 + (cam.zoom - 1) * 0.35 : 1);
+  ctx.translate(-W / 2, -H / 2);
+
+  // Tilted orbital rings (matching the megaphone orbital rings in the WizardZ hero illustration)
+  const cx = W * 0.5;
+  const cy = H * 0.47;
+  for (let r = 0; r < 3; r++) {
+    ctx.save();
+    ctx.translate(cx, cy + (r - 1) * 26);
+    ctx.rotate(-0.22 + 0.04 * Math.sin(tGlobal * 1.3 + r));
+    ctx.strokeStyle = hexToRgba(accent, 0.22 - r * 0.04);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, W * (0.40 + r * 0.03), H * (0.08 + r * 0.015), 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Editorial 4-point starbursts (black & acid lime stars from WizardZ reference)
+  drawFourPointStar(ctx, W * 0.14, H * 0.30, 26, 9, accent, null, tGlobal * 0.6);
+  drawFourPointStar(ctx, W * 0.85, H * 0.62, 32, 11, highlight, accent, -tGlobal * 0.5);
+  drawFourPointStar(ctx, W * 0.20, H * 0.72, 18, 6, highlight, accent, tGlobal * 0.8);
+
+  ctx.restore();
+}
+
+/**
+ * L2_HeroSubject: Neo-Brutalist Positivus/WizardZ Hero Card OR Articulated 2.5D Character Rig
  */
 export function renderL2HeroSubject(ctx, W, H, layerProps = {}, cam = {}, tGlobal = 0, tLocal = 0, audioAmp = 0.2) {
   ctx.save();
   const kind = layerProps.kind || 'saas_3d_card';
-  const accent = layerProps.accent_color || '#D4FF00';
-  const stiffness = layerProps.stiffness || 210;
+  const accent = layerProps.accent_color || '#B9FF66';
+  const ink = layerProps.ink_color || '#191A23';
+  const stiffness = layerProps.stiffness || 220;
   const damping = layerProps.damping || 18;
-  const entrySpring = clamp(springDamper(tLocal + 0.08, stiffness, damping), 0, 1.35);
-  const settleRing = ring(tLocal, 0.12, 0.035, 22, 5.5);
+  const entrySpring = clamp(springDamper(tLocal + 0.08, stiffness, damping), 0, 1.3);
+  const settleRing = ring(tLocal, 0.10, 0.03, 20, 5.5);
 
   const cx = W * 0.5 + (cam.panX || 0);
-  const cy = H * 0.45 + (cam.panY || 0);
-  const scale = (cam.zoom || 1.0) * (0.82 + 0.18 * entrySpring + settleRing);
+  const cy = H * 0.47 + (cam.panY || 0);
+  const scale = (cam.zoom || 1.0) * (0.85 + 0.15 * entrySpring + settleRing);
 
   ctx.translate(cx, cy);
   ctx.rotate(((cam.tiltDeg || 0) * Math.PI) / 180);
   ctx.scale(scale, scale);
 
   if (kind === 'character_rig') {
-    _drawArticulatedCharacterRig(ctx, W, H, layerProps, tGlobal, tLocal, audioAmp, accent);
+    _drawArticulatedCharacterRig(ctx, W, H, layerProps, tGlobal, tLocal, audioAmp, accent, ink);
   } else {
-    _drawSaaS3DHeroCard(ctx, W, H, layerProps, tGlobal, tLocal, entrySpring, accent);
+    _drawWizardZEditorialCard(ctx, W, H, layerProps, tGlobal, tLocal, entrySpring, accent, ink);
   }
 
   ctx.restore();
 }
 
-function _drawSaaS3DHeroCard(ctx, W, H, props, tGlobal, tLocal, springVal, accent) {
-  const cardW = Math.min(W * 0.78, 760);
-  const cardH = Math.min(H * 0.36, 560);
+function _drawWizardZEditorialCard(ctx, W, H, props, tGlobal, tLocal, springVal, accent, ink) {
+  const cardW = Math.min(W * 0.82, 820);
+  const cardH = Math.min(H * 0.37, 570);
   const x = -cardW / 2;
   const y = -cardH / 2;
 
-  // Drop shadow + ambient neon aura
-  ctx.shadowColor = hexToRgba(accent, 0.35);
-  ctx.shadowBlur = 42;
-  ctx.shadowOffsetY = 18;
+  const variant = props.card_variant || 'white';
+  const cardBg = variant === 'dark' ? '#191A23' : variant === 'lime' ? accent : '#FFFFFF';
+  const mainText = variant === 'dark' ? '#FFFFFF' : '#191A23';
+  const pillBg = variant === 'lime' ? '#FFFFFF' : accent;
+  const pillText = '#191A23';
 
-  // Main glassmorphic chassis
-  const bgGrad = ctx.createLinearGradient(x, y, x + cardW, y + cardH);
-  bgGrad.addColorStop(0, 'rgba(18, 21, 30, 0.94)');
-  bgGrad.addColorStop(0.6, 'rgba(11, 13, 20, 0.96)');
-  bgGrad.addColorStop(1, 'rgba(22, 27, 38, 0.94)');
-  ctx.fillStyle = bgGrad;
-  roundRectPath(ctx, x, y, cardW, cardH, 28);
+  // Signature Neo-Brutalist Hard Offset Shadow (0 10px 0 #191A23)
+  ctx.fillStyle = ink;
+  roundRectPath(ctx, x + 4, y + 12, cardW, cardH, 38);
   ctx.fill();
 
-  ctx.shadowBlur = 0;
-  ctx.shadowOffsetY = 0;
-
-  // Specular border highlight
-  const borderGrad = ctx.createLinearGradient(x, y, x + cardW, y + cardH);
-  borderGrad.addColorStop(0, hexToRgba(accent, 0.85));
-  borderGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.18)');
-  borderGrad.addColorStop(1, hexToRgba('#00F5D4', 0.65));
-  ctx.strokeStyle = borderGrad;
-  ctx.lineWidth = 2.8;
-  roundRectPath(ctx, x, y, cardW, cardH, 28);
+  // Main Card Body
+  ctx.fillStyle = cardBg;
+  ctx.strokeStyle = ink;
+  ctx.lineWidth = 3.5;
+  roundRectPath(ctx, x, y, cardW, cardH, 38);
+  ctx.fill();
   ctx.stroke();
 
-  // Top studio header bar inside card
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
-  roundRectPath(ctx, x + 20, y + 20, cardW - 40, 54, 14);
+  // Top Lime Highlight Label Pill inside Card (exact Positivus service card style)
+  const cardTitle = String(props.card_title || props.metric_label || 'DIGITAL GROWTH').toUpperCase();
+  ctx.font = '800 26px "Space Grotesk", "Inter", sans-serif';
+  const pillW = Math.min(cardW - 96, Math.max(220, ctx.measureText(cardTitle).width + 44));
+  ctx.fillStyle = pillBg;
+  roundRectPath(ctx, x + 44, y + 42, pillW, 52, 12);
   ctx.fill();
 
-  // Traffic light dots + live status pill
-  const dotColors = ['#FF3366', '#F59E0B', accent];
-  for (let i = 0; i < 3; i++) {
-    ctx.fillStyle = dotColors[i];
-    ctx.beginPath();
-    ctx.arc(x + 48 + i * 22, y + 47, 6.5, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  ctx.fillStyle = pillText;
+  ctx.textAlign = 'left';
+  ctx.fillText(cardTitle, x + 64, y + 77, pillW - 36);
 
-  ctx.font = '700 18px "JetBrains Mono", monospace';
-  ctx.fillStyle = accent;
-  ctx.textAlign = 'right';
-  ctx.fillText(`ENGINE // ${String(props.pose_mode || 'ACTIVE').toUpperCase()}`, x + cardW - 42, y + 53);
-
-  // Animated Metric Odometer Counter
-  const targetVal = Number(props.metric_value ?? 99.8);
-  const unit = String(props.metric_unit || 'FPS');
-  const animatedVal = (targetVal * clamp(backOut(clamp(tLocal / 0.65), 1.6), 0, 1.15)).toFixed(
+  // Animated Metric Counter on Left Side
+  const targetVal = Number(props.metric_value ?? 240);
+  const unit = String(props.metric_unit || '%');
+  const animatedVal = (targetVal * clamp(backOut(clamp(tLocal / 0.6), 1.5), 0, 1.1)).toFixed(
     targetVal % 1 === 0 ? 0 : 1
   );
 
-  ctx.textAlign = 'left';
-  ctx.font = '800 76px "Inter", "Geist", sans-serif';
+  ctx.font = '800 84px "Space Grotesk", "Inter", sans-serif';
+  ctx.fillStyle = mainText;
+  ctx.fillText(`${animatedVal}${unit}`, x + 44, y + 195);
+
+  ctx.font = '600 21px "Plus Jakarta Sans", "Inter", sans-serif';
+  ctx.fillStyle = variant === 'dark' ? '#CBD5E1' : '#595A66';
+  ctx.fillText(String(props.metric_label || 'VERIFIED CAMPAIGN IMPACT'), x + 46, y + 234);
+
+  // Right Side Vector Illustration (Megaphone / Geometric Growth Node like WizardZ)
+  const illX = x + cardW * 0.72;
+  const illY = y + cardH * 0.44;
+  ctx.save();
+  ctx.translate(illX, illY);
+  const floatY = Math.sin(tGlobal * 3.2) * 8;
+  ctx.translate(0, floatY);
+
+  // Orbit ellipse
+  ctx.strokeStyle = variant === 'dark' ? '#FFFFFF' : ink;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.ellipse(0, 22, 92, 28, -0.25, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Megaphone cone (Lime + Ink outline)
+  ctx.rotate(-0.28 + 0.06 * Math.sin(tGlobal * 4));
+  ctx.fillStyle = accent;
+  ctx.strokeStyle = ink;
+  ctx.lineWidth = 3.2;
+  ctx.beginPath();
+  ctx.moveTo(-48, -14);
+  ctx.lineTo(38, -46);
+  ctx.lineTo(38, 46);
+  ctx.lineTo(-48, 14);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Megaphone bell
   ctx.fillStyle = '#FFFFFF';
-  ctx.fillText(`${animatedVal}${unit}`, x + 38, y + 168);
+  ctx.beginPath();
+  ctx.ellipse(38, 0, 16, 46, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
 
-  ctx.font = '600 20px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#94A3B8';
-  ctx.fillText('DETERMINISTIC MIDDLEWARE THROUGHPUT', x + 40, y + 204);
-
-  // Live Animated Telemetry Sparkline + Bars
-  const chartX = x + 38;
-  const chartY = y + 235;
-  const chartW = cardW - 76;
-  const chartH = cardH - 275;
-
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
-  roundRectPath(ctx, chartX, chartY, chartW, chartH, 16);
+  // Bottom Section: Clean Progress Bar + "Learn more ↗" Circle Arrow Button
+  const bottomY = y + cardH - 86;
+  ctx.fillStyle = variant === 'dark' ? '#FFFFFF' : ink;
+  ctx.beginPath();
+  ctx.arc(x + 68, bottomY + 22, 24, 0, Math.PI * 2);
   ctx.fill();
 
-  // Animated frequency/telemetry bars
-  const barCount = 18;
-  const barGap = 8;
-  const barW = (chartW - 32 - (barCount - 1) * barGap) / barCount;
+  // Arrow inside circle
+  ctx.strokeStyle = variant === 'dark' ? ink : accent;
+  ctx.lineWidth = 3.5;
+  ctx.beginPath();
+  ctx.moveTo(x + 60, bottomY + 30);
+  ctx.lineTo(x + 76, bottomY + 14);
+  ctx.moveTo(x + 64, bottomY + 14);
+  ctx.lineTo(x + 76, bottomY + 14);
+  ctx.lineTo(x + 76, bottomY + 26);
+  ctx.stroke();
+
+  ctx.font = '700 22px "Space Grotesk", "Inter", sans-serif';
+  ctx.fillStyle = mainText;
+  ctx.fillText('Active Stage', x + 108, bottomY + 30);
+
+  // Animated Bars on bottom right
+  const barStartX = x + cardW * 0.48;
+  const barCount = 10;
   for (let b = 0; b < barCount; b++) {
-    const wave = 0.35 + 0.6 * Math.abs(Math.sin(tGlobal * 3.8 + b * 0.45));
-    const bh = Math.max(12, (chartH - 36) * wave * clamp(tLocal * 2.2, 0.2, 1));
-    const bx = chartX + 16 + b * (barW + barGap);
-    const by = chartY + chartH - 16 - bh;
-    ctx.fillStyle = b % 4 === 0 ? accent : 'rgba(56, 189, 248, 0.55)';
-    roundRectPath(ctx, bx, by, barW, bh, 5);
+    const wave = 0.35 + 0.65 * Math.abs(Math.sin(tGlobal * 3.6 + b * 0.5));
+    const bh = 18 + 56 * wave;
+    const bx = barStartX + b * 34;
+    const by = bottomY + 44 - bh;
+    ctx.fillStyle = b % 2 === 0 ? accent : (variant === 'dark' ? '#FFFFFF' : ink);
+    roundRectPath(ctx, bx, by, 20, bh, 6);
     ctx.fill();
   }
-
-  // Smooth glowing spline curve over bars
-  ctx.strokeStyle = accent;
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  for (let s = 0; s <= 32; s++) {
-    const u = s / 32;
-    const px = chartX + 16 + u * (chartW - 32);
-    const py =
-      chartY +
-      chartH * 0.55 -
-      Math.sin(u * Math.PI * 2.5 + tGlobal * 4.2) * (chartH * 0.26) -
-      u * (chartH * 0.15);
-    if (s === 0) ctx.moveTo(px, py);
-    else ctx.lineTo(px, py);
-  }
-  ctx.stroke();
 }
 
-function _drawArticulatedCharacterRig(ctx, W, H, props, tGlobal, tLocal, audioAmp, accent) {
-  // Multi-joint 2.5D Cyber-Director / Felt-Craft Character Rig with squash, stretch, blink, and lip-sync
+function _drawArticulatedCharacterRig(ctx, W, H, props, tGlobal, tLocal, audioAmp, accent, ink) {
   const breathe = 1 + 0.025 * Math.sin(tGlobal * 3.4);
   const hop = ring(tLocal, 0.05, 18, 20, 5);
-  const squash = 1 + ring(tLocal, 0.05, 0.08, 22, 6);
+  const squash = 1 + ring(tLocal, 0.05, 0.07, 22, 6);
 
   ctx.save();
   ctx.translate(0, -hop);
   ctx.scale(squash, (2 - squash) * breathe);
 
-  // Rim light aura behind character
-  const rimGrad = ctx.createRadialGradient(0, -40, 20, 0, -40, 280);
-  rimGrad.addColorStop(0, hexToRgba(accent, 0.42));
-  rimGrad.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = rimGrad;
-  ctx.beginPath();
-  ctx.arc(0, -40, 280, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Torso / Jacket chassis
-  ctx.fillStyle = '#161925';
-  ctx.strokeStyle = accent;
+  // Neo-brutalist backdrop badge behind character
+  ctx.fillStyle = accent;
+  ctx.strokeStyle = ink;
   ctx.lineWidth = 3.5;
-  roundRectPath(ctx, -115, 20, 230, 210, 48);
+  ctx.beginPath();
+  ctx.arc(0, -20, 210, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
 
-  // Chest core emblem
-  ctx.fillStyle = hexToRgba(accent, 0.9);
-  ctx.beginPath();
-  ctx.arc(0, 105, 28 + 5 * Math.sin(tGlobal * 6), 0, Math.PI * 2);
+  // Torso
+  ctx.fillStyle = '#191A23';
+  ctx.strokeStyle = ink;
+  ctx.lineWidth = 4;
+  roundRectPath(ctx, -110, 25, 220, 195, 46);
   ctx.fill();
+  ctx.stroke();
 
-  // Articulated Left & Right Arms
+  // Chest Star Emblem
+  drawFourPointStar(ctx, 0, 110, 32, 12, accent, '#FFFFFF', tGlobal * 0.8);
+
+  // Arms
   for (const dir of [-1, 1]) {
     ctx.save();
-    ctx.translate(dir * 122, 55);
-    const armAngle = dir * (0.25 + 0.18 * Math.sin(tGlobal * 4.2 + dir));
-    ctx.rotate(armAngle);
-    ctx.fillStyle = '#1E2436';
-    ctx.strokeStyle = hexToRgba(accent, 0.7);
-    ctx.lineWidth = 3;
-    roundRectPath(ctx, -24, 0, 48, 135, 22);
+    ctx.translate(dir * 118, 55);
+    ctx.rotate(dir * (0.22 + 0.16 * Math.sin(tGlobal * 4.0 + dir)));
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = 3.5;
+    roundRectPath(ctx, -22, 0, 44, 130, 20);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
   }
 
-  // Head with subtle tilt
+  // Head
   ctx.save();
-  const headTilt = 0.08 * Math.sin(tGlobal * 2.7);
-  ctx.translate(0, -85);
-  ctx.rotate(headTilt);
-
-  ctx.fillStyle = '#1E2330';
-  ctx.strokeStyle = '#FFFFFF';
-  ctx.lineWidth = 3.5;
-  roundRectPath(ctx, -95, -95, 190, 175, 52);
+  ctx.translate(0, -82);
+  ctx.rotate(0.06 * Math.sin(tGlobal * 2.5));
+  ctx.fillStyle = '#FFFFFF';
+  ctx.strokeStyle = ink;
+  ctx.lineWidth = 4;
+  roundRectPath(ctx, -92, -92, 184, 170, 50);
   ctx.fill();
   ctx.stroke();
 
-  // Visor / Eyes with deterministic blink every 2.8 seconds
+  // Expressive Eyes
   const blinkPhase = tGlobal % 2.8;
-  const eyeOpen = blinkPhase > 2.66 ? 0.12 : 1.0;
-  for (const ex of [-40, 40]) {
-    ctx.fillStyle = accent;
-    roundRectPath(ctx, ex - 20, -32, 40, Math.max(4, 26 * eyeOpen), 10);
+  const eyeOpen = blinkPhase > 2.66 ? 0.15 : 1.0;
+  for (const ex of [-36, 36]) {
+    ctx.fillStyle = ink;
+    roundRectPath(ctx, ex - 14, -28, 28, Math.max(4, 34 * eyeOpen), 14);
     ctx.fill();
   }
 
-  // Audio-reactive Lip-Sync Mouth Waveform
-  const jawOpen = 6 + 34 * clamp(audioAmp * 1.8 + 0.25 * Math.abs(Math.sin(tGlobal * 18)), 0.05, 1.0);
-  ctx.fillStyle = '#09090B';
-  ctx.strokeStyle = accent;
-  ctx.lineWidth = 2.5;
-  roundRectPath(ctx, -38, 22, 76, jawOpen, 12);
+  // Lip-sync mouth
+  const jawOpen = 8 + 30 * clamp(audioAmp * 1.8 + 0.25 * Math.abs(Math.sin(tGlobal * 18)), 0.05, 1.0);
+  ctx.fillStyle = accent;
+  ctx.strokeStyle = ink;
+  ctx.lineWidth = 3;
+  roundRectPath(ctx, -34, 24, 68, jawOpen, 12);
   ctx.fill();
   ctx.stroke();
 
@@ -388,98 +395,58 @@ function _drawArticulatedCharacterRig(ctx, W, H, props, tGlobal, tLocal, audioAm
 }
 
 /**
- * L3_MotionProps: Persistent Through-Line Object + Velocity-Trailed Cursor + Floating Callout Badges
+ * L3_MotionProps: Floating Neo-Brutalist Badges + Interactive Studio Cursor
  */
 export function renderL3MotionProps(ctx, W, H, layerProps = {}, cam = {}, tGlobal = 0, tLocal = 0) {
   ctx.save();
-  const stateIdx = Number(layerProps.through_line_state || 0);
-  const accent = '#00F5D4';
+  const accent = layerProps.accent_color || '#B9FF66';
+  const ink = layerProps.ink_color || '#191A23';
 
-  // 1. Through-Line Object ("telemetry_orb" / Quantum Pulse Core) that progresses across shots S1..S5
-  const orbPositions = [
-    [W * 0.5, H * 0.19],
-    [W * 0.82, H * 0.25],
-    [W * 0.82, H * 0.22],
-    [W * 0.80, H * 0.68],
-    [W * 0.5, H * 0.19],
-  ];
-  const [ox, oy] = orbPositions[stateIdx % orbPositions.length];
-  const pulse = 1 + 0.14 * Math.sin(tGlobal * 6.5) + ring(tLocal, 0.05, 0.25, 24, 5);
-  const orbR = 34 * pulse;
-
-  ctx.save();
-  ctx.translate(ox + (cam.panX || 0) * 0.6, oy + (cam.panY || 0) * 0.6);
-  const orbGrad = ctx.createRadialGradient(0, 0, 4, 0, 0, orbR * 1.8);
-  orbGrad.addColorStop(0, '#FFFFFF');
-  orbGrad.addColorStop(0.35, accent);
-  orbGrad.addColorStop(1, 'rgba(0, 245, 212, 0)');
-  ctx.fillStyle = orbGrad;
-  ctx.beginPath();
-  ctx.arc(0, 0, orbR * 1.8, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Rotating orbital ring around through-line core
-  ctx.rotate(tGlobal * 2.4 + stateIdx);
-  ctx.strokeStyle = '#D4FF00';
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  ctx.ellipse(0, 0, orbR * 1.35, orbR * 0.55, 0.4, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.restore();
-
-  // 2. Floating Callout Badges
-  const badges = Array.isArray(layerProps.floating_badges) ? layerProps.floating_badges : ['60FPS LOCK', 'PURE AST'];
+  // Floating Callout Badges with crisp ink borders & offset shadows
+  const badges = Array.isArray(layerProps.floating_badges) ? layerProps.floating_badges : ['GROWTH', '01 // FOCUS'];
   badges.forEach((label, idx) => {
-    const enter = backOut(clamp((tLocal - idx * 0.12) / 0.42), 1.85);
-    const bx = idx === 0 ? W * 0.12 : W * 0.62;
-    const by = (idx === 0 ? H * 0.24 : H * 0.66) + (1 - enter) * 40;
+    const enter = backOut(clamp((tLocal - idx * 0.10) / 0.40), 1.7);
+    const bx = idx === 0 ? W * 0.10 : W * 0.60;
+    const by = (idx === 0 ? H * 0.23 : H * 0.69) + (1 - enter) * 32;
 
     ctx.save();
     ctx.globalAlpha = clamp(enter, 0, 1);
-    ctx.fillStyle = 'rgba(12, 15, 24, 0.90)';
-    ctx.strokeStyle = idx === 0 ? '#D4FF00' : '#00F5D4';
-    ctx.lineWidth = 2;
-    roundRectPath(ctx, bx, by, 280, 52, 26);
+    // Offset shadow
+    ctx.fillStyle = ink;
+    roundRectPath(ctx, bx + 3, by + 6, 290, 54, 27);
+    ctx.fill();
+
+    ctx.fillStyle = idx === 0 ? accent : '#FFFFFF';
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = 2.5;
+    roundRectPath(ctx, bx, by, 290, 54, 27);
     ctx.fill();
     ctx.stroke();
 
-    ctx.font = '700 18px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#F8FAFC';
+    ctx.font = '800 19px "Space Grotesk", "Inter", sans-serif';
+    ctx.fillStyle = ink;
     ctx.textAlign = 'center';
-    ctx.fillText(String(label), bx + 140, by + 32);
+    ctx.fillText(String(label), bx + 145, by + 34);
     ctx.restore();
   });
 
-  // 3. Velocity-Trailed Interactive Studio Cursor (when active)
+  // Interactive Cursor
   if (layerProps.cursor_active) {
-    const u = easeInOut(clamp(tLocal / 1.1));
-    const curX = lerp(W * 0.78, W * 0.52, u);
-    const curY = lerp(H * 0.68, H * 0.46, u);
+    const u = easeInOut(clamp(tLocal / 1.05));
+    const curX = lerp(W * 0.78, W * 0.54, u);
+    const curY = lerp(H * 0.66, H * 0.48, u);
 
-    // Motion trail ghosts
-    for (let g = 3; g >= 1; g--) {
-      const ug = easeInOut(clamp((tLocal - g * 0.03) / 1.1));
-      const gx = lerp(W * 0.78, W * 0.52, ug);
-      const gy = lerp(H * 0.68, H * 0.46, ug);
-      ctx.fillStyle = `rgba(212, 255, 0, ${0.15 / g})`;
-      ctx.beginPath();
-      ctx.arc(gx, gy, 14, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Click ripple after tLocal > 0.9s
-    if (tLocal > 0.85) {
-      const rU = clamp((tLocal - 0.85) / 0.45);
-      ctx.strokeStyle = `rgba(212, 255, 0, ${1 - rU})`;
+    if (tLocal > 0.82) {
+      const rU = clamp((tLocal - 0.82) / 0.45);
+      ctx.strokeStyle = hexToRgba(ink, 1 - rU);
       ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.arc(curX, curY, 16 + rU * 68, 0, Math.PI * 2);
+      ctx.arc(curX, curY, 14 + rU * 58, 0, Math.PI * 2);
       ctx.stroke();
     }
 
-    // Cursor pointer triangle
-    ctx.fillStyle = '#D4FF00';
-    ctx.strokeStyle = '#09090B';
+    ctx.fillStyle = accent;
+    ctx.strokeStyle = ink;
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(curX, curY);
@@ -498,56 +465,67 @@ export function renderL3MotionProps(ctx, W, H, layerProps = {}, cam = {}, tGloba
 }
 
 /**
- * L4_TypographyHUD: Staggered Kinetic Headline + Word-Synced Narration Box inside >=8% Safe Margins
+ * L4_TypographyHUD: WizardZ Highlight Headline + Word-Synced Subtitle Card inside >=8% Safe Margins
  */
 export function renderL4TypographyHUD(ctx, W, H, layerProps = {}, tGlobal = 0, tLocal = 0, shotDur = 2.0) {
   ctx.save();
   const marginX = Math.round(W * Math.max(0.08, layerProps.safe_margin_pct || 0.08));
-  const marginY = Math.round(H * 0.075);
+  const marginY = Math.round(H * 0.07);
   const safeW = W - marginX * 2;
-  const accent = layerProps.accent_color || '#D4FF00';
-  const textColor = layerProps.text_color || '#F8FAFC';
+  const accent = layerProps.accent_color || '#B9FF66';
+  const ink = layerProps.ink_color || '#191A23';
 
-  // 1. Top Studio Telemetry Pill (strictly inside safe zone)
-  const badgeTag = String(layerProps.badge_tag || 'CODE-HIGGSFIELD // 60FPS');
-  ctx.fillStyle = 'rgba(9, 9, 11, 0.86)';
-  ctx.strokeStyle = hexToRgba(accent, 0.75);
-  ctx.lineWidth = 2;
-  roundRectPath(ctx, marginX, marginY, Math.min(safeW, 440), 48, 24);
+  // 1. Top Pill Tag
+  const badgeTag = String(layerProps.badge_tag || '01 • STUDIO');
+  ctx.fillStyle = '#FFFFFF';
+  ctx.strokeStyle = ink;
+  ctx.lineWidth = 2.5;
+  roundRectPath(ctx, marginX, marginY, Math.min(safeW, 340), 48, 24);
   ctx.fill();
   ctx.stroke();
 
   ctx.fillStyle = accent;
+  ctx.strokeStyle = ink;
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.arc(marginX + 26, marginY + 24, 6, 0, Math.PI * 2);
+  ctx.arc(marginX + 26, marginY + 24, 8, 0, Math.PI * 2);
   ctx.fill();
+  ctx.stroke();
 
-  ctx.font = '700 17px "JetBrains Mono", monospace';
-  ctx.fillStyle = textColor;
+  ctx.font = '800 18px "Space Grotesk", monospace';
+  ctx.fillStyle = ink;
   ctx.textAlign = 'left';
-  ctx.fillText(badgeTag, marginX + 44, marginY + 30);
+  ctx.fillText(badgeTag, marginX + 46, marginY + 30);
 
-  // 2. Kinetic Overshoot Headline
-  const headline = String(layerProps.headline || 'CODE-HIGGSFIELD STUDIO');
-  const headEnter = backOut(clamp(tLocal / 0.36), 1.9);
-  const headY = marginY + 118 + (1 - headEnter) * 28;
+  // 2. Signature Lime Highlight Headline Bar (WizardZ "Services" / "Case study" highlight style)
+  const headline = String(layerProps.headline || 'DIGITAL LANDSCAPE');
+  const headEnter = backOut(clamp(tLocal / 0.35), 1.7);
+  const headY = marginY + 115 + (1 - headEnter) * 24;
 
   ctx.save();
   ctx.translate(W / 2, headY);
-  ctx.scale(0.88 + 0.12 * headEnter, 0.88 + 0.12 * headEnter);
+  ctx.scale(0.9 + 0.1 * headEnter, 0.9 + 0.1 * headEnter);
 
-  // High-contrast backdrop plate behind headline for guaranteed WCAG > 7:1 readability
-  ctx.fillStyle = 'rgba(9, 9, 11, 0.82)';
-  roundRectPath(ctx, -safeW / 2, -52, safeW, 84, 18);
+  // Offset shadow
+  ctx.fillStyle = ink;
+  roundRectPath(ctx, -safeW / 2 + 4, -44, safeW, 84, 18);
   ctx.fill();
 
-  ctx.font = '900 44px "Inter", "Geist", sans-serif';
-  ctx.fillStyle = textColor;
+  // Lime highlight bar with ink border
+  ctx.fillStyle = accent;
+  ctx.strokeStyle = ink;
+  ctx.lineWidth = 3;
+  roundRectPath(ctx, -safeW / 2, -50, safeW, 84, 18);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.font = '900 42px "Space Grotesk", "Inter", sans-serif';
+  ctx.fillStyle = '#191A23';
   ctx.textAlign = 'center';
   ctx.fillText(headline, 0, 6, safeW - 36);
   ctx.restore();
 
-  // 3. Bottom Word-Synced Narration Subtitle Box (strictly inside safe margins)
+  // 3. Bottom Word-Synced Subtitle Card (#191A23 Charcoal Card with #B9FF66 active word pill -> 18:1 WCAG contrast)
   const caption = String(layerProps.sub_caption || '');
   if (caption) {
     const words = caption.split(/\s+/).filter(Boolean);
@@ -558,21 +536,19 @@ export function renderL4TypographyHUD(ctx, W, H, layerProps = {}, tGlobal = 0, t
 
     const boxH = 148;
     const boxY = H - marginY - boxH;
-    ctx.fillStyle = 'rgba(9, 9, 11, 0.92)';
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
-    ctx.lineWidth = 2;
-    roundRectPath(ctx, marginX, boxY, safeW, boxH, 22);
+    ctx.fillStyle = '#191A23';
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = 3;
+    roundRectPath(ctx, marginX, boxY, safeW, boxH, 26);
     ctx.fill();
     ctx.stroke();
 
-    // Accent progress bar along bottom of caption card
-    const progW = (safeW - 24) * clamp(tLocal / Math.max(0.1, shotDur));
+    const progW = (safeW - 32) * clamp(tLocal / Math.max(0.1, shotDur));
     ctx.fillStyle = accent;
-    roundRectPath(ctx, marginX + 12, boxY + boxH - 10, Math.max(8, progW), 4, 2);
+    roundRectPath(ctx, marginX + 16, boxY + boxH - 12, Math.max(8, progW), 5, 3);
     ctx.fill();
 
-    // Wrap words into 2 clean lines inside safeW - 48
-    ctx.font = '700 28px "Inter", sans-serif';
+    ctx.font = '700 27px "Plus Jakarta Sans", "Inter", sans-serif';
     const maxLineW = safeW - 56;
     const lines = [];
     let currentLine = [];
@@ -607,11 +583,11 @@ export function renderL4TypographyHUD(ctx, W, H, layerProps = {}, tGlobal = 0, t
           ctx.fillStyle = accent;
           roundRectPath(ctx, cursorX - 6, lineY - 28, wordW + 4, 36, 8);
           ctx.fill();
-          ctx.fillStyle = '#09090B';
+          ctx.fillStyle = '#191A23';
         } else if (isPast) {
           ctx.fillStyle = '#FFFFFF';
         } else {
-          ctx.fillStyle = '#94A3B8';
+          ctx.fillStyle = '#CBD5E1';
         }
 
         ctx.textAlign = 'left';
@@ -625,41 +601,18 @@ export function renderL4TypographyHUD(ctx, W, H, layerProps = {}, tGlobal = 0, t
 }
 
 /**
- * L5_PostFX: Beat-Drop Impact Flash, Anamorphic Streak & Radial Vignette
+ * L5_PostFX: Subtle Editorial Frame Polish
  */
 export function renderL5PostFX(ctx, W, H, layerProps = {}, tGlobal = 0, tLocal = 0) {
   ctx.save();
-
-  // 1. Cut/Beat entry flash decay (subtle cinematic lens flare on downbeat cuts)
-  if (layerProps.beat_flash && tLocal < 0.22) {
-    const flashAlpha = (1 - tLocal / 0.22) ** 2 * 0.22;
-    ctx.fillStyle = `rgba(212, 255, 0, ${flashAlpha})`;
+  if (layerProps.beat_flash && tLocal < 0.18) {
+    const flashAlpha = (1 - tLocal / 0.18) ** 2 * 0.14;
+    ctx.fillStyle = `rgba(185, 255, 102, ${flashAlpha})`;
     ctx.fillRect(0, 0, W, H);
   }
-
-  // 2. Anamorphic horizontal streak across hero center
-  const streakY = H * 0.45;
-  const streakGrad = ctx.createLinearGradient(0, streakY, W, streakY);
-  streakGrad.addColorStop(0, 'rgba(0, 245, 212, 0)');
-  streakGrad.addColorStop(0.5, 'rgba(212, 255, 0, 0.08)');
-  streakGrad.addColorStop(1, 'rgba(0, 245, 212, 0)');
-  ctx.fillStyle = streakGrad;
-  ctx.fillRect(0, streakY - 3, W, 6);
-
-  // 3. Optical Vignette
-  const vigStrength = layerProps.vignette ?? 0.22;
-  const rad = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.72);
-  rad.addColorStop(0, 'rgba(0,0,0,0)');
-  rad.addColorStop(1, `rgba(0,0,0,${vigStrength})`);
-  ctx.fillStyle = rad;
-  ctx.fillRect(0, 0, W, H);
-
   ctx.restore();
 }
 
-/**
- * Render complete 6-Layer Scene Graph for frame i (or isolated single layer if activeLayerFilter is set)
- */
 export function renderSceneLayers(ctx, sceneDescriptor, activeLayerFilter = null) {
   const { width: W, height: H, tGlobal, tLocal, shotDur, cam, layers, audioAmp = 0.25 } = sceneDescriptor;
   ctx.clearRect(0, 0, W, H);

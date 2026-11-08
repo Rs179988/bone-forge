@@ -1,2 +1,4 @@
-file '/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/chunks/chunk_0480_0540.ts'
-file '/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/chunks/chunk_0540_0600.ts'
+file '/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/chunks/chunk_0000_0150.ts'
+file '/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/chunks/chunk_0150_0300.ts'
+file '/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/chunks/chunk_0300_0450.ts'
+file '/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/chunks/chunk_0450_0600.ts'

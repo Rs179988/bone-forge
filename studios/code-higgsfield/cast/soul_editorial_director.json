@@ -1,0 +1,9 @@
+{
+  "id": "soul_editorial_director",
+  "name": "Aegis // Studio Director Character Rig",
+  "kind": "character_rig",
+  "blurb": "Articulated 2.5D character rig with audio-reactive lip-sync, expressive eyes, and neo-brutalist ink outlines.",
+  "accent_color": "#B9FF66",
+  "default_stiffness": 225.0,
+  "default_damping": 17.0
+}

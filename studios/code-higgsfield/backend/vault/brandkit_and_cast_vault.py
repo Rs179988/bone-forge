@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Layer 6C: Persistent BrandKit DNA & Soul ID Character/Component Rig Vault
-Adapted from higgsfield-ai/skills (higgsfield-brandkit & higgsfield-soul-id)
-and Autom8AI/Open-Higgsfield-AI (src/lib/characters.js).
+Updated with Light Editorial (WizardZ / Positivus), Royal Violet Daylight, Warm Ivory Craft,
+and Obsidian Cinema palettes so videos are never forced into generic dark-only slop.
 """
 
 from __future__ import annotations
@@ -18,98 +18,122 @@ CAST_DIR = STUDIO_ROOT / "cast"
 
 DEFAULT_BRANDKITS: list[dict[str, Any]] = [
     {
-        "id": "higgsfield_obsidian_lime",
-        "name": "Higgsfield Obsidian & Acid Lime",
-        "typography": {"heading": "Inter", "mono": "JetBrains Mono"},
-        "motion_physics": {"stiffness": 210.0, "damping": 18.0, "primary_curve": "backOut"},
+        "id": "wizardz_editorial_light",
+        "name": "WizardZ Editorial Light & Acid Lime (Default)",
+        "typography": {"heading": "Space Grotesk", "mono": "JetBrains Mono"},
+        "motion_physics": {"stiffness": 220.0, "damping": 18.0, "primary_curve": "backOut"},
         "palette": {
-            "bg_primary": "#09090B",
-            "bg_secondary": "#121318",
-            "accent_primary": "#D4FF00",
-            "accent_secondary": "#00F5D4",
-            "text_primary": "#F8FAFC",
-            "texture": "brushed_metal",
-        },
-    },
-    {
-        "id": "cupertino_titanium",
-        "name": "Cupertino Titanium & Cyan",
-        "typography": {"heading": "Inter", "mono": "JetBrains Mono"},
-        "motion_physics": {"stiffness": 185.0, "damping": 22.0, "primary_curve": "springDamper"},
-        "palette": {
-            "bg_primary": "#06080E",
-            "bg_secondary": "#0F172A",
-            "accent_primary": "#38BDF8",
-            "accent_secondary": "#818CF8",
-            "text_primary": "#FFFFFF",
-            "texture": "frosted_glass",
-        },
-    },
-    {
-        "id": "cinema_noir_amber",
-        "name": "Cinema Noir & Warm Amber",
-        "typography": {"heading": "Inter", "mono": "JetBrains Mono"},
-        "motion_physics": {"stiffness": 160.0, "damping": 16.0, "primary_curve": "ring"},
-        "palette": {
-            "bg_primary": "#0A0807",
-            "bg_secondary": "#1A1412",
-            "accent_primary": "#F59E0B",
-            "accent_secondary": "#EF4444",
-            "text_primary": "#FEF3C7",
+            "theme_mode": "light",
+            "bg_primary": "#FFFFFF",
+            "bg_secondary": "#F3F3F3",
+            "accent_primary": "#B9FF66",
+            "accent_secondary": "#191A23",
+            "alert_color": "#FF4D4D",
+            "text_primary": "#191A23",
+            "text_muted": "#595A66",
+            "surface_card": "#FFFFFF",
+            "surface_dark": "#191A23",
+            "border_ink": "#191A23",
             "texture": "paper_a",
         },
     },
     {
-        "id": "felt_stopmotion_craft",
-        "name": "Tactile Felt & Warm Daylight",
-        "typography": {"heading": "Inter", "mono": "JetBrains Mono"},
-        "motion_physics": {"stiffness": 240.0, "damping": 15.0, "primary_curve": "backOut"},
+        "id": "royal_violet_daylight",
+        "name": "Royal Violet & Crisp Daylight",
+        "typography": {"heading": "Space Grotesk", "mono": "JetBrains Mono"},
+        "motion_physics": {"stiffness": 205.0, "damping": 19.0, "primary_curve": "springDamper"},
         "palette": {
-            "bg_primary": "#141824",
-            "bg_secondary": "#22293E",
-            "accent_primary": "#FBBF24",
-            "accent_secondary": "#34D399",
-            "text_primary": "#FFFBEB",
+            "theme_mode": "light",
+            "bg_primary": "#FAF8FF",
+            "bg_secondary": "#EDE9FE",
+            "accent_primary": "#7C3AED",
+            "accent_secondary": "#EC4899",
+            "alert_color": "#F43F5E",
+            "text_primary": "#1E1B4B",
+            "text_muted": "#5B21B6",
+            "surface_card": "#FFFFFF",
+            "surface_dark": "#1E1B4B",
+            "border_ink": "#1E1B4B",
+            "texture": "frosted_glass",
+        },
+    },
+    {
+        "id": "warm_ivory_craft",
+        "name": "Warm Ivory & Tactile Coral Craft",
+        "typography": {"heading": "Space Grotesk", "mono": "JetBrains Mono"},
+        "motion_physics": {"stiffness": 235.0, "damping": 16.0, "primary_curve": "ring"},
+        "palette": {
+            "theme_mode": "light",
+            "bg_primary": "#FFFDF9",
+            "bg_secondary": "#F5EFE6",
+            "accent_primary": "#FF6B4A",
+            "accent_secondary": "#10B981",
+            "alert_color": "#EF4444",
+            "text_primary": "#1C1917",
+            "text_muted": "#57534E",
+            "surface_card": "#FFFFFF",
+            "surface_dark": "#1C1917",
+            "border_ink": "#1C1917",
             "texture": "felt_a",
+        },
+    },
+    {
+        "id": "higgsfield_obsidian_lime",
+        "name": "Obsidian Studio & Acid Lime (Dark)",
+        "typography": {"heading": "Space Grotesk", "mono": "JetBrains Mono"},
+        "motion_physics": {"stiffness": 210.0, "damping": 18.0, "primary_curve": "backOut"},
+        "palette": {
+            "theme_mode": "dark",
+            "bg_primary": "#09090B",
+            "bg_secondary": "#121318",
+            "accent_primary": "#B9FF66",
+            "accent_secondary": "#00F5D4",
+            "alert_color": "#FF3366",
+            "text_primary": "#F8FAFC",
+            "text_muted": "#94A3B8",
+            "surface_card": "#14161F",
+            "surface_dark": "#09090B",
+            "border_ink": "#B9FF00",
+            "texture": "brushed_metal",
         },
     },
 ]
 
 DEFAULT_CAST_RIGS: list[dict[str, Any]] = [
     {
-        "id": "soul_cyber_architect",
-        "name": "Aegis // Cyber Director Rig",
-        "kind": "character_rig",
-        "blurb": "Articulated 2.5D studio director puppet with audio-reactive lip-sync, visor blink timer, and dual rim-light.",
-        "accent_color": "#D4FF00",
+        "id": "rig_wizardz_editorial_deck",
+        "name": "WizardZ // Neo-Brutalist Editorial Deck",
+        "kind": "saas_3d_card",
+        "blurb": "Crisp white & charcoal neo-brutalist card rig with #B9FF66 lime highlight pills, live metric odometer, and vector megaphone/starburst geometry.",
+        "accent_color": "#B9FF66",
         "default_stiffness": 220.0,
+        "default_damping": 18.0,
+    },
+    {
+        "id": "soul_editorial_director",
+        "name": "Aegis // Studio Director Character Rig",
+        "kind": "character_rig",
+        "blurb": "Articulated 2.5D character rig with audio-reactive lip-sync, expressive eyes, and neo-brutalist ink outlines.",
+        "accent_color": "#B9FF66",
+        "default_stiffness": 225.0,
         "default_damping": 17.0,
     },
     {
         "id": "soul_felt_pip",
-        "name": "Chik & Wool // Tactile Felt Rig",
+        "name": "Chik & Wool // Tactile Story Character Rig",
         "kind": "character_rig",
-        "blurb": "Stop-motion felt character rig with spring squash-and-stretch hops and damped ring oscillation.",
-        "accent_color": "#FBBF24",
-        "default_stiffness": 260.0,
-        "default_damping": 14.0,
+        "blurb": "Stop-motion tactile character rig with spring squash-and-stretch hops and damped ring oscillation.",
+        "accent_color": "#FF6B4A",
+        "default_stiffness": 250.0,
+        "default_damping": 15.0,
     },
     {
-        "id": "rig_quantum_saas_card",
-        "name": "Quantum // 3D Glass Telemetry Deck",
+        "id": "rig_violet_product_showcase",
+        "name": "Prism // Daylight Product Showcase Card",
         "kind": "saas_3d_card",
-        "blurb": "Glassmorphic 3D SaaS dashboard card with odometer counter, live sparkline spline, and frequency bars.",
-        "accent_color": "#00F5D4",
-        "default_stiffness": 210.0,
-        "default_damping": 18.0,
-    },
-    {
-        "id": "rig_fintech_terminal",
-        "name": "Apex // Fintech Orderbook Rig",
-        "kind": "saas_3d_card",
-        "blurb": "High-contrast titanium trading & metrics rig with velocity-trailed cursor and click ripple.",
-        "accent_color": "#38BDF8",
-        "default_stiffness": 195.0,
+        "blurb": "High-contrast daylight & royal violet interactive UI showcase rig with smooth cursor choreography.",
+        "accent_color": "#7C3AED",
+        "default_stiffness": 200.0,
         "default_damping": 20.0,
     },
 ]
@@ -121,13 +145,11 @@ def ensure_default_vault() -> dict[str, Any]:
 
     for bk in DEFAULT_BRANDKITS:
         p = BRANDKITS_DIR / f"{bk['id']}.json"
-        if not p.exists():
-            p.write_text(json.dumps(bk, indent=2) + "\n", encoding="utf-8")
+        p.write_text(json.dumps(bk, indent=2) + "\n", encoding="utf-8")
 
     for cr in DEFAULT_CAST_RIGS:
         p = CAST_DIR / f"{cr['id']}.json"
-        if not p.exists():
-            p.write_text(json.dumps(cr, indent=2) + "\n", encoding="utf-8")
+        p.write_text(json.dumps(cr, indent=2) + "\n", encoding="utf-8")
 
     return list_vault()
 

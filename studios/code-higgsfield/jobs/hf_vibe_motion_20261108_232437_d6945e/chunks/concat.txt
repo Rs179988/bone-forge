@@ -1,0 +1,4 @@
+file '/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/chunks/chunk_0000_0150.ts'
+file '/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/chunks/chunk_0150_0300.ts'
+file '/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/chunks/chunk_0300_0450.ts'
+file '/workspace/studios/code-higgsfield/jobs/hf_vibe_motion_20261108_232437_d6945e/chunks/chunk_0450_0600.ts'

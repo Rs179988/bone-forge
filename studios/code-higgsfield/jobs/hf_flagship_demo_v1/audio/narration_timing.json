@@ -36,97 +36,57 @@
       "shot_id": "S1",
       "in_sec": 0.0,
       "out_sec": 1.8,
-      "spoken_line": "Look closely at Quantum. Every frame is engineered with zero latency.",
-      "word_count": 11,
-      "words_per_sec": 7.11,
+      "spoken_line": "Navigating the digital landscape for success.",
+      "word_count": 6,
+      "words_per_sec": 3.79,
       "words": [
         {
-          "word": "Look",
+          "word": "Navigating",
           "index": 0,
           "start_sec": 0.06,
-          "end_sec": 0.165,
+          "end_sec": 0.456,
           "start_frame": 4,
-          "end_frame": 10
+          "end_frame": 27
         },
         {
-          "word": "closely",
+          "word": "the",
           "index": 1,
-          "start_sec": 0.165,
-          "end_sec": 0.349,
-          "start_frame": 10,
-          "end_frame": 21
+          "start_sec": 0.456,
+          "end_sec": 0.575,
+          "start_frame": 27,
+          "end_frame": 34
         },
         {
-          "word": "at",
+          "word": "digital",
           "index": 2,
-          "start_sec": 0.349,
-          "end_sec": 0.401,
-          "start_frame": 21,
-          "end_frame": 24
+          "start_sec": 0.575,
+          "end_sec": 0.852,
+          "start_frame": 34,
+          "end_frame": 51
         },
         {
-          "word": "Quantum.",
+          "word": "landscape",
           "index": 3,
-          "start_sec": 0.401,
-          "end_sec": 0.611,
-          "start_frame": 24,
-          "end_frame": 37
+          "start_sec": 0.852,
+          "end_sec": 1.208,
+          "start_frame": 51,
+          "end_frame": 72
         },
         {
-          "word": "Every",
+          "word": "for",
           "index": 4,
-          "start_sec": 0.611,
-          "end_sec": 0.742,
-          "start_frame": 37,
-          "end_frame": 45
+          "start_sec": 1.208,
+          "end_sec": 1.327,
+          "start_frame": 72,
+          "end_frame": 80
         },
         {
-          "word": "frame",
+          "word": "success.",
           "index": 5,
-          "start_sec": 0.742,
-          "end_sec": 0.873,
-          "start_frame": 45,
-          "end_frame": 52
-        },
-        {
-          "word": "is",
-          "index": 6,
-          "start_sec": 0.873,
-          "end_sec": 0.926,
-          "start_frame": 52,
-          "end_frame": 56
-        },
-        {
-          "word": "engineered",
-          "index": 7,
-          "start_sec": 0.926,
-          "end_sec": 1.188,
-          "start_frame": 56,
-          "end_frame": 71
-        },
-        {
-          "word": "with",
-          "index": 8,
-          "start_sec": 1.188,
-          "end_sec": 1.293,
-          "start_frame": 71,
-          "end_frame": 78
-        },
-        {
-          "word": "zero",
-          "index": 9,
-          "start_sec": 1.293,
-          "end_sec": 1.398,
-          "start_frame": 78,
-          "end_frame": 84
-        },
-        {
-          "word": "latency.",
-          "index": 10,
-          "start_sec": 1.398,
-          "end_sec": 1.608,
-          "start_frame": 84,
-          "end_frame": 96
+          "start_sec": 1.327,
+          "end_sec": 1.644,
+          "start_frame": 80,
+          "end_frame": 99
         }
       ]
     },
@@ -134,105 +94,33 @@
       "shot_id": "S2",
       "in_sec": 1.8,
       "out_sec": 3.9,
-      "spoken_line": "Inside the middle layer, deterministic curves lock motion to the exact millisecond.",
-      "word_count": 12,
-      "words_per_sec": 6.64,
+      "spoken_line": "search engine optimization.",
+      "word_count": 3,
+      "words_per_sec": 1.62,
       "words": [
         {
-          "word": "Inside",
+          "word": "search",
           "index": 0,
           "start_sec": 1.86,
-          "end_sec": 2.01,
+          "end_sec": 2.304,
           "start_frame": 112,
-          "end_frame": 121
+          "end_frame": 138
         },
         {
-          "word": "the",
+          "word": "engine",
           "index": 1,
-          "start_sec": 2.01,
-          "end_sec": 2.086,
-          "start_frame": 121,
-          "end_frame": 125
+          "start_sec": 2.304,
+          "end_sec": 2.747,
+          "start_frame": 138,
+          "end_frame": 165
         },
         {
-          "word": "middle",
+          "word": "optimization.",
           "index": 2,
-          "start_sec": 2.086,
-          "end_sec": 2.236,
-          "start_frame": 125,
-          "end_frame": 134
-        },
-        {
-          "word": "layer,",
-          "index": 3,
-          "start_sec": 2.236,
-          "end_sec": 2.387,
-          "start_frame": 134,
-          "end_frame": 143
-        },
-        {
-          "word": "deterministic",
-          "index": 4,
-          "start_sec": 2.387,
-          "end_sec": 2.713,
-          "start_frame": 143,
-          "end_frame": 163
-        },
-        {
-          "word": "curves",
-          "index": 5,
-          "start_sec": 2.713,
-          "end_sec": 2.863,
-          "start_frame": 163,
-          "end_frame": 172
-        },
-        {
-          "word": "lock",
-          "index": 6,
-          "start_sec": 2.863,
-          "end_sec": 2.964,
-          "start_frame": 172,
-          "end_frame": 178
-        },
-        {
-          "word": "motion",
-          "index": 7,
-          "start_sec": 2.964,
-          "end_sec": 3.114,
-          "start_frame": 178,
-          "end_frame": 187
-        },
-        {
-          "word": "to",
-          "index": 8,
-          "start_sec": 3.114,
-          "end_sec": 3.164,
-          "start_frame": 187,
-          "end_frame": 190
-        },
-        {
-          "word": "the",
-          "index": 9,
-          "start_sec": 3.164,
-          "end_sec": 3.24,
-          "start_frame": 190,
-          "end_frame": 194
-        },
-        {
-          "word": "exact",
-          "index": 10,
-          "start_sec": 3.24,
-          "end_sec": 3.365,
-          "start_frame": 194,
-          "end_frame": 202
-        },
-        {
-          "word": "millisecond.",
-          "index": 11,
-          "start_sec": 3.365,
-          "end_sec": 3.666,
-          "start_frame": 202,
-          "end_frame": 220
+          "start_sec": 2.747,
+          "end_sec": 3.708,
+          "start_frame": 165,
+          "end_frame": 222
         }
       ]
     },
@@ -240,97 +128,41 @@
       "shot_id": "S3",
       "in_sec": 3.9,
       "out_sec": 5.8,
-      "spoken_line": "Watch the real-time telemetry spike past ninety-nine point eight percent precision.",
-      "word_count": 11,
-      "words_per_sec": 6.73,
+      "spoken_line": "pay per click campaigns.",
+      "word_count": 4,
+      "words_per_sec": 2.39,
       "words": [
         {
-          "word": "Watch",
+          "word": "pay",
           "index": 0,
           "start_sec": 3.96,
-          "end_sec": 4.072,
+          "end_sec": 4.199,
           "start_frame": 238,
-          "end_frame": 244
+          "end_frame": 252
         },
         {
-          "word": "the",
+          "word": "per",
           "index": 1,
-          "start_sec": 4.072,
-          "end_sec": 4.139,
-          "start_frame": 244,
-          "end_frame": 248
+          "start_sec": 4.199,
+          "end_sec": 4.438,
+          "start_frame": 252,
+          "end_frame": 266
         },
         {
-          "word": "real-time",
+          "word": "click",
           "index": 2,
-          "start_sec": 4.139,
-          "end_sec": 4.341,
-          "start_frame": 248,
-          "end_frame": 260
+          "start_sec": 4.438,
+          "end_sec": 4.836,
+          "start_frame": 266,
+          "end_frame": 290
         },
         {
-          "word": "telemetry",
+          "word": "campaigns.",
           "index": 3,
-          "start_sec": 4.341,
-          "end_sec": 4.542,
-          "start_frame": 260,
-          "end_frame": 273
-        },
-        {
-          "word": "spike",
-          "index": 4,
-          "start_sec": 4.542,
-          "end_sec": 4.654,
-          "start_frame": 273,
-          "end_frame": 279
-        },
-        {
-          "word": "past",
-          "index": 5,
-          "start_sec": 4.654,
-          "end_sec": 4.743,
-          "start_frame": 279,
-          "end_frame": 285
-        },
-        {
-          "word": "ninety-nine",
-          "index": 6,
-          "start_sec": 4.743,
-          "end_sec": 4.99,
-          "start_frame": 285,
-          "end_frame": 299
-        },
-        {
-          "word": "point",
-          "index": 7,
-          "start_sec": 4.99,
-          "end_sec": 5.102,
-          "start_frame": 299,
-          "end_frame": 306
-        },
-        {
-          "word": "eight",
-          "index": 8,
-          "start_sec": 5.102,
-          "end_sec": 5.213,
-          "start_frame": 306,
-          "end_frame": 313
-        },
-        {
-          "word": "percent",
-          "index": 9,
-          "start_sec": 5.213,
-          "end_sec": 5.37,
-          "start_frame": 313,
-          "end_frame": 322
-        },
-        {
-          "word": "precision.",
-          "index": 10,
-          "start_sec": 5.37,
-          "end_sec": 5.594,
-          "start_frame": 322,
-          "end_frame": 336
+          "start_sec": 4.836,
+          "end_sec": 5.632,
+          "start_frame": 290,
+          "end_frame": 338
         }
       ]
     },
@@ -338,113 +170,33 @@
       "shot_id": "S4",
       "in_sec": 5.8,
       "out_sec": 8.0,
-      "spoken_line": "Click any isolated layer to patch physics, lighting, or typography on the fly.",
-      "word_count": 13,
-      "words_per_sec": 6.87,
+      "spoken_line": "social media marketing.",
+      "word_count": 3,
+      "words_per_sec": 1.55,
       "words": [
         {
-          "word": "Click",
+          "word": "social",
           "index": 0,
           "start_sec": 5.86,
-          "end_sec": 6.003,
+          "end_sec": 6.413,
           "start_frame": 352,
-          "end_frame": 360
+          "end_frame": 385
         },
         {
-          "word": "any",
+          "word": "media",
           "index": 1,
-          "start_sec": 6.003,
-          "end_sec": 6.089,
-          "start_frame": 360,
-          "end_frame": 365
+          "start_sec": 6.413,
+          "end_sec": 6.874,
+          "start_frame": 385,
+          "end_frame": 412
         },
         {
-          "word": "isolated",
+          "word": "marketing.",
           "index": 2,
-          "start_sec": 6.089,
-          "end_sec": 6.319,
-          "start_frame": 365,
-          "end_frame": 379
-        },
-        {
-          "word": "layer",
-          "index": 3,
-          "start_sec": 6.319,
-          "end_sec": 6.462,
-          "start_frame": 379,
-          "end_frame": 388
-        },
-        {
-          "word": "to",
-          "index": 4,
-          "start_sec": 6.462,
-          "end_sec": 6.519,
-          "start_frame": 388,
-          "end_frame": 391
-        },
-        {
-          "word": "patch",
-          "index": 5,
-          "start_sec": 6.519,
-          "end_sec": 6.663,
-          "start_frame": 391,
-          "end_frame": 400
-        },
-        {
-          "word": "physics,",
-          "index": 6,
-          "start_sec": 6.663,
-          "end_sec": 6.892,
-          "start_frame": 400,
-          "end_frame": 414
-        },
-        {
-          "word": "lighting,",
-          "index": 7,
-          "start_sec": 6.892,
-          "end_sec": 7.15,
-          "start_frame": 414,
-          "end_frame": 429
-        },
-        {
-          "word": "or",
-          "index": 8,
-          "start_sec": 7.15,
-          "end_sec": 7.207,
-          "start_frame": 429,
-          "end_frame": 432
-        },
-        {
-          "word": "typography",
-          "index": 9,
-          "start_sec": 7.207,
-          "end_sec": 7.494,
-          "start_frame": 432,
-          "end_frame": 450
-        },
-        {
-          "word": "on",
-          "index": 10,
-          "start_sec": 7.494,
-          "end_sec": 7.551,
-          "start_frame": 450,
-          "end_frame": 453
-        },
-        {
-          "word": "the",
-          "index": 11,
-          "start_sec": 7.551,
-          "end_sec": 7.637,
-          "start_frame": 453,
-          "end_frame": 458
-        },
-        {
-          "word": "fly.",
-          "index": 12,
-          "start_sec": 7.637,
-          "end_sec": 7.752,
-          "start_frame": 458,
-          "end_frame": 465
+          "start_sec": 6.874,
+          "end_sec": 7.796,
+          "start_frame": 412,
+          "end_frame": 468
         }
       ]
     },
@@ -452,97 +204,41 @@
       "shot_id": "S5",
       "in_sec": 8.0,
       "out_sec": 10.0,
-      "spoken_line": "Code Higgsfield Studio. Pure procedural cinema at sixty frames per second.",
-      "word_count": 11,
-      "words_per_sec": 6.4,
+      "spoken_line": "240% organic traffic growth.",
+      "word_count": 4,
+      "words_per_sec": 2.27,
       "words": [
         {
-          "word": "Code",
+          "word": "240%",
           "index": 0,
           "start_sec": 8.06,
-          "end_sec": 8.168,
+          "end_sec": 8.342,
           "start_frame": 484,
-          "end_frame": 490
+          "end_frame": 501
         },
         {
-          "word": "Higgsfield",
+          "word": "organic",
           "index": 1,
-          "start_sec": 8.168,
-          "end_sec": 8.436,
-          "start_frame": 490,
-          "end_frame": 506
+          "start_sec": 8.342,
+          "end_sec": 8.834,
+          "start_frame": 501,
+          "end_frame": 530
         },
         {
-          "word": "Studio.",
+          "word": "traffic",
           "index": 2,
-          "start_sec": 8.436,
-          "end_sec": 8.624,
-          "start_frame": 506,
-          "end_frame": 517
+          "start_sec": 8.834,
+          "end_sec": 9.327,
+          "start_frame": 530,
+          "end_frame": 560
         },
         {
-          "word": "Pure",
+          "word": "growth.",
           "index": 3,
-          "start_sec": 8.624,
-          "end_sec": 8.732,
-          "start_frame": 517,
-          "end_frame": 524
-        },
-        {
-          "word": "procedural",
-          "index": 4,
-          "start_sec": 8.732,
-          "end_sec": 9.001,
-          "start_frame": 524,
-          "end_frame": 540
-        },
-        {
-          "word": "cinema",
-          "index": 5,
-          "start_sec": 9.001,
-          "end_sec": 9.162,
-          "start_frame": 540,
-          "end_frame": 550
-        },
-        {
-          "word": "at",
-          "index": 6,
-          "start_sec": 9.162,
-          "end_sec": 9.216,
-          "start_frame": 550,
-          "end_frame": 553
-        },
-        {
-          "word": "sixty",
-          "index": 7,
-          "start_sec": 9.216,
-          "end_sec": 9.35,
-          "start_frame": 553,
-          "end_frame": 561
-        },
-        {
-          "word": "frames",
-          "index": 8,
-          "start_sec": 9.35,
-          "end_sec": 9.511,
-          "start_frame": 561,
-          "end_frame": 571
-        },
-        {
-          "word": "per",
-          "index": 9,
-          "start_sec": 9.511,
-          "end_sec": 9.592,
-          "start_frame": 571,
-          "end_frame": 576
-        },
-        {
-          "word": "second.",
-          "index": 10,
-          "start_sec": 9.592,
-          "end_sec": 9.78,
-          "start_frame": 576,
-          "end_frame": 587
+          "start_sec": 9.327,
+          "end_sec": 9.82,
+          "start_frame": 560,
+          "end_frame": 589
         }
       ]
     }

@@ -1,0 +1,443 @@
+{
+  "job_id": "hf_vibe_motion_20261108_232437_d6945e",
+  "title": "Launching Matcha Craft",
+  "prompt": "Launching Matcha Craft Cold Brew with 320% morning energy boost, zero sugar, and organic Kyoto leaves",
+  "studio_mode": "vibe_motion",
+  "genre": "editorial_motion",
+  "aspect_ratio": "9:16",
+  "width": 1080,
+  "height": 1920,
+  "fps": 60,
+  "duration_sec": 10.0,
+  "total_frames": 600,
+  "brand_kit": "wizardz_editorial_light",
+  "palette": {
+    "name": "WizardZ Editorial Light & Acid Lime",
+    "theme_mode": "light",
+    "bg_primary": "#FFFFFF",
+    "bg_secondary": "#F3F3F3",
+    "accent_primary": "#B9FF66",
+    "accent_secondary": "#191A23",
+    "alert_color": "#FF4D4D",
+    "text_primary": "#191A23",
+    "text_muted": "#595A66",
+    "surface_card": "#FFFFFF",
+    "surface_dark": "#191A23",
+    "border_ink": "#191A23",
+    "texture": "paper_a"
+  },
+  "physics": {
+    "stiffness": 220.0,
+    "damping": 18.0,
+    "overshoot_k": 1.9
+  },
+  "cast": [
+    {
+      "id": "hero_primary",
+      "kind": "saas_3d_card",
+      "name": "Launching Matcha Craft Hero",
+      "soul_id": "rig_wizardz_editorial_deck",
+      "accent_color": "#B9FF66"
+    },
+    {
+      "id": "telemetry_orb",
+      "kind": "through_line_prop",
+      "name": "Editorial Starburst Beacon",
+      "accent_color": "#191A23"
+    }
+  ],
+  "through_line": {
+    "object_id": "telemetry_orb",
+    "name": "LAUNCHING Editorial Starburst",
+    "progression": [
+      "S1: Launches beside LAUNCHING MATCHA CRAFT COLD",
+      "S2: Anchors card focus on 320% MORNING ENERGY",
+      "S3: Highlights key metric proof on ZERO SUGAR",
+      "S4: Drives dynamic transition into ORGANIC KYOTO LEAVES",
+      "S5: Locks final brand signature on LAUNCHING MATCHA // NEXT LEVEL"
+    ]
+  },
+  "arc": {
+    "hook": "S1 (0.0s-1.8s): LAUNCHING MATCHA CRAFT COLD",
+    "build": "S2-S3: 320% MORNING ENERGY -> ZERO SUGAR",
+    "turn": "S4: ORGANIC KYOTO LEAVES",
+    "payoff": "S5: LAUNCHING MATCHA // NEXT LEVEL"
+  },
+  "shots": [
+    {
+      "id": "S1",
+      "index": 0,
+      "in_sec": 0.0,
+      "out_sec": 1.8,
+      "in_frame": 0,
+      "out_frame": 108,
+      "shot_size": "WIDE",
+      "subject": "hero_primary_angle_1",
+      "camera_move": "dolly_in",
+      "primary_curve": "backOut",
+      "spoken_line": "Here is how Launching Matcha Craft transforms the entire landscape.",
+      "sfx_trigger": {
+        "type": "whoosh",
+        "offset_sec": 0.08
+      },
+      "layers": {
+        "L0_Backdrop": {
+          "theme_mode": "light",
+          "palette_bg": "#FFFFFF",
+          "palette_secondary": "#F3F3F3",
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23",
+          "texture": "paper_a",
+          "ray_intensity": 0.28
+        },
+        "L1_Environment": {
+          "grid_mode": "editorial_dots",
+          "parallax_depth": 1.0,
+          "accent_color": "#191A23",
+          "highlight_color": "#B9FF66"
+        },
+        "L2_HeroSubject": {
+          "cast_id": "hero_primary",
+          "kind": "saas_3d_card",
+          "card_variant": "white",
+          "pose_mode": "establish_rise",
+          "card_title": "LAUNCHING MATCHA CRAFT COLD",
+          "metric_value": 320.0,
+          "metric_unit": "%",
+          "metric_label": "LAUNCHING MATCHA IMPACT",
+          "stiffness": 220.0,
+          "damping": 18.0,
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23"
+        },
+        "L3_MotionProps": {
+          "through_line_id": "telemetry_orb",
+          "through_line_state": 0,
+          "cursor_active": false,
+          "floating_badges": [
+            "LAUNCHING",
+            "01 // MATCHA"
+          ],
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23"
+        },
+        "L4_TypographyHUD": {
+          "headline": "LAUNCHING MATCHA CRAFT COLD",
+          "sub_caption": "Here is how Launching Matcha Craft transforms the entire landscape.",
+          "safe_margin_pct": 0.08,
+          "theme_mode": "light",
+          "text_color": "#191A23",
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23",
+          "badge_tag": "01 \u2022 LAUNCHING"
+        },
+        "L5_PostFX": {
+          "bloom_intensity": 0.18,
+          "vignette": 0.06,
+          "chromatic_aberration": 0.001,
+          "beat_flash": true
+        }
+      }
+    },
+    {
+      "id": "S2",
+      "index": 1,
+      "in_sec": 1.8,
+      "out_sec": 3.9,
+      "in_frame": 108,
+      "out_frame": 234,
+      "shot_size": "CU",
+      "subject": "hero_primary_angle_2",
+      "camera_move": "orbital_arc",
+      "primary_curve": "ring",
+      "spoken_line": "We focus on craft and cold with clean, unmistakable clarity.",
+      "sfx_trigger": {
+        "type": "ui_pop",
+        "offset_sec": 0.08
+      },
+      "layers": {
+        "L0_Backdrop": {
+          "theme_mode": "light",
+          "palette_bg": "#FFFFFF",
+          "palette_secondary": "#F3F3F3",
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23",
+          "texture": "paper_a",
+          "ray_intensity": 0.36
+        },
+        "L1_Environment": {
+          "grid_mode": "editorial_dots",
+          "parallax_depth": 1.28,
+          "accent_color": "#191A23",
+          "highlight_color": "#B9FF66"
+        },
+        "L2_HeroSubject": {
+          "cast_id": "hero_primary",
+          "kind": "saas_3d_card",
+          "card_variant": "dark",
+          "pose_mode": "close_inspect",
+          "card_title": "320% MORNING ENERGY",
+          "metric_value": 240.0,
+          "metric_unit": "%",
+          "metric_label": "CRAFT COLD IMPACT",
+          "stiffness": 220.0,
+          "damping": 18.0,
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23"
+        },
+        "L3_MotionProps": {
+          "through_line_id": "telemetry_orb",
+          "through_line_state": 1,
+          "cursor_active": true,
+          "floating_badges": [
+            "CRAFT",
+            "02 // COLD"
+          ],
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23"
+        },
+        "L4_TypographyHUD": {
+          "headline": "320% MORNING ENERGY",
+          "sub_caption": "We focus on craft and cold with clean, unmistakable clarity.",
+          "safe_margin_pct": 0.08,
+          "theme_mode": "light",
+          "text_color": "#191A23",
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23",
+          "badge_tag": "02 \u2022 MATCHA"
+        },
+        "L5_PostFX": {
+          "bloom_intensity": 0.18,
+          "vignette": 0.06,
+          "chromatic_aberration": 0.001,
+          "beat_flash": false
+        }
+      }
+    },
+    {
+      "id": "S3",
+      "index": 2,
+      "in_sec": 3.9,
+      "out_sec": 5.8,
+      "in_frame": 234,
+      "out_frame": 348,
+      "shot_size": "DETAIL",
+      "subject": "hero_primary_angle_3",
+      "camera_move": "macro_rack_focus",
+      "primary_curve": "springDamper",
+      "spoken_line": "Every detail of craft is built for real measurable growth.",
+      "sfx_trigger": {
+        "type": "mechanical_click",
+        "offset_sec": 0.08
+      },
+      "layers": {
+        "L0_Backdrop": {
+          "theme_mode": "light",
+          "palette_bg": "#FFFFFF",
+          "palette_secondary": "#F3F3F3",
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23",
+          "texture": "paper_a",
+          "ray_intensity": 0.44
+        },
+        "L1_Environment": {
+          "grid_mode": "editorial_dots",
+          "parallax_depth": 1.56,
+          "accent_color": "#191A23",
+          "highlight_color": "#B9FF66"
+        },
+        "L2_HeroSubject": {
+          "cast_id": "hero_primary",
+          "kind": "saas_3d_card",
+          "card_variant": "lime",
+          "pose_mode": "macro_pulse",
+          "card_title": "ZERO SUGAR",
+          "metric_value": 99.4,
+          "metric_unit": "%",
+          "metric_label": "BREW 320% IMPACT",
+          "stiffness": 220.0,
+          "damping": 18.0,
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23"
+        },
+        "L3_MotionProps": {
+          "through_line_id": "telemetry_orb",
+          "through_line_state": 2,
+          "cursor_active": true,
+          "floating_badges": [
+            "BREW",
+            "03 // 320%"
+          ],
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23"
+        },
+        "L4_TypographyHUD": {
+          "headline": "ZERO SUGAR",
+          "sub_caption": "Every detail of craft is built for real measurable growth.",
+          "safe_margin_pct": 0.08,
+          "theme_mode": "light",
+          "text_color": "#191A23",
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23",
+          "badge_tag": "03 \u2022 CRAFT"
+        },
+        "L5_PostFX": {
+          "bloom_intensity": 0.18,
+          "vignette": 0.06,
+          "chromatic_aberration": 0.001,
+          "beat_flash": false
+        }
+      }
+    },
+    {
+      "id": "S4",
+      "index": 3,
+      "in_sec": 5.8,
+      "out_sec": 8.0,
+      "in_frame": 348,
+      "out_frame": 480,
+      "shot_size": "MEDIUM",
+      "subject": "hero_primary_angle_4",
+      "camera_move": "whip_pan",
+      "primary_curve": "backOut",
+      "spoken_line": "Watch how fast Launching Matcha Craft scales from concept to execution.",
+      "sfx_trigger": {
+        "type": "bass_sub_drop",
+        "offset_sec": 0.08
+      },
+      "layers": {
+        "L0_Backdrop": {
+          "theme_mode": "light",
+          "palette_bg": "#FFFFFF",
+          "palette_secondary": "#F3F3F3",
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23",
+          "texture": "paper_a",
+          "ray_intensity": 0.28
+        },
+        "L1_Environment": {
+          "grid_mode": "editorial_dots",
+          "parallax_depth": 1.84,
+          "accent_color": "#191A23",
+          "highlight_color": "#B9FF66"
+        },
+        "L2_HeroSubject": {
+          "cast_id": "hero_primary",
+          "kind": "saas_3d_card",
+          "card_variant": "white",
+          "pose_mode": "action_turn",
+          "card_title": "ORGANIC KYOTO LEAVES",
+          "metric_value": 50.0,
+          "metric_unit": "+",
+          "metric_label": "MORNING ENERGY IMPACT",
+          "stiffness": 220.0,
+          "damping": 18.0,
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23"
+        },
+        "L3_MotionProps": {
+          "through_line_id": "telemetry_orb",
+          "through_line_state": 3,
+          "cursor_active": true,
+          "floating_badges": [
+            "MORNING",
+            "04 // ENERGY"
+          ],
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23"
+        },
+        "L4_TypographyHUD": {
+          "headline": "ORGANIC KYOTO LEAVES",
+          "sub_caption": "Watch how fast Launching Matcha Craft scales from concept to execution.",
+          "safe_margin_pct": 0.08,
+          "theme_mode": "light",
+          "text_color": "#191A23",
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23",
+          "badge_tag": "04 \u2022 COLD"
+        },
+        "L5_PostFX": {
+          "bloom_intensity": 0.18,
+          "vignette": 0.06,
+          "chromatic_aberration": 0.001,
+          "beat_flash": true
+        }
+      }
+    },
+    {
+      "id": "S5",
+      "index": 4,
+      "in_sec": 8.0,
+      "out_sec": 10.0,
+      "in_frame": 480,
+      "out_frame": 600,
+      "shot_size": "OTS",
+      "subject": "hero_primary_angle_5",
+      "camera_move": "dutch_tilt",
+      "primary_curve": "easeInOut",
+      "spoken_line": "Let's make Launching Matcha Craft happen today with zero compromise.",
+      "sfx_trigger": {
+        "type": "tada",
+        "offset_sec": 0.08
+      },
+      "layers": {
+        "L0_Backdrop": {
+          "theme_mode": "light",
+          "palette_bg": "#FFFFFF",
+          "palette_secondary": "#F3F3F3",
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23",
+          "texture": "paper_a",
+          "ray_intensity": 0.36
+        },
+        "L1_Environment": {
+          "grid_mode": "editorial_dots",
+          "parallax_depth": 2.12,
+          "accent_color": "#191A23",
+          "highlight_color": "#B9FF66"
+        },
+        "L2_HeroSubject": {
+          "cast_id": "hero_primary",
+          "kind": "saas_3d_card",
+          "card_variant": "dark",
+          "pose_mode": "hero_lock",
+          "card_title": "LAUNCHING MATCHA // NEXT LEVEL",
+          "metric_value": 100.0,
+          "metric_unit": "%",
+          "metric_label": "BOOST ZERO IMPACT",
+          "stiffness": 220.0,
+          "damping": 18.0,
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23"
+        },
+        "L3_MotionProps": {
+          "through_line_id": "telemetry_orb",
+          "through_line_state": 4,
+          "cursor_active": false,
+          "floating_badges": [
+            "BOOST",
+            "05 // ZERO"
+          ],
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23"
+        },
+        "L4_TypographyHUD": {
+          "headline": "LAUNCHING MATCHA // NEXT LEVEL",
+          "sub_caption": "Let's make Launching Matcha Craft happen today with zero compromise.",
+          "safe_margin_pct": 0.08,
+          "theme_mode": "light",
+          "text_color": "#191A23",
+          "accent_color": "#B9FF66",
+          "ink_color": "#191A23",
+          "badge_tag": "05 \u2022 BREW"
+        },
+        "L5_PostFX": {
+          "bloom_intensity": 0.18,
+          "vignette": 0.06,
+          "chromatic_aberration": 0.001,
+          "beat_flash": false
+        }
+      }
+    }
+  ]
+}

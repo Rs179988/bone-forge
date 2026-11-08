@@ -1,0 +1,27 @@
+{
+  "id": "royal_violet_daylight",
+  "name": "Royal Violet & Crisp Daylight",
+  "typography": {
+    "heading": "Space Grotesk",
+    "mono": "JetBrains Mono"
+  },
+  "motion_physics": {
+    "stiffness": 205.0,
+    "damping": 19.0,
+    "primary_curve": "springDamper"
+  },
+  "palette": {
+    "theme_mode": "light",
+    "bg_primary": "#FAF8FF",
+    "bg_secondary": "#EDE9FE",
+    "accent_primary": "#7C3AED",
+    "accent_secondary": "#EC4899",
+    "alert_color": "#F43F5E",
+    "text_primary": "#1E1B4B",
+    "text_muted": "#5B21B6",
+    "surface_card": "#FFFFFF",
+    "surface_dark": "#1E1B4B",
+    "border_ink": "#1E1B4B",
+    "texture": "frosted_glass"
+  }
+}

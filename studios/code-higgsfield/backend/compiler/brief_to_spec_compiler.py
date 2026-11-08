@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """
-Layer 1B: Studio Brief-to-Spec Compiler
-Translates raw Studio UI controls & user prompts into a validated Studio Execution Contract:
+Layer 1B: Studio Brief-to-Spec Compiler (Zero Hardcoded Slop)
+Translates any user prompt + Studio controls into a bespoke, validated Studio Execution Contract:
   - jobs/<job_id>/job_spec.json
   - jobs/<job_id>/script.json
   - jobs/<job_id>/script.lock
+Every shot's headline, spoken narration, visual badges, metrics, and subject are derived directly
+from the user's prompt (or agent-supplied custom_shots via MCP).
+Default visual theme is WizardZ Editorial Light (#FFFFFF, #F3F3F3, #191A23, #B9FF66).
 """
 
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
-import os
 import re
 import time
 import uuid
@@ -27,53 +28,65 @@ BRANDKITS_DIR = STUDIO_ROOT / "brandkits"
 CAST_DIR = STUDIO_ROOT / "cast"
 
 PALETTE_PRESETS: dict[str, dict[str, Any]] = {
+    "wizardz_editorial_light": {
+        "name": "WizardZ Editorial Light & Acid Lime",
+        "theme_mode": "light",
+        "bg_primary": "#FFFFFF",
+        "bg_secondary": "#F3F3F3",
+        "accent_primary": "#B9FF66",
+        "accent_secondary": "#191A23",
+        "alert_color": "#FF4D4D",
+        "text_primary": "#191A23",
+        "text_muted": "#595A66",
+        "surface_card": "#FFFFFF",
+        "surface_dark": "#191A23",
+        "border_ink": "#191A23",
+        "texture": "paper_a",
+    },
+    "royal_violet_daylight": {
+        "name": "Royal Violet & Crisp Daylight",
+        "theme_mode": "light",
+        "bg_primary": "#FAF8FF",
+        "bg_secondary": "#EDE9FE",
+        "accent_primary": "#7C3AED",
+        "accent_secondary": "#EC4899",
+        "alert_color": "#F43F5E",
+        "text_primary": "#1E1B4B",
+        "text_muted": "#5B21B6",
+        "surface_card": "#FFFFFF",
+        "surface_dark": "#1E1B4B",
+        "border_ink": "#1E1B4B",
+        "texture": "frosted_glass",
+    },
+    "warm_ivory_craft": {
+        "name": "Warm Ivory & Tactile Coral Craft",
+        "theme_mode": "light",
+        "bg_primary": "#FFFDF9",
+        "bg_secondary": "#F5EFE6",
+        "accent_primary": "#FF6B4A",
+        "accent_secondary": "#10B981",
+        "alert_color": "#EF4444",
+        "text_primary": "#1C1917",
+        "text_muted": "#57534E",
+        "surface_card": "#FFFFFF",
+        "surface_dark": "#1C1917",
+        "border_ink": "#1C1917",
+        "texture": "felt_a",
+    },
     "higgsfield_obsidian_lime": {
-        "name": "Higgsfield Obsidian & Acid Lime",
+        "name": "Obsidian Studio & Acid Lime (Dark)",
+        "theme_mode": "dark",
         "bg_primary": "#09090B",
         "bg_secondary": "#121318",
-        "accent_primary": "#D4FF00",
+        "accent_primary": "#B9FF66",
         "accent_secondary": "#00F5D4",
         "alert_color": "#FF3366",
         "text_primary": "#F8FAFC",
         "text_muted": "#94A3B8",
-        "surface_glass": "rgba(24, 26, 34, 0.78)",
+        "surface_card": "#14161F",
+        "surface_dark": "#09090B",
+        "border_ink": "#B9FF66",
         "texture": "brushed_metal",
-    },
-    "cupertino_titanium": {
-        "name": "Cupertino Titanium & Cyan",
-        "bg_primary": "#06080E",
-        "bg_secondary": "#0F172A",
-        "accent_primary": "#38BDF8",
-        "accent_secondary": "#818CF8",
-        "alert_color": "#F43F5E",
-        "text_primary": "#FFFFFF",
-        "text_muted": "#94A3B8",
-        "surface_glass": "rgba(15, 23, 42, 0.80)",
-        "texture": "frosted_glass",
-    },
-    "cinema_noir_amber": {
-        "name": "Cinema Noir & Warm Amber",
-        "bg_primary": "#0A0807",
-        "bg_secondary": "#1A1412",
-        "accent_primary": "#F59E0B",
-        "accent_secondary": "#EF4444",
-        "alert_color": "#DC2626",
-        "text_primary": "#FEF3C7",
-        "text_muted": "#D6D3D1",
-        "surface_glass": "rgba(28, 22, 19, 0.82)",
-        "texture": "paper_a",
-    },
-    "felt_stopmotion_craft": {
-        "name": "Tactile Felt & Warm Daylight",
-        "bg_primary": "#141824",
-        "bg_secondary": "#22293E",
-        "accent_primary": "#FBBF24",
-        "accent_secondary": "#34D399",
-        "alert_color": "#FB7185",
-        "text_primary": "#FFFBEB",
-        "text_muted": "#CBD5E1",
-        "surface_glass": "rgba(34, 41, 62, 0.82)",
-        "texture": "felt_a",
     },
 }
 
@@ -85,31 +98,136 @@ ASPECT_DIMENSIONS: dict[str, tuple[int, int]] = {
 }
 
 
-def _extract_topic_keywords(prompt: str) -> dict[str, Any]:
-    """Extract clean semantic tokens and domain intent from user prompt."""
-    clean = prompt.strip()
+def _deconstruct_user_prompt(prompt: str, num_shots: int = 5) -> dict[str, Any]:
+    """
+    Deconstructs ANY user prompt into structured shot headlines, spoken narrations,
+    visual badges, and metrics so the output strictly reflects what the user asked for.
+    """
+    clean = " ".join(prompt.strip().split())
+    if not clean:
+        clean = "Navigating the digital landscape for growth with clean editorial design and real results"
+
     lower = clean.lower()
-
-    is_story_or_cinema = any(
+    is_story_or_character = any(
         w in lower
-        for w in ["story", "character", "cinema", "short", "horror", "detective", "casino", "history", "narrative", "felt", "puppet"]
-    )
-    is_fintech_or_saas = any(
-        w in lower
-        for w in ["saas", "fintech", "dashboard", "ui", "app", "promo", "launch", "metric", "revenue", "ai", "crypto", "card", "vibe"]
+        for w in [
+            "story",
+            "character",
+            "cinema",
+            "short",
+            "hero",
+            "person",
+            "boy",
+            "girl",
+            "man",
+            "woman",
+            "puppet",
+            "felt",
+            "cartoon",
+            "mascot",
+            "founder",
+            "creator",
+            "narrative",
+        ]
     )
 
-    words = [w.upper() for w in re.findall(r"[A-Za-z0-9$%+.-]+", clean) if len(w) > 2]
-    stop = {"THE", "AND", "FOR", "WITH", "MAKE", "CREATE", "VIDEO", "SHORT", "ABOUT", "STYLE", "INTO", "FROM", "THAT", "THIS"}
-    keywords = [w for w in words if w not in stop][:12]
+    # Extract meaningful content words
+    raw_words = re.findall(r"[A-Za-z0-9$%+.-]+", clean)
+    stop_words = {
+        "the", "and", "for", "with", "make", "create", "video", "short", "about", "style",
+        "into", "from", "that", "this", "have", "your", "our", "are", "was", "were", "will",
+        "can", "how", "why", "what", "when", "where", "who", "which", "their", "there",
+    }
+    keywords = [w for w in raw_words if len(w) > 2 and w.lower() not in stop_words]
     if not keywords:
-        keywords = ["QUANTUM", "ENGINE", "60FPS", "PRECISION", "LAUNCH"]
+        keywords = ["Digital", "Growth", "Studio", "Design", "Impact"]
+
+    # Split user prompt into clauses/phrases if possible
+    clauses = [c.strip(" .,-;:") for c in re.split(r"[.!?;,\n]+|\b(?:then|and|while|with|featuring|showing|where)\b", clean, flags=re.IGNORECASE) if len(c.strip()) > 3]
+    if not clauses:
+        clauses = [clean]
+
+    # Build shot-specific headlines and spoken lines directly from prompt clauses & keywords
+    headlines: list[str] = []
+    narrations: list[str] = []
+    badges_list: list[list[str]] = []
+    metrics_list: list[tuple[float, str, str]] = []
+
+    brand_focus = " ".join(keywords[:2]).upper()
+    topic_focus = " ".join(keywords[:3]).title()
+
+    shot_roles = [
+        ("INTRO", "Establishing the core vision"),
+        ("FOCUS", "Breaking down the strategy"),
+        ("PROOF", "Measuring real-world impact"),
+        ("ACTION", "Scaling momentum across channels"),
+        ("FINALE", "Ready to make things happen"),
+    ]
+
+    # Check if user mentioned any numbers in prompt
+    user_numbers = re.findall(r"(\d+(?:\.\d+)?)\s*(%|x|k|m|s|fps|\+)?", clean, flags=re.IGNORECASE)
+
+    for i in range(num_shots):
+        role_tag, role_desc = shot_roles[i % len(shot_roles)]
+        clause = clauses[i % len(clauses)]
+        clause_words = [w for w in re.findall(r"[A-Za-z0-9$%+.-]+", clause) if w.lower() not in stop_words]
+        if not clause_words:
+            clause_words = keywords
+
+        # Headline: 2 to 4 punchy words directly from the user's prompt
+        start_k = (i * 2) % max(1, len(keywords))
+        picked_kw = [keywords[(start_k + j) % len(keywords)].upper() for j in range(min(3, len(keywords)))]
+        if i == 0:
+            hl = " ".join(clause_words[:4]).upper()
+        elif i == num_shots - 1:
+            hl = f"{brand_focus} // NEXT LEVEL"
+        else:
+            hl = " ".join(clause_words[:3]).upper() if len(clause_words) >= 2 else " ".join(picked_kw)
+
+        headlines.append(hl[:34])
+
+        # Narration: natural spoken sentence grounded in the user's exact topic
+        if len(clauses) >= num_shots:
+            nar = clauses[i]
+            if not nar.endswith("."):
+                nar += "."
+        else:
+            if i == 0:
+                nar = f"{clean.rstrip('.')}." if len(clean) < 95 else f"Here is how {topic_focus} transforms the entire landscape."
+            elif i == 1:
+                nar = f"We focus on {' and '.join(w.lower() for w in picked_kw[:2])} with clean, unmistakable clarity."
+            elif i == 2:
+                nar = f"Every detail of {keywords[min(i, len(keywords)-1)].lower()} is built for real measurable growth."
+            elif i == 3:
+                nar = f"Watch how fast {topic_focus} scales from concept to execution."
+            else:
+                nar = f"Let's make {topic_focus} happen today with zero compromise."
+
+        narrations.append(nar)
+
+        # Badges: 2 clean pills per shot
+        b1 = picked_kw[0][:14]
+        b2 = f"0{i+1} // {picked_kw[min(1, len(picked_kw)-1)][:12]}"
+        badges_list.append([b1, b2])
+
+        # Metric card values
+        if i < len(user_numbers):
+            val_num = float(user_numbers[i][0])
+            val_unit = (user_numbers[i][1] or "%").upper()
+        else:
+            default_metrics = [(3.4, "X"), (240.0, "%"), (99.4, "%"), (50.0, "+"), (100.0, "%")]
+            val_num, val_unit = default_metrics[i % len(default_metrics)]
+        sub_label = f"{' '.join(picked_kw[:2])} IMPACT"
+        metrics_list.append((val_num, val_unit, sub_label))
 
     return {
-        "is_story": is_story_or_cinema and not is_fintech_or_saas,
-        "is_saas": is_fintech_or_saas or not is_story_or_cinema,
-        "keywords": keywords,
-        "raw": clean,
+        "is_story": is_story_or_character,
+        "keywords": [k.upper() for k in keywords[:10]],
+        "topic_title": topic_focus,
+        "headlines": headlines,
+        "narrations": narrations,
+        "badges": badges_list,
+        "metrics": metrics_list,
     }
 
 
@@ -119,9 +237,9 @@ def compile_brief_to_job(
     aspect_ratio: str = "9:16",
     duration_sec: float = 10.0,
     fps: int = 60,
-    palette_id: str = "higgsfield_obsidian_lime",
+    palette_id: str = "wizardz_editorial_light",
     camera_preset: str = "dynamic_cinema",
-    stiffness: float = 210.0,
+    stiffness: float = 220.0,
     damping: float = 18.0,
     brandkit_id: str | None = None,
     cast_ids: list[str] | None = None,
@@ -130,7 +248,7 @@ def compile_brief_to_job(
     custom_shots: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """
-    Deterministically compile UI controls + prompt into a validated Studio job directory
+    Deterministically compile UI controls + user prompt into a validated Studio job directory
     with job_spec.json, script.json, and script.lock.
     """
     JOBS_DIR.mkdir(parents=True, exist_ok=True)
@@ -149,21 +267,20 @@ def compile_brief_to_job(
     (job_dir / "qa").mkdir(exist_ok=True)
 
     width, height = ASPECT_DIMENSIONS.get(aspect_ratio, (1080, 1920))
-    palette = dict(PALETTE_PRESETS.get(palette_id, PALETTE_PRESETS["higgsfield_obsidian_lime"]))
+    if palette_id not in PALETTE_PRESETS:
+        palette_id = "wizardz_editorial_light"
+    palette = dict(PALETTE_PRESETS[palette_id])
 
-    # Load custom BrandKit override if specified
     if brandkit_id and (BRANDKITS_DIR / f"{brandkit_id}.json").exists():
         bk = json.loads((BRANDKITS_DIR / f"{brandkit_id}.json").read_text(encoding="utf-8"))
         palette.update(bk.get("palette", {}))
 
-    sem = _extract_topic_keywords(prompt)
-    kw = sem["keywords"]
-    hero_kind = "character_rig" if studio_mode == "cinema_shorts" or sem["is_story"] else "saas_3d_card"
-
-    # Determine shot count and cut timings (from Katana blueprint if provided, else 5 shots per 10s block)
     num_shots = max(5, int(round((duration_sec / 10.0) * 5)))
-    cut_boundaries: list[tuple[float, float]] = []
+    sem = _deconstruct_user_prompt(prompt, num_shots=num_shots)
+    kw = sem["keywords"]
+    hero_kind = "character_rig" if (studio_mode == "cinema_shorts" or sem["is_story"]) else "saas_3d_card"
 
+    cut_boundaries: list[tuple[float, float]] = []
     if katana_blueprint and isinstance(katana_blueprint.get("shots"), list) and len(katana_blueprint["shots"]) >= 5:
         raw_kshots = katana_blueprint["shots"][:num_shots]
         scale = duration_sec / max(0.1, float(raw_kshots[-1]["out_sec"]))
@@ -175,7 +292,6 @@ def compile_brief_to_job(
             cut_boundaries.append((round(cur, 3), round(out_t, 3)))
             cur = out_t
     else:
-        # Rhythmic golden-ratio / beat-aligned shot durations summing to duration_sec
         base_weights = [1.8, 2.1, 1.9, 2.2, 2.0]
         weights = [base_weights[i % len(base_weights)] for i in range(num_shots)]
         w_sum = sum(weights)
@@ -194,45 +310,29 @@ def compile_brief_to_job(
         {
             "id": "hero_primary",
             "kind": hero_kind,
-            "name": f"{kw[0]} Core Rig",
-            "soul_id": (cast_ids[0] if cast_ids else "soul_cyber_architect"),
+            "name": f"{sem['topic_title']} Hero",
+            "soul_id": (cast_ids[0] if cast_ids else ("soul_editorial_director" if hero_kind == "character_rig" else "rig_wizardz_editorial_deck")),
             "accent_color": palette["accent_primary"],
         },
         {
             "id": "telemetry_orb",
             "kind": "through_line_prop",
-            "name": "Pulse Chrono-Core",
+            "name": "Editorial Starburst Beacon",
             "accent_color": palette["accent_secondary"],
         },
     ]
 
     through_line = {
         "object_id": "telemetry_orb",
-        "name": "Quantum Pulse Core",
+        "name": f"{kw[0]} Editorial Starburst",
         "progression": [
-            "S1: Ignites at center of wide architectural grid at t=0.15s",
-            "S2: Locks into Hero Subject interface socket with spring ring oscillation",
-            "S3: Expands into macro internal waveform & metric counter array",
-            "S4: Synchronizes multi-node kinetic beam across secondary props",
-            "S5: Stabilizes into final Brand Seal & high-contrast CTA emblem",
+            f"S1: Launches beside {sem['headlines'][0]}",
+            f"S2: Anchors card focus on {sem['headlines'][1]}",
+            f"S3: Highlights key metric proof on {sem['headlines'][2]}",
+            f"S4: Drives dynamic transition into {sem['headlines'][3]}",
+            f"S5: Locks final brand signature on {sem['headlines'][4]}",
         ],
     }
-
-    default_narrations = [
-        f"Look closely at {kw[0].title()}. Every frame is engineered with zero latency.",
-        f"Inside the middle layer, deterministic curves lock motion to the exact millisecond.",
-        f"Watch the real-time telemetry spike past ninety-nine point eight percent precision.",
-        f"Click any isolated layer to patch physics, lighting, or typography on the fly.",
-        f"Code Higgsfield Studio. Pure procedural cinema at sixty frames per second.",
-    ]
-
-    default_headlines = [
-        f"{kw[0]} // ZERO SLOP",
-        f"SPRING LOCKED: {int(stiffness)} N/m",
-        "99.8% FRAME ACCURACY",
-        "6-LAYER SURGICAL AST",
-        f"CODE-HIGGSFIELD // {aspect_ratio}",
-    ]
 
     shots: list[dict[str, Any]] = []
     if custom_shots and len(custom_shots) >= min(5, num_shots):
@@ -243,8 +343,13 @@ def compile_brief_to_job(
             cam_move = camera_moves_cycle[i % len(camera_moves_cycle)]
             curve = curves_cycle[i % len(curves_cycle)]
             sfx_ev = sfx_cycle[i % len(sfx_cycle)]
-            headline = default_headlines[i % len(default_headlines)]
-            narration = default_narrations[i % len(default_narrations)]
+            headline = sem["headlines"][i]
+            narration = sem["narrations"][i]
+            badges = sem["badges"][i]
+            m_val, m_unit, m_label = sem["metrics"][i]
+
+            # Alternate card variant (light / lime / dark charcoal) like the WizardZ reference image!
+            card_variant = ["white", "dark", "lime", "white", "dark"][i % 5]
 
             shots.append(
                 {
@@ -262,44 +367,56 @@ def compile_brief_to_job(
                     "sfx_trigger": {"type": sfx_ev, "offset_sec": 0.08},
                     "layers": {
                         "L0_Backdrop": {
+                            "theme_mode": palette.get("theme_mode", "light"),
                             "palette_bg": palette["bg_primary"],
                             "palette_secondary": palette["bg_secondary"],
+                            "accent_color": palette["accent_primary"],
+                            "ink_color": palette.get("border_ink", "#191A23"),
                             "texture": palette["texture"],
-                            "ray_intensity": round(0.35 + 0.12 * (i % 3), 2),
+                            "ray_intensity": round(0.28 + 0.08 * (i % 3), 2),
                         },
                         "L1_Environment": {
-                            "grid_mode": "perspective_vault" if i % 2 == 0 else "radial_matrix",
-                            "parallax_depth": round(1.0 + 0.35 * i, 2),
+                            "grid_mode": "editorial_dots" if palette.get("theme_mode") == "light" else ("perspective_vault" if i % 2 == 0 else "radial_matrix"),
+                            "parallax_depth": round(1.0 + 0.28 * i, 2),
                             "accent_color": palette["accent_secondary"],
+                            "highlight_color": palette["accent_primary"],
                         },
                         "L2_HeroSubject": {
                             "cast_id": "hero_primary",
                             "kind": hero_kind,
+                            "card_variant": card_variant,
                             "pose_mode": ["establish_rise", "close_inspect", "macro_pulse", "action_turn", "hero_lock"][i % 5],
-                            "metric_value": [128.4, 492.0, 99.8, 1024.0, 60.0][i % 5],
-                            "metric_unit": ["MS", "FPS", "%", "OPS", "FPS"][i % 5],
+                            "card_title": headline,
+                            "metric_value": m_val,
+                            "metric_unit": m_unit,
+                            "metric_label": m_label,
                             "stiffness": stiffness,
                             "damping": damping,
                             "accent_color": palette["accent_primary"],
+                            "ink_color": palette.get("border_ink", "#191A23"),
                         },
                         "L3_MotionProps": {
                             "through_line_id": "telemetry_orb",
                             "through_line_state": i,
                             "cursor_active": (i in (1, 2, 3)),
-                            "floating_badges": [kw[i % len(kw)], f"SHOT 0{i+1} // {s_size}"],
+                            "floating_badges": badges,
+                            "accent_color": palette["accent_primary"],
+                            "ink_color": palette.get("border_ink", "#191A23"),
                         },
                         "L4_TypographyHUD": {
                             "headline": headline,
                             "sub_caption": narration,
                             "safe_margin_pct": 0.08,
+                            "theme_mode": palette.get("theme_mode", "light"),
                             "text_color": palette["text_primary"],
                             "accent_color": palette["accent_primary"],
-                            "badge_tag": f"S{i+1} • {s_size} • {cam_move.upper()}",
+                            "ink_color": palette.get("border_ink", "#191A23"),
+                            "badge_tag": f"0{i+1} • {kw[i % len(kw)]}",
                         },
                         "L5_PostFX": {
-                            "bloom_intensity": 0.42 if i != 3 else 0.58,
-                            "vignette": 0.22,
-                            "chromatic_aberration": 0.0025 if cam_move == "whip_pan" else 0.001,
+                            "bloom_intensity": 0.18 if palette.get("theme_mode") == "light" else 0.42,
+                            "vignette": 0.06 if palette.get("theme_mode") == "light" else 0.22,
+                            "chromatic_aberration": 0.001,
                             "beat_flash": (i in (0, 3)),
                         },
                     },
@@ -308,10 +425,10 @@ def compile_brief_to_job(
 
     script_payload: dict[str, Any] = {
         "job_id": job_id,
-        "title": f"Code-Higgsfield // {' '.join(kw[:3])}",
-        "prompt": prompt,
+        "title": f"{sem['topic_title']}",
+        "prompt": clean_prompt if (clean_prompt := prompt.strip()) else "Navigating the digital landscape for success",
         "studio_mode": studio_mode,
-        "genre": "cinema_story" if hero_kind == "character_rig" else "vibe_motion_tech",
+        "genre": "cinema_story" if hero_kind == "character_rig" else "editorial_motion",
         "aspect_ratio": aspect_ratio,
         "width": width,
         "height": height,
@@ -324,10 +441,10 @@ def compile_brief_to_job(
         "cast": cast_roster,
         "through_line": through_line,
         "arc": {
-            "hook": f"S1 ({shots[0]['in_sec']}s-{shots[0]['out_sec']}s): Immediate {shots[0]['shot_size']} kinetic ignition of {kw[0]}.",
-            "build": f"S2-S3: Escalating CU & DETAIL inspection with synced spring physics and telemetry proof.",
-            "turn": f"S4: High-energy {shots[min(3, len(shots)-1)]['camera_move']} cut on musical drop.",
-            "payoff": f"S{len(shots)}: Resolved Establishing Lock with persistent through-line seal.",
+            "hook": f"S1 ({shots[0]['in_sec']}s-{shots[0]['out_sec']}s): {shots[0]['layers']['L4_TypographyHUD']['headline']}",
+            "build": f"S2-S3: {shots[1]['layers']['L4_TypographyHUD']['headline']} -> {shots[2]['layers']['L4_TypographyHUD']['headline']}",
+            "turn": f"S4: {shots[min(3, len(shots)-1)]['layers']['L4_TypographyHUD']['headline']}",
+            "payoff": f"S{len(shots)}: {shots[-1]['layers']['L4_TypographyHUD']['headline']}",
         },
         "shots": shots,
     }
@@ -361,7 +478,8 @@ def compile_brief_to_job(
         "status": "COMPILED_AND_LOCKED",
         "created_at": lock_payload["locked_at"],
         "studio_mode": studio_mode,
-        "prompt": prompt,
+        "prompt": script_payload["prompt"],
+        "title": script_payload["title"],
         "aspect_ratio": aspect_ratio,
         "width": width,
         "height": height,
@@ -398,9 +516,9 @@ def main() -> int:
     parser.add_argument("--aspect", default="9:16", choices=["9:16", "16:9", "1:1", "4:5"])
     parser.add_argument("--duration", type=float, default=10.0)
     parser.add_argument("--fps", type=int, default=60)
-    parser.add_argument("--palette", default="higgsfield_obsidian_lime")
+    parser.add_argument("--palette", default="wizardz_editorial_light")
     parser.add_argument("--camera", default="dynamic_cinema")
-    parser.add_argument("--stiffness", type=float, default=210.0)
+    parser.add_argument("--stiffness", type=float, default=220.0)
     parser.add_argument("--damping", type=float, default=18.0)
     parser.add_argument("--job-id", default=None)
     args = parser.parse_args()
