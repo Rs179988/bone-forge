@@ -2,8 +2,32 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Iraa — Why Your High-Effort Videos Flop (Light Editorial Graph-Paper Cut)</title>
+<title>Iraa — Why Your High-Effort Videos Flop (14-Scene Dynamic Cut)</title>
 <style>
+  @font-face {
+    font-family: 'Ellak';
+    src: url('../../assets/fonts/Ellak.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Inter Tight';
+    src: url('../../assets/fonts/InterTight.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Instrument Serif';
+    src: url('../../assets/fonts/InstrumentSerif-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Instrument Serif';
+    src: url('../../assets/fonts/InstrumentSerif-Italic.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
     width: 1080px;
@@ -19,17 +43,22 @@
 </style>
 </head>
 <body>
+<!-- Pre-warm custom fonts in DOM so Canvas 2D context has all glyphs rasterized -->
+<div style="position:fixed;left:-9999px;top:-9999px;opacity:0;pointer-events:none;">
+  <span style="font-family:'Ellak';font-weight:800;"> preload </span>
+  <span style="font-family:'Inter Tight';font-weight:900;"> preload </span>
+  <span style="font-family:'Instrument Serif';font-style:italic;"> preload </span>
+</div>
 <canvas id="stage" width="1080" height="1920"></canvas>
 <script src="../../rig/studio_rig.js"></script>
 <script>
 const canvas = document.getElementById("stage");
 const ctx = canvas.getContext("2d");
-const { spring, easeOutExpo, easeInOutCubic, clamp } = window.StudioRig;
+const { spring, easeOutExpo, easeInOutCubic, applyCanvasCamera, clamp } = window.StudioRig;
 
 window.BEAT_CLOCK = null;
 window.STUDIO_LOCK = null;
 
-// Default palette & typography bound to the user's studio_lock.json
 window.PAL = {
   bg_obsidian: "#EAEAE6",
   bg_elevated: "#FFFFFF",
@@ -45,6 +74,12 @@ window.PAL = {
   chart_gradients: ["#38A3A5", "#5E60CE", "#E05297", "#FF7B00"]
 };
 
+window.TYPO = {
+  font_display: "'Inter Tight', 'Ellak', sans-serif",
+  font_editorial_serif: "'Instrument Serif', serif",
+  font_mono: "'DejaVu Sans Mono', monospace"
+};
+
 window.GRID_SIZE = 64;
 
 window.initClock = function(clockData, studioLockData) {
@@ -55,6 +90,9 @@ window.initClock = function(clockData, studioLockData) {
     if (ds.palette) {
       window.PAL = Object.assign({}, window.PAL, ds.palette);
       document.body.style.background = window.PAL.bg_obsidian;
+    }
+    if (ds.typography) {
+      window.TYPO = Object.assign({}, window.TYPO, ds.typography);
     }
     if (ds.canvas_and_motion_effects && ds.canvas_and_motion_effects.grid_cell_size_px) {
       window.GRID_SIZE = ds.canvas_and_motion_effects.grid_cell_size_px;
@@ -73,96 +111,104 @@ function hexRgba(hex, alpha) {
 }
 
 // ============================================================================
-// SHARED COMPONENT 1: LIGHT EDITORIAL GRAPH-PAPER GRID + SUBTLE CURVED RIBBONS
+// SHARED PRIMITIVE 1: LIGHT EDITORIAL GRAPH-PAPER GRID + CURVED RIBBONS
 // ============================================================================
 function drawLightGraphPaperCanvas(ctx, frame) {
   const P = window.PAL;
   const gs = window.GRID_SIZE || 64;
 
-  // Base warm off-white / light grey (#EAEAE6)
-  ctx.fillStyle = P.bg_obsidian;
-  ctx.fillRect(0, 0, 1080, 1920);
-
-  // Subtle animated drift on graph-paper grid so zero frames are ever static
-  const shiftX = (frame * 0.45) % gs;
-  const shiftY = (frame * 0.35) % gs;
-
   ctx.save();
+  ctx.fillStyle = P.bg_obsidian;
+  ctx.fillRect(-300, -300, 1680, 2520);
+
+  const shiftX = (frame * 0.5) % gs;
+  const shiftY = (frame * 0.4) % gs;
+
   ctx.strokeStyle = P.border_subtle || "rgba(17, 17, 17, 0.08)";
   ctx.lineWidth = 1.5;
-  for (let x = -gs + shiftX; x < 1080 + gs; x += gs) {
+  for (let x = -256 + shiftX; x < 1344; x += gs) {
     ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, 1920);
+    ctx.moveTo(x, -256);
+    ctx.lineTo(x, 2176);
     ctx.stroke();
   }
-  for (let y = -gs + shiftY; y < 1920 + gs; y += gs) {
+  for (let y = -256 + shiftY; y < 2176; y += gs) {
     ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(1080, y);
+    ctx.moveTo(-256, y);
+    ctx.lineTo(1344, y);
     ctx.stroke();
   }
 
-  // Major grid crosshairs every 4 cells
-  ctx.strokeStyle = "rgba(20, 20, 20, 0.15)";
+  // Subtle crosshairs every 4 grid cells
+  ctx.strokeStyle = "rgba(20, 20, 20, 0.14)";
   ctx.lineWidth = 2;
-  for (let x = -gs * 4 + (shiftX * 2) % (gs * 4); x < 1080; x += gs * 4) {
-    for (let y = -gs * 4 + (shiftY * 2) % (gs * 4); y < 1920; y += gs * 4) {
+  for (let x = -gs * 4 + (shiftX * 2) % (gs * 4); x < 1280; x += gs * 4) {
+    for (let y = -gs * 4 + (shiftY * 2) % (gs * 4); y < 2100; y += gs * 4) {
       ctx.beginPath();
-      ctx.moveTo(x - 8, y); ctx.lineTo(x + 8, y);
-      ctx.moveTo(x, y - 8); ctx.lineTo(x, y + 8);
+      ctx.moveTo(x - 7, y); ctx.lineTo(x + 7, y);
+      ctx.moveTo(x, y - 7); ctx.lineTo(x, y + 7);
       ctx.stroke();
     }
   }
 
-  // Subtle curved background ribbons sweeping across the graph paper
-  ctx.strokeStyle = hexRgba(P.accent_primary, 0.08);
-  ctx.lineWidth = 42;
+  // Faint sweeping curved ribbons
+  ctx.strokeStyle = hexRgba(P.accent_primary, 0.075);
+  ctx.lineWidth = 44;
   ctx.lineCap = "round";
   ctx.beginPath();
-  ctx.moveTo(-100, 380 + Math.sin(frame * 0.03) * 40);
-  ctx.bezierCurveTo(360, 180, 720, 620, 1180, 340 + Math.cos(frame * 0.03) * 40);
+  ctx.moveTo(-160, 360 + Math.sin(frame * 0.03) * 45);
+  ctx.bezierCurveTo(360, 160, 720, 600, 1240, 320 + Math.cos(frame * 0.03) * 45);
   ctx.stroke();
 
-  ctx.strokeStyle = hexRgba(P.accent_secondary, 0.09);
-  ctx.lineWidth = 34;
+  ctx.strokeStyle = hexRgba(P.accent_secondary, 0.08);
+  ctx.lineWidth = 36;
   ctx.beginPath();
-  ctx.moveTo(-100, 1520 + Math.cos(frame * 0.025) * 45);
-  ctx.bezierCurveTo(380, 1720, 700, 1280, 1180, 1560 + Math.sin(frame * 0.025) * 45);
+  ctx.moveTo(-160, 1540 + Math.cos(frame * 0.025) * 45);
+  ctx.bezierCurveTo(380, 1740, 700, 1300, 1240, 1580 + Math.sin(frame * 0.025) * 45);
   ctx.stroke();
   ctx.restore();
 }
 
+function setFitFont(ctx, weight, startPx, family, text, maxWidth) {
+  let px = startPx;
+  ctx.font = `${weight} ${px}px ${family}`;
+  while (ctx.measureText(text).width > maxWidth && px > 14) {
+    px -= 2;
+    ctx.font = `${weight} ${px}px ${family}`;
+  }
+  return px;
+}
+
 // ============================================================================
-// SHARED COMPONENT 2: DASHED VECTOR SELECTION BOX WITH 4 CORNER ANCHOR DOTS
+// SHARED PRIMITIVE 2: TRANSPARENT DASHED VECTOR SELECTION BOX (1-2 WORDS ONLY)
+// Zero subLabel, zero solid box clutter—sits directly on the graph-paper grid!
 // ============================================================================
-function drawDashedSelectionBox(ctx, x, y, w, h, label, fillHex, textHex, sVal, subLabel = "") {
+function drawDashedSelectionBox(ctx, x, y, w, h, word, textHex, sVal, tintAlpha = 0.0) {
   const P = window.PAL;
+  const T = window.TYPO;
   if (sVal <= 0.01) return;
+  const cleanWord = String(word || "").trim();
+  if (cleanWord.split(/\s+/).length > 3) {
+    throw new Error(`Subtitle Ban Violation in drawDashedSelectionBox: "${cleanWord}"`);
+  }
+
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(sVal, sVal);
 
-  // Soft tactile drop shadow
-  ctx.shadowColor = "rgba(20, 20, 20, 0.14)";
-  ctx.shadowBlur = 24;
-  ctx.shadowOffsetX = 0;
-  ctx.shadowOffsetY = 12;
+  if (tintAlpha > 0) {
+    ctx.fillStyle = hexRgba(textHex || P.accent_primary, tintAlpha);
+    ctx.fillRect(-w / 2, -h / 2, w, h);
+  }
 
-  ctx.fillStyle = fillHex || P.bg_elevated;
-  ctx.beginPath();
-  ctx.roundRect(-w / 2, -h / 2, w, h, 10);
-  ctx.fill();
-  ctx.shadowColor = "transparent";
-
-  // Dashed vector border (#141414)
+  // Dashed vector outline (#141414)
   ctx.strokeStyle = P.border_dashed_vector || "#141414";
   ctx.lineWidth = 3.5;
   ctx.setLineDash([12, 8]);
   ctx.strokeRect(-w / 2, -h / 2, w, h);
   ctx.setLineDash([]);
 
-  // 4 Corner Anchor Dots (Vector Handle Nodes)
+  // 4 Corner Vector Handle Dots
   const corners = [
     [-w / 2, -h / 2],
     [w / 2, -h / 2],
@@ -174,144 +220,128 @@ function drawDashedSelectionBox(ctx, x, y, w, h, label, fillHex, textHex, sVal, 
     ctx.strokeStyle = P.border_dashed_vector;
     ctx.lineWidth = 3.5;
     ctx.beginPath();
-    ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+    ctx.arc(cx, cy, 8.5, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = P.accent_primary;
+    ctx.fillStyle = textHex || P.accent_primary;
     ctx.beginPath();
-    ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
+    ctx.arc(cx, cy, 3.8, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  // Main label
   ctx.fillStyle = textHex || P.ink_primary;
-  ctx.font = "900 40px 'Liberation Sans', sans-serif";
+  setFitFont(ctx, "900", 40, T.font_display, cleanWord, w - 48);
   ctx.textAlign = "center";
-  ctx.fillText(label, 0, subLabel ? -4 : 14);
-
-  if (subLabel) {
-    ctx.fillStyle = P.ink_muted;
-    ctx.font = "italic 26px 'Liberation Serif', serif";
-    ctx.fillText(subLabel, 0, 32);
-  }
+  ctx.textBaseline = "middle";
+  ctx.fillText(cleanWord, 0, 2);
 
   ctx.restore();
 }
 
 // ============================================================================
-// SHARED COMPONENT 3: DIRECTIONAL HORIZONTAL MOTION-BLUR WIPE TYPOGRAPHY
-// Mixes Italic Editorial Serif lead with Heavy Sans-Serif Punch Words
+// SHARED PRIMITIVE 3: EDITORIAL SERIF + BOLD DISPLAY MOTION-BLUR WIPE HEADER
 // ============================================================================
-function drawEditorialHeader(ctx, serifLead, boldPunch1, boldPunch2, accentHex, yPos, frame, startF) {
+function drawEditorialHeader(ctx, serifLead, boldPunch, accentHex, yPos, localF) {
   const P = window.PAL;
-  const wipe1 = spring(frame, startF, { stiffness: 230, damping: 17 });
-  const wipe2 = spring(frame, startF + 7, { stiffness: 230, damping: 17 });
+  const T = window.TYPO;
+  const wipe1 = spring(localF, 0, { stiffness: 250, damping: 18 });
+  const wipe2 = spring(localF, 6, { stiffness: 240, damping: 17 });
 
   ctx.save();
   ctx.translate(540, yPos);
   ctx.textAlign = "center";
 
-  // Italic Editorial Serif Lead
+  // Italic Instrument Serif Lead
   ctx.save();
   ctx.globalAlpha = clamp(wipe1, 0, 1);
-  ctx.translate((1 - wipe1) * -90, 0);
-  ctx.font = "italic 52px 'Liberation Serif', 'Times New Roman', serif";
+  ctx.translate((1 - wipe1) * -80, 0);
+  setFitFont(ctx, "italic", 62, T.font_editorial_serif, serifLead, 900);
   ctx.fillStyle = P.ink_primary;
-  ctx.fillText(serifLead, 0, -92);
+  ctx.fillText(serifLead, 0, -78);
   ctx.restore();
 
-  // Directional Motion-Blur Ghost Trail for Bold Sans Punch 1 (only while actively wiping in)
-  const dx1 = Math.abs(1 - wipe1) < 0.03 ? 0 : (1 - wipe1) * 180;
-  if (Math.abs(dx1) > 8) {
+  const fitPx = setFitFont(ctx, "900", 78, T.font_display, boldPunch, 800);
+  const measuredW = ctx.measureText(boldPunch).width;
+
+  // Horizontal Directional Motion-Blur Wipe for Bold Display Punch
+  const dx = Math.abs(1 - wipe2) < 0.03 ? 0 : (1 - wipe2) * 190;
+  if (Math.abs(dx) > 8) {
     for (let g = 1; g <= 3; g++) {
       ctx.save();
-      ctx.globalAlpha = 0.10 * (4 - g);
-      ctx.font = "900 88px 'Liberation Sans', sans-serif";
-      ctx.fillStyle = P.accent_primary;
-      ctx.fillText(boldPunch1, dx1 + g * 18, 0);
+      ctx.globalAlpha = 0.11 * (4 - g);
+      ctx.font = `900 ${fitPx}px ${T.font_display}`;
+      ctx.fillStyle = accentHex || P.accent_primary;
+      ctx.fillText(boldPunch, dx + g * 20, 26);
       ctx.restore();
     }
   }
-  ctx.save();
-  ctx.globalAlpha = clamp(wipe1, 0, 1);
-  ctx.font = "900 88px 'Liberation Sans', sans-serif";
-  ctx.fillStyle = P.ink_primary;
-  ctx.fillText(boldPunch1, dx1, 0);
-  ctx.restore();
 
-  // Highlighted Lime / Accent Pill behind Punch 2
-  const dx2 = Math.abs(1 - wipe2) < 0.03 ? 0 : (1 - wipe2) * -180;
   ctx.save();
-  ctx.translate(dx2, 92);
-  ctx.scale(0.9 + 0.1 * wipe2, 0.9 + 0.1 * wipe2);
+  ctx.translate(dx, 26);
+  ctx.scale(0.92 + 0.08 * wipe2, 0.92 + 0.08 * wipe2);
 
-  // Tactile Lime or Accent highlight bar behind text
-  const tw = Math.max(380, boldPunch2.length * 54);
-  ctx.fillStyle = accentHex === P.accent_highlight_lime ? P.accent_highlight_lime : hexRgba(accentHex, 0.16);
+  const pillW = Math.min(920, Math.max(380, measuredW + 96));
+  ctx.fillStyle = accentHex === P.accent_highlight_lime ? P.accent_highlight_lime : hexRgba(accentHex, 0.15);
   ctx.strokeStyle = P.border_dashed_vector;
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 3.5;
   ctx.beginPath();
-  ctx.roundRect(-tw / 2, -68, tw, 92, 14);
+  ctx.roundRect(-pillW / 2, -74, pillW, 102, 16);
   ctx.fill();
   ctx.stroke();
 
-  ctx.font = "900 82px 'Liberation Sans', sans-serif";
+  ctx.font = `900 ${fitPx}px ${T.font_display}`;
   ctx.fillStyle = accentHex === P.accent_highlight_lime ? P.ink_primary : accentHex;
-  ctx.fillText(boldPunch2, 0, 6);
+  ctx.fillText(boldPunch, 0, 8);
   ctx.restore();
 
   ctx.restore();
 }
 
 // ============================================================================
-// SHARED COMPONENT 4: FAST ROLLING ODOMETER COUNTER WITH AMBER (#FF9500) GLOW
+// SHARED PRIMITIVE 4: ROLLING AMBER (#FF9500) ODOMETER COUNTER
 // ============================================================================
-function drawAmberOdometer(ctx, x, y, valStr, labelStr, sVal) {
+function drawAmberOdometer(ctx, x, y, valStr, tagWord, sVal) {
   const P = window.PAL;
+  const T = window.TYPO;
   if (sVal <= 0.01) return;
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(sVal, sVal);
 
-  // Glowing Orange/Amber (#FF9500) outer glow card
   ctx.shadowColor = P.accent_secondary || "#FF9500";
-  ctx.shadowBlur = 36;
+  ctx.shadowBlur = 40;
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 0;
   ctx.fillStyle = P.bg_elevated;
   ctx.strokeStyle = P.accent_secondary;
   ctx.lineWidth = 5;
   ctx.beginPath();
-  ctx.roundRect(-220, -78, 440, 156, 20);
+  ctx.roundRect(-215, -80, 430, 160, 22);
   ctx.fill();
   ctx.stroke();
   ctx.shadowColor = "transparent";
   ctx.shadowBlur = 0;
 
-  // Rolling odometer slot lines
   ctx.strokeStyle = "rgba(20,20,20,0.08)";
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(-200, -24); ctx.lineTo(200, -24);
-  ctx.moveTo(-200, 24); ctx.lineTo(200, 24);
+  ctx.moveTo(-195, -24); ctx.lineTo(195, -24);
+  ctx.moveTo(-195, 24); ctx.lineTo(195, 24);
   ctx.stroke();
 
   ctx.fillStyle = P.accent_secondary;
-  ctx.font = "900 68px 'DejaVu Sans Mono', monospace";
+  ctx.font = `900 72px ${T.font_mono}`;
   ctx.textAlign = "center";
-  ctx.fillText(valStr, 0, 8);
+  ctx.fillText(valStr, 0, 10);
 
   ctx.fillStyle = P.ink_primary;
-  ctx.font = "bold 23px 'DejaVu Sans Mono', monospace";
-  ctx.fillText(labelStr, 0, 54);
+  ctx.font = `800 24px ${T.font_display}`;
+  ctx.fillText(tagWord, 0, 56);
 
   ctx.restore();
 }
 
-// ============================================================================
-// SHARED COMPONENT 5: 2D TACTILE 4-POINT STAR & IRAA MENTOR TOP BAR
-// ============================================================================
 function drawFourPointStar(ctx, x, y, radius, rot, fillHex) {
   ctx.save();
   ctx.translate(x, y);
@@ -332,693 +362,1055 @@ function drawFourPointStar(ctx, x, y, radius, rot, fillHex) {
   ctx.restore();
 }
 
-function drawIraaMentorBar(ctx, actLabel, frame) {
+function drawDashedPedestal(ctx, x, y, radius, frame) {
   const P = window.PAL;
   ctx.save();
-  ctx.translate(540, 88);
-
-  ctx.fillStyle = P.bg_elevated;
-  ctx.strokeStyle = P.border_dashed_vector;
-  ctx.lineWidth = 3;
-  ctx.shadowColor = "rgba(20,20,20,0.1)";
-  ctx.shadowBlur = 16;
-  ctx.shadowOffsetY = 6;
-  ctx.beginPath();
-  ctx.roundRect(-460, -38, 920, 76, 38);
-  ctx.fill();
-  ctx.stroke();
-  ctx.shadowColor = "transparent";
-
-  // Female Mentor Avatar Pill (Left)
-  ctx.fillStyle = P.accent_primary;
-  ctx.beginPath();
-  ctx.roundRect(-444, -26, 220, 52, 26);
-  ctx.fill();
-
-  // Pulsing live dot
-  ctx.fillStyle = P.accent_highlight_lime;
-  ctx.beginPath();
-  ctx.arc(-412, 0, 9 + Math.sin(frame * 0.2) * 2, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = "#FFFFFF";
-  ctx.font = "900 24px 'Liberation Sans', sans-serif";
-  ctx.textAlign = "left";
-  ctx.fillText("IRAA // CRITIC", -390, 8);
-
-  // Act / Section Label (Right)
-  ctx.fillStyle = P.ink_primary;
-  ctx.font = "bold 23px 'DejaVu Sans Mono', monospace";
-  ctx.textAlign = "right";
-  ctx.fillText(actLabel, 430, 8);
-
-  ctx.restore();
-}
-
-// ============================================================================
-// BEAT 1 (f: 0..590): THE HOOK — 90-FRAME COLOR-BLOCK CARD -> LIGHT GRID SNAP
-// ============================================================================
-function renderBeat01_Hook(ctx, frame, f0, dur) {
-  const P = window.PAL;
-  const localF = frame - f0;
-
-  if (localF < 90) {
-    ctx.save();
-    ctx.fillStyle = P.accent_primary;
-    ctx.fillRect(0, 0, 1080, 1920);
-
-    ctx.strokeStyle = "rgba(255,255,255,0.12)";
-    ctx.lineWidth = 2;
-    for (let i = -1080; i < 1920; i += 80) {
-      ctx.beginPath();
-      ctx.moveTo(0, i + (localF * 1.5) % 80);
-      ctx.lineTo(1080, i + 540 + (localF * 1.5) % 80);
-      ctx.stroke();
-    }
-
-    const cardS = spring(localF, 2, { stiffness: 250, damping: 16 });
-    ctx.translate(540, 920);
-    ctx.scale(cardS, cardS);
-
-    ctx.fillStyle = P.accent_highlight_lime;
-    ctx.strokeStyle = "#141414";
-    ctx.lineWidth = 6;
-    ctx.shadowColor = "rgba(0,0,0,0.45)";
-    ctx.shadowBlur = 40;
-    ctx.shadowOffsetY = 18;
-    ctx.beginPath();
-    ctx.roundRect(-440, -340, 880, 680, 28);
-    ctx.fill();
-    ctx.stroke();
-    ctx.shadowColor = "transparent";
-    ctx.shadowBlur = 0;
-    ctx.shadowOffsetY = 0;
-
-    ctx.fillStyle = "#141414";
-    ctx.font = "italic 48px 'Liberation Serif', serif";
-    ctx.textAlign = "center";
-    ctx.fillText("Iraa's Brutal Reality Check:", 0, -235);
-
-    ctx.font = "900 108px 'Liberation Sans', sans-serif";
-    ctx.fillText("4 HOURS", 0, -110);
-    ctx.font = "900 64px 'Liberation Sans', sans-serif";
-    ctx.fillStyle = P.accent_primary;
-    ctx.fillText("ON A 3-SEC TRANSITION", 0, -22);
-
-    const hrsRoll = Math.min(4.0, (localF / 40) * 4.0).toFixed(1);
-    drawAmberOdometer(ctx, 0, 150, `${hrsRoll} HRS`, "EDITOR TIME INVESTED", 1.0);
-
-    drawFourPointStar(ctx, -370, -260, 38, localF * 0.06, P.accent_secondary);
-    drawFourPointStar(ctx, 370, 260, 42, -localF * 0.06, "#FFFFFF");
-    ctx.restore();
-    return;
-  }
-
-  drawLightGraphPaperCanvas(ctx, frame);
-  drawIraaMentorBar(ctx, "01 // PATTERN INTERRUPT", frame);
-
-  drawEditorialHeader(
-    ctx,
-    "four hours of keyframes...",
-    "SWIPED IN",
-    "0.5 SECONDS",
-    P.accent_highlight_lime,
-    310,
-    frame,
-    92
-  );
-
-  const swipeT = easeInOutCubic(clamp((localF - 210) / 55, 0, 1));
-  const truthS = spring(localF, 340, { stiffness: 220, damping: 15 });
+  ctx.translate(x, y);
 
   ctx.save();
-  ctx.translate(540, 960);
-
-  ctx.save();
-  ctx.rotate(frame * 0.008);
-  ctx.strokeStyle = P.border_dashed_vector;
-  ctx.lineWidth = 4;
-  ctx.setLineDash([18, 12]);
-  ctx.beginPath();
-  ctx.arc(0, 0, 310, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.restore();
-
-  ctx.save();
-  ctx.shadowColor = "rgba(20, 20, 20, 0.22)";
-  ctx.shadowBlur = 35;
-  ctx.shadowOffsetY = 18;
-  const rings = [
-    [250, P.bg_elevated],
-    [190, P.accent_primary],
-    [130, P.bg_elevated],
-    [72, P.accent_secondary]
-  ];
-  for (const [rad, col] of rings) {
-    ctx.fillStyle = col;
-    ctx.strokeStyle = P.ink_primary;
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.arc(0, 0, rad, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-  }
-  ctx.restore();
-
-  ctx.save();
-  ctx.translate(swipeT * 380, -swipeT * 680);
-  ctx.rotate(swipeT * 0.35);
-  ctx.globalAlpha = clamp(1 - swipeT * 1.1, 0, 1);
-
-  ctx.fillStyle = P.bg_elevated;
-  ctx.strokeStyle = P.ink_primary;
-  ctx.lineWidth = 4;
-  ctx.shadowColor = "rgba(20,20,20,0.18)";
-  ctx.shadowBlur = 28;
-  ctx.shadowOffsetY = 14;
-  ctx.beginPath();
-  ctx.roundRect(-380, -130, 760, 260, 20);
-  ctx.fill();
-  ctx.stroke();
-  ctx.shadowColor = "transparent";
-
-  ctx.fillStyle = P.ink_primary;
-  ctx.font = "900 32px 'DejaVu Sans Mono', monospace";
-  ctx.textAlign = "left";
-  ctx.fillText("TIMELINE // 3.0s FANCY TRANSITION", -340, -72);
-
-  const gradCols = P.chart_gradients;
-  for (let t = 0; t < 4; t++) {
-    ctx.fillStyle = gradCols[t % gradCols.length];
-    ctx.beginPath();
-    ctx.roundRect(-340 + t * 172, -35 + (t % 2) * 55, 155, 42, 8);
-    ctx.fill();
-  }
-  ctx.fillStyle = P.accent_tertiary;
-  ctx.font = "bold 26px 'DejaVu Sans Mono', monospace";
-  ctx.fillText("480 BEZIER KEYFRAMES + 12 GLOW LAYERS", -340, 95);
-  ctx.restore();
-
-  ctx.restore();
-
-  const odoS = spring(localF, 105, { stiffness: 210, damping: 16 });
-  drawAmberOdometer(ctx, 290, 1470, "4.0 HRS", "YOUR EDITING TIME", odoS);
-  drawAmberOdometer(ctx, 790, 1470, "0.5 SEC", "VIEWER SWIPE SPEED", spring(localF, 170, { stiffness: 210, damping: 16 }));
-
-  if (truthS > 0.01) {
-    drawDashedSelectionBox(
-      ctx,
-      540,
-      1715,
-      820,
-      125,
-      "BURA LAGA? GOOD. AB SACH SUNO.",
-      P.accent_highlight_lime,
-      P.ink_primary,
-      truthS,
-      "The Brutally Honest Truth About Retention"
-    );
-  }
-
-  drawFourPointStar(ctx, 135, 620, 34, frame * 0.04, P.accent_secondary);
-  drawFourPointStar(ctx, 945, 1220, 38, -frame * 0.05, P.accent_tertiary);
-}
-
-// ============================================================================
-// BEAT 2 (f: 590..1535): THE REALITY CHECK — 90% CREATORS & EDITOR FLEX TRAP
-// ============================================================================
-function renderBeat02_RealityCheck(ctx, frame, f0, dur) {
-  const P = window.PAL;
-  const localF = frame - f0;
-
-  drawLightGraphPaperCanvas(ctx, frame);
-  drawIraaMentorBar(ctx, "02 // THE EDITOR FLEX TRAP", frame);
-
-  drawEditorialHeader(
-    ctx,
-    "you edit to impress other editors...",
-    "CINEMATIC GRADE",
-    "BORING STORY",
-    P.accent_secondary,
-    310,
-    frame,
-    f0 + 4
-  );
-
-  const pctVal = Math.min(90, Math.round((localF / 45) * 90));
-  const kfVal = Math.min(35000, Math.round((localF / 70) * 35000)).toLocaleString();
-  drawAmberOdometer(ctx, 295, 610, `${pctVal}%`, "CHASE VIRAL PLUGINS", spring(frame, f0 + 10, { stiffness: 210, damping: 16 }));
-  drawAmberOdometer(ctx, 785, 610, kfVal, "KEYFRAMES IGNORED", spring(frame, f0 + 28, { stiffness: 210, damping: 16 }));
-
-  const b1S = spring(frame, f0 + 160, { stiffness: 210, damping: 15 });
-  const b2S = spring(frame, f0 + 220, { stiffness: 210, damping: 15 });
-  const b3S = spring(frame, f0 + 290, { stiffness: 210, damping: 15 });
-
-  drawDashedSelectionBox(ctx, 295, 845, 430, 118, "CINEMATIC LUTs ✓", P.bg_elevated, P.accent_primary, b1S, "10/10 Visual Polish");
-  drawDashedSelectionBox(ctx, 785, 845, 430, 118, "CRISPY SFX ✓", P.bg_elevated, P.accent_tertiary, b2S, "10/10 Audio Design");
-  drawDashedSelectionBox(ctx, 540, 1005, 920, 124, "PAR VIDEO BORING HAI ✗", P.accent_highlight_lime, P.ink_primary, b3S, "Because You Are Flexing For Other Editors");
-
-  // BOTTOM STAGE: Tactile 2D Bar Chart with clean vertical separation (zero text collision!)
-  const chartS = spring(frame, f0 + 390, { stiffness: 190, damping: 16 });
-  ctx.save();
-  ctx.translate(540, 1465);
-  ctx.scale(chartS, chartS);
-
-  ctx.fillStyle = P.bg_elevated;
-  ctx.strokeStyle = P.border_dashed_vector;
-  ctx.lineWidth = 4;
-  ctx.shadowColor = "rgba(20,20,20,0.14)";
-  ctx.shadowBlur = 28;
-  ctx.shadowOffsetY = 12;
-  ctx.beginPath();
-  ctx.roundRect(-460, -265, 920, 530, 24);
-  ctx.fill();
-  ctx.stroke();
-  ctx.shadowColor = "transparent";
-
-  ctx.fillStyle = P.ink_primary;
-  ctx.font = "900 32px 'DejaVu Sans Mono', monospace";
-  ctx.textAlign = "center";
-  ctx.fillText("REALITY TELEMETRY // WHO ACTUALLY CARES?", 0, -208);
-
-  // Clean subtitle in its own reserved row at y = -158 (well above all bar percentage labels!)
-  ctx.fillStyle = P.accent_primary;
-  ctx.font = "italic bold 30px 'Liberation Serif', serif";
-  ctx.fillText("Audience doesn't care about keyframes!", 0, -158);
-
-  const bars = [
-    { label: "SPEED RAMPS", val: 0.92, col: P.chart_gradients[0], x: -310 },
-    { label: "3D PLUGINS", val: 0.86, col: P.chart_gradients[1], x: -105 },
-    { label: "EDITOR EGO", val: 0.98, col: P.chart_gradients[2], x: 105 },
-    { label: "VIEWER CARE", val: 0.06, col: P.chart_gradients[3], x: 310 }
-  ];
-
-  const baseLineY = 165;
-  const maxH = 220;
-  for (let i = 0; i < bars.length; i++) {
-    const b = bars[i];
-    const barGrow = spring(frame, f0 + 420 + i * 25, { stiffness: 180, damping: 14 });
-    const bh = Math.max(18, b.val * maxH * barGrow);
-
-    ctx.fillStyle = b.col;
-    ctx.strokeStyle = P.ink_primary;
-    ctx.lineWidth = 3.5;
-    ctx.beginPath();
-    ctx.roundRect(b.x - 68, baseLineY - bh, 136, bh, 12);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = P.ink_primary;
-    ctx.font = "900 34px 'DejaVu Sans Mono', monospace";
-    ctx.textAlign = "center";
-    ctx.fillText(`${Math.round(b.val * 100)}%`, b.x, baseLineY - bh - 18);
-
-    ctx.font = "bold 22px 'Liberation Sans', sans-serif";
-    ctx.fillText(b.label, b.x, baseLineY + 42);
-  }
-
-  // Curved arrow pointing specifically to the tiny 6% VIEWER CARE bar on the far right
-  ctx.strokeStyle = P.accent_primary;
-  ctx.lineWidth = 5;
-  ctx.beginPath();
-  ctx.moveTo(225, -135);
-  ctx.quadraticCurveTo(310, -110, 310, 80);
-  ctx.stroke();
-  // Arrowhead
-  ctx.beginPath();
-  ctx.moveTo(298, 65);
-  ctx.lineTo(310, 84);
-  ctx.lineTo(322, 65);
-  ctx.stroke();
-
-  ctx.restore();
-
-  drawFourPointStar(ctx, 110, 1140, 34, frame * 0.05, P.accent_secondary);
-  drawFourPointStar(ctx, 970, 1140, 34, -frame * 0.05, P.accent_primary);
-}
-
-// ============================================================================
-// BEAT 3 (f: 1535..2858): THE FIX — 3 BRUTAL QUESTIONS + [FASTER, SHARPER, EFFECTIVE]
-// ============================================================================
-function renderBeat03_TheFix(ctx, frame, f0, dur) {
-  const P = window.PAL;
-  const localF = frame - f0;
-
-  drawLightGraphPaperCanvas(ctx, frame);
-  drawIraaMentorBar(ctx, "03 // THE 3-QUESTION AUDIT", frame);
-
-  drawEditorialHeader(
-    ctx,
-    "mute your timeline & ask...",
-    "3 BRUTAL",
-    "QUESTIONS",
-    P.accent_primary,
-    295,
-    frame,
-    f0 + 4
-  );
-
-  const w1 = spring(frame, f0 + 25, { stiffness: 220, damping: 16 });
-  const w2 = spring(frame, f0 + 55, { stiffness: 220, damping: 16 });
-  const w3 = spring(frame, f0 + 85, { stiffness: 220, damping: 16 });
-
-  drawDashedSelectionBox(ctx, 205, 520, 285, 96, "Faster", P.accent_highlight_lime, P.ink_primary, w1);
-  drawDashedSelectionBox(ctx, 540, 520, 285, 96, "Sharper", P.bg_elevated, P.accent_primary, w2);
-  drawDashedSelectionBox(ctx, 875, 520, 285, 96, "Effective", P.bg_elevated, P.accent_tertiary, w3);
-
-  const phase = localF < 520 ? 1 : (localF < 920 ? 2 : 3);
-
-  ctx.save();
-  ctx.translate(540, 965);
-
-  ctx.save();
-  ctx.rotate(frame * 0.01);
+  ctx.rotate(frame * 0.009);
   ctx.strokeStyle = P.border_dashed_vector;
   ctx.lineWidth = 4.5;
   ctx.setLineDash([20, 12]);
   ctx.beginPath();
-  ctx.arc(0, 0, 295, 0, Math.PI * 2);
+  ctx.arc(0, 0, radius + 32, 0, Math.PI * 2);
   ctx.stroke();
   ctx.setLineDash([]);
   ctx.restore();
 
-  ctx.shadowColor = "rgba(20,20,20,0.18)";
+  ctx.shadowColor = "rgba(20, 20, 20, 0.16)";
   ctx.shadowBlur = 36;
   ctx.shadowOffsetY = 16;
   ctx.fillStyle = P.bg_elevated;
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 3.5;
   ctx.beginPath();
-  ctx.arc(0, 0, 265, 0, Math.PI * 2);
+  ctx.arc(0, 0, radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ============================================================================
+// SCENE 01 (f: 0..90): 1.5s COBALT/LIME COLOR-BLOCK HOOK + LIVE BEZIER CURVE
+// "Tumne apni pichli video ke 3-second ke transition..."
+// ============================================================================
+function renderScene01(ctx, frame, localF) {
+  const P = window.PAL;
+  const T = window.TYPO;
+
+  ctx.fillStyle = P.accent_primary;
+  ctx.fillRect(-200, -200, 1480, 2320);
+
+  // Moving structural lines
+  ctx.strokeStyle = "rgba(255,255,255,0.12)";
+  ctx.lineWidth = 2;
+  for (let i = -1080; i < 1920; i += 80) {
+    ctx.beginPath();
+    ctx.moveTo(-100, i + (localF * 2.0) % 80);
+    ctx.lineTo(1180, i + 540 + (localF * 2.0) % 80);
+    ctx.stroke();
+  }
+
+  const cardS = spring(localF, 0, { stiffness: 260, damping: 16 });
+  ctx.save();
+  ctx.translate(540, 960);
+  ctx.scale(cardS, cardS);
+
+  ctx.fillStyle = P.accent_highlight_lime;
+  ctx.strokeStyle = "#141414";
+  ctx.lineWidth = 6;
+  ctx.shadowColor = "rgba(0,0,0,0.4)";
+  ctx.shadowBlur = 42;
+  ctx.shadowOffsetY = 18;
+  ctx.beginPath();
+  ctx.roundRect(-430, -390, 860, 780, 32);
+  ctx.fill();
+  ctx.stroke();
+  ctx.shadowColor = "transparent";
+
+  ctx.fillStyle = "#141414";
+  ctx.font = `italic 62px ${T.font_editorial_serif}`;
+  ctx.textAlign = "center";
+  ctx.fillText("that 3-second transition...", 0, -275);
+
+  ctx.font = `900 102px ${T.font_display}`;
+  ctx.fillText("3.0 SEC", 0, -165);
+
+  // Interactive Bezier Speed-Ramp Graph inside Dark Editor Window
+  ctx.fillStyle = "#141414";
+  ctx.beginPath();
+  ctx.roundRect(-350, -105, 700, 340, 22);
+  ctx.fill();
+
+  const handleShift = Math.sin(localF * 0.14) * 55;
+  ctx.strokeStyle = P.accent_secondary;
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.moveTo(-270, 165);
+  ctx.bezierCurveTo(-60, 165, 40, -35 + handleShift, 270, -35);
+  ctx.stroke();
+
+  // Bezier tangent handles
+  ctx.strokeStyle = P.accent_highlight_lime;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(40, -35 + handleShift);
+  ctx.lineTo(270, -35);
+  ctx.stroke();
+
+  ctx.fillStyle = P.accent_highlight_lime;
+  ctx.beginPath();
+  ctx.arc(-270, 165, 13, 0, Math.PI * 2);
+  ctx.arc(270, -35, 13, 0, Math.PI * 2);
+  ctx.arc(40, -35 + handleShift, 11, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#141414";
+  setFitFont(ctx, "900", 54, T.font_display, "SPEED RAMP", 640);
+  ctx.fillText("SPEED RAMP", 0, 315);
+
+  drawFourPointStar(ctx, -360, -310, 36, localF * 0.07, P.accent_secondary);
+  drawFourPointStar(ctx, 360, 310, 36, -localF * 0.07, "#FFFFFF");
+  ctx.restore();
+}
+
+// ============================================================================
+// SCENE 02 (f: 90..258): 4 HOURS OF NLE KEYFRAME LABOUR
+// "...par 4 ghante lagaye..."
+// ============================================================================
+function renderScene02(ctx, frame, localF) {
+  const P = window.PAL;
+  drawEditorialHeader(ctx, "painstakingly keyframing for...", "4 HOURS", P.accent_primary, 310, localF);
+
+  const odoS = spring(localF, 8, { stiffness: 220, damping: 16 });
+  const hrsVal = Math.min(4.0, (localF / 40) * 4.0).toFixed(1);
+  drawAmberOdometer(ctx, 540, 580, `${hrsVal} HRS`, "EDITING TIME", odoS);
+
+  // Tactile Multi-Track NLE Timeline Cutout inside Dashed Pedestal
+  const tlS = spring(localF, 14, { stiffness: 210, damping: 16 });
+  ctx.save();
+  ctx.translate(540, 1180);
+  ctx.scale(tlS, tlS);
+
+  drawDashedPedestal(ctx, 0, 0, 340, frame);
+
+  // NLE Track Stack inside the circle
+  const tracks = [
+    { y: -130, col: P.chart_gradients[0], w: 460 },
+    { y: -40,  col: P.chart_gradients[1], w: 500 },
+    { y: 50,   col: P.chart_gradients[2], w: 460 },
+    { y: 140,  col: P.chart_gradients[3], w: 380 }
+  ];
+  for (let i = 0; i < tracks.length; i++) {
+    const tr = tracks[i];
+    ctx.fillStyle = tr.col;
+    ctx.strokeStyle = P.ink_primary;
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.roundRect(-tr.w / 2, tr.y - 28, tr.w, 56, 12);
+    ctx.fill();
+    ctx.stroke();
+
+    // Keyframe diamonds along each track
+    for (let k = -tr.w / 2 + 45; k < tr.w / 2 - 30; k += 75) {
+      ctx.save();
+      ctx.translate(k, tr.y);
+      ctx.rotate(Math.PI / 4);
+      ctx.fillStyle = P.bg_elevated;
+      ctx.strokeStyle = P.ink_primary;
+      ctx.lineWidth = 2.5;
+      ctx.fillRect(-9, -9, 18, 18);
+      ctx.strokeRect(-9, -9, 18, 18);
+      ctx.restore();
+    }
+  }
+
+  // Sweeping Playhead Needle
+  const phX = -210 + ((localF * 4.5) % 420);
+  ctx.strokeStyle = P.accent_secondary;
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.moveTo(phX, -210);
+  ctx.lineTo(phX, 210);
+  ctx.stroke();
+
+  ctx.restore();
+
+  drawDashedSelectionBox(ctx, 290, 1690, 380, 100, "KEYFRAMES", P.accent_primary, spring(localF, 28));
+  drawDashedSelectionBox(ctx, 790, 1690, 380, 100, "GLOW FX", P.accent_tertiary, spring(localF, 38));
+}
+
+// ============================================================================
+// SCENE 03 (f: 258..449): 0.5-SECOND SMARTPHONE SWIPE SIMULATION
+// "...aur viewer ne use 0.5 second mein swipe kar diya."
+// ============================================================================
+function renderScene03(ctx, frame, localF) {
+  const P = window.PAL;
+  drawEditorialHeader(ctx, "and the viewer swiped in...", "0.5 SECONDS", P.accent_highlight_lime, 290, localF);
+
+  const swipeProgress = easeInOutCubic(clamp((localF - 28) / 42, 0, 1));
+
+  // Center Recognizable Smartphone Bezel + Physical Thumb Swipe Gesture
+  ctx.save();
+  ctx.translate(540, 990);
+
+  // Phone Outer Body
+  ctx.shadowColor = "rgba(20, 20, 20, 0.22)";
+  ctx.shadowBlur = 40;
+  ctx.shadowOffsetY = 20;
+  ctx.fillStyle = "#141414";
+  ctx.beginPath();
+  ctx.roundRect(-250, -430, 500, 860, 54);
   ctx.fill();
   ctx.shadowColor = "transparent";
 
-  if (phase === 1) {
-    const pS = spring(localF, 40, { stiffness: 200, damping: 15 });
-    ctx.scale(pS, pS);
+  // Phone Screen Viewport (Clipped)
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(-226, -402, 452, 804, 40);
+  ctx.clip();
 
-    ctx.fillStyle = P.accent_tertiary;
+  ctx.fillStyle = "#F4F4F0";
+  ctx.fillRect(-226, -402, 452, 804);
+
+  // Incoming next reel below
+  ctx.fillStyle = P.bg_elevated;
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.roundRect(-190, 420 - swipeProgress * 680, 380, 520, 24);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = P.accent_primary;
+  setFitFont(ctx, "900", 36, window.TYPO.font_display, "NEXT VIDEO", 320);
+  ctx.textAlign = "center";
+  ctx.fillText("NEXT VIDEO", 0, 680 - swipeProgress * 680);
+
+  // Your 4-Hour Video Card getting swiped UP off screen!
+  ctx.save();
+  ctx.translate(0, -swipeProgress * 720);
+  ctx.fillStyle = P.accent_tertiary;
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.roundRect(-190, -310, 380, 540, 24);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = "#FFFFFF";
+  setFitFont(ctx, "900", 34, window.TYPO.font_display, "YOUR 4-HR EDIT", 320);
+  ctx.fillText("YOUR 4-HR EDIT", 0, -40);
+  ctx.restore();
+
+  // Tactile Stylized Hand / Thumb Swipe Trail
+  const thumbY = 180 - swipeProgress * 440;
+  ctx.strokeStyle = P.accent_secondary;
+  ctx.lineWidth = 14;
+  ctx.lineCap = "round";
+  ctx.setLineDash([14, 12]);
+  ctx.beginPath();
+  ctx.moveTo(0, 220);
+  ctx.lineTo(0, thumbY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Touch Circle + Upward Arrow
+  ctx.fillStyle = P.accent_secondary;
+  ctx.strokeStyle = "#141414";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(0, thumbY, 38, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.restore();
+  ctx.restore();
+
+  drawAmberOdometer(ctx, 540, 1630, "0.5 SEC", "SWIPE SPEED", spring(localF, 12));
+}
+
+// ============================================================================
+// SCENE 04 (f: 449..590): "BURA LAGA? GOOD. AB SACH SUNO."
+// ============================================================================
+function renderScene04(ctx, frame, localF) {
+  const P = window.PAL;
+  drawEditorialHeader(ctx, "did that hurt your ego?", "SACH SUNO", P.accent_secondary, 310, localF);
+
+  drawDashedSelectionBox(ctx, 290, 540, 400, 108, "BURA LAGA?", P.ink_primary, spring(localF, 5), 0.06);
+  drawDashedSelectionBox(ctx, 790, 540, 400, 108, "GOOD.", P.accent_primary, spring(localF, 22), 0.10);
+
+  // Center 3D Tactile Target Bullseye with Arrow Impact at localF = 45
+  const bullS = spring(localF, 15, { stiffness: 230, damping: 15 });
+  ctx.save();
+  ctx.translate(540, 1140);
+  ctx.scale(bullS, bullS);
+
+  drawDashedPedestal(ctx, 0, 0, 320, frame);
+
+  const rings = [
+    [260, P.accent_primary],
+    [185, P.bg_elevated],
+    [115, P.accent_tertiary],
+    [55,  P.accent_secondary]
+  ];
+  for (const [r, c] of rings) {
+    ctx.fillStyle = c;
     ctx.strokeStyle = P.ink_primary;
-    ctx.lineWidth = 4.5;
+    ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.arc(-65, -25, 110, 0, Math.PI * 2);
-    ctx.arc(65, -25, 110, 0, Math.PI * 2);
-    ctx.arc(-50, 55, 85, 0, Math.PI * 2);
-    ctx.arc(50, 55, 85, 0, Math.PI * 2);
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
+  }
 
-    const gapOffset = (1 - spring(localF, 140, { stiffness: 180, damping: 13 })) * 130;
+  // Dart / Vector Arrow striking dead-center bullseye
+  const dartIn = easeOutExpo(clamp((localF - 35) / 18, 0, 1));
+  ctx.save();
+  ctx.translate((1 - dartIn) * 320, -(1 - dartIn) * 320);
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 10;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(145, -145);
+  ctx.stroke();
+
+  ctx.fillStyle = P.accent_highlight_lime;
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(115, -145);
+  ctx.lineTo(175, -175);
+  ctx.lineTo(145, -115);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.restore();
+}
+
+// ============================================================================
+// SCENE 05 (f: 590..906): 90% CREATORS CHASE AI PLUGINS -> "NAHI." STAMP
+// "90 percent naye creators ko lagta hai... viral pack ya AI plugin... Nahi."
+// ============================================================================
+function renderScene05(ctx, frame, localF) {
+  const P = window.PAL;
+  drawEditorialHeader(ctx, "what 90% of creators chase...", "VIRAL PLUGINS", P.accent_primary, 300, localF);
+
+  const pct = Math.min(90, Math.round((localF / 40) * 90));
+  drawAmberOdometer(ctx, 540, 575, `${pct}%`, "NEW CREATORS", spring(localF, 6));
+
+  // Center 3D Software Plugin Box
+  const boxS = spring(localF, 20, { stiffness: 210, damping: 16 });
+  ctx.save();
+  ctx.translate(540, 1130);
+  ctx.scale(boxS, boxS);
+
+  drawDashedPedestal(ctx, 0, 0, 310, frame);
+
+  // Isometric 3D Plugin Cube
+  ctx.fillStyle = P.accent_tertiary;
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 4.5;
+  ctx.beginPath();
+  ctx.roundRect(-210, -140, 420, 280, 24);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = "#FFFFFF";
+  setFitFont(ctx, "900", 42, window.TYPO.font_display, "AI PLUGIN v9", 360);
+  ctx.textAlign = "center";
+  ctx.fillText("AI PLUGIN v9", 0, -20);
+  ctx.fillStyle = P.accent_highlight_lime;
+  setFitFont(ctx, "800", 30, window.TYPO.font_mono, "VIRAL EDIT PACK", 360);
+  ctx.fillText("VIRAL EDIT PACK", 0, 48);
+
+  // At global frame 865 (localF = 275), Iraa says "Nahi." -> Giant Red/Amber Cross Stamp!
+  if (frame >= 855) {
+    const stampS = spring(frame, 855, { stiffness: 320, damping: 14 });
     ctx.save();
-    ctx.translate(0, -15 - gapOffset);
+    ctx.scale(stampS, stampS);
+    ctx.rotate(-0.18);
+
     ctx.fillStyle = P.accent_secondary;
     ctx.strokeStyle = P.ink_primary;
-    ctx.lineWidth = 4.5;
-    ctx.shadowColor = P.accent_secondary;
-    ctx.shadowBlur = 28;
+    ctx.lineWidth = 6;
     ctx.beginPath();
-    ctx.roundRect(-58, -58, 116, 116, 18);
-    ctx.arc(0, -68, 24, 0, Math.PI * 2);
-    ctx.arc(68, 0, 24, 0, Math.PI * 2);
+    ctx.roundRect(-260, -75, 520, 150, 20);
     ctx.fill();
     ctx.stroke();
-    ctx.shadowBlur = 0;
 
     ctx.fillStyle = P.ink_primary;
-    ctx.font = "900 58px 'Liberation Sans', sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("?", 0, 20);
+    setFitFont(ctx, "900", 72, window.TYPO.font_display, "✗ NAHI.", 460);
+    ctx.fillText("✗ NAHI.", 0, 26);
     ctx.restore();
+  }
+  ctx.restore();
 
-    ctx.fillStyle = P.ink_primary;
-    ctx.font = "900 27px 'DejaVu Sans Mono', monospace";
-    ctx.textAlign = "center";
-    ctx.fillText("Q1: 3-SEC CURIOSITY GAP", 0, 158);
-  } else if (phase === 2) {
-    const pS = spring(localF, 525, { stiffness: 210, damping: 15 });
-    ctx.scale(pS, pS);
+  drawDashedSelectionBox(ctx, 290, 1640, 390, 100, "MAGIC LUTs", P.ink_primary, spring(localF, 35));
+  drawDashedSelectionBox(ctx, 790, 1640, 390, 100, "AUTO GLOW", P.ink_primary, spring(localF, 50));
+}
 
-    ctx.strokeStyle = P.accent_primary;
-    ctx.lineWidth = 28;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.beginPath();
-    ctx.moveTo(-165, 80);
-    ctx.lineTo(-55, -80);
-    ctx.lineTo(55, 50);
-    ctx.lineTo(165, -95);
-    ctx.stroke();
+// ============================================================================
+// SCENE 06 (f: 906..1179): CINEMATIC GRADE + CRISPY SOUND = FLATLINE BORING
+// "Tumhara color grade cinematic hai, sound design crispy hai—par video boring hai."
+// ============================================================================
+function renderScene06(ctx, frame, localF) {
+  const P = window.PAL;
+  drawEditorialHeader(ctx, "10/10 polish, 0/10 retention...", "BORING VIDEO", P.accent_highlight_lime, 300, localF);
 
-    const nodes = [[-165, 80], [-55, -80], [55, 50], [165, -95]];
-    for (const [nx, ny] of nodes) {
-      ctx.fillStyle = P.accent_secondary;
-      ctx.strokeStyle = P.ink_primary;
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.arc(nx, ny, 22, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-    }
+  drawDashedSelectionBox(ctx, 285, 560, 410, 108, "COLOR GRADE ✓", P.accent_primary, spring(localF, 8), 0.08);
+  drawDashedSelectionBox(ctx, 795, 560, 410, 108, "CRISPY SFX ✓", P.accent_tertiary, spring(localF, 24), 0.08);
 
-    ctx.fillStyle = P.ink_primary;
-    ctx.font = "900 27px 'DejaVu Sans Mono', monospace";
-    ctx.textAlign = "center";
-    ctx.fillText("Q2: 15-SEC DIRECTION TWIST", 0, 158);
-  } else {
-    const pS = spring(localF, 925, { stiffness: 210, damping: 15 });
-    const ejectT = easeInOutCubic(clamp((localF - 1010) / 50, 0, 1));
-    ctx.scale(pS, pS);
+  // Monitor showing energetic waveform suddenly flatlining after localF > 110 ("par tumhari video boring hai")
+  const flatlineT = easeInOutCubic(clamp((localF - 110) / 35, 0, 1));
 
-    const pullIn = ejectT * 65;
+  ctx.save();
+  ctx.translate(540, 1140);
+
+  ctx.fillStyle = P.bg_elevated;
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 4.5;
+  ctx.shadowColor = "rgba(20,20,20,0.16)";
+  ctx.shadowBlur = 32;
+  ctx.shadowOffsetY = 14;
+  ctx.beginPath();
+  ctx.roundRect(-430, -300, 860, 600, 28);
+  ctx.fill();
+  ctx.stroke();
+  ctx.shadowColor = "transparent";
+
+  // Waveform / Pulse line
+  ctx.strokeStyle = flatlineT > 0.6 ? P.accent_secondary : P.accent_primary;
+  ctx.lineWidth = 10;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  for (let x = -360; x <= 360; x += 15) {
+    const waveAmp = (1 - flatlineT) * Math.sin((x + localF * 8) * 0.045) * 140 * Math.cos(x * 0.004);
+    const y = -20 + waveAmp;
+    if (x === -360) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  if (flatlineT > 0.3) {
+    const stampS = spring(localF, 115, { stiffness: 250, damping: 15 });
+    ctx.save();
+    ctx.translate(0, 155);
+    ctx.scale(stampS, stampS);
     ctx.fillStyle = P.accent_highlight_lime;
     ctx.strokeStyle = P.ink_primary;
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.roundRect(-210 + pullIn, -65, 130, 110, 14);
-    ctx.roundRect(80 - pullIn, -65, 130, 110, 14);
+    ctx.roundRect(-330, -58, 660, 116, 16);
     ctx.fill();
     ctx.stroke();
 
-    if (ejectT < 0.95) {
-      ctx.save();
-      ctx.translate(0, -10 - ejectT * 140);
-      ctx.scale(1 - ejectT * 0.5, 1 - ejectT * 0.5);
-      ctx.globalAlpha = clamp(1 - ejectT * 1.1, 0, 1);
-      ctx.fillStyle = P.accent_secondary;
-      ctx.strokeStyle = P.ink_primary;
-      ctx.lineWidth = 4;
-      ctx.setLineDash([8, 6]);
-      ctx.beginPath();
-      ctx.roundRect(-65, -55, 130, 110, 14);
-      ctx.fill();
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = P.ink_primary;
-      ctx.font = "900 24px 'DejaVu Sans Mono', monospace";
-      ctx.textAlign = "center";
-      ctx.fillText("FLUFF", 0, 8);
-      ctx.restore();
-    }
-
     ctx.fillStyle = P.ink_primary;
-    ctx.font = "900 27px 'DejaVu Sans Mono', monospace";
+    setFitFont(ctx, "900", 44, window.TYPO.font_display, "ZERO STORY PULSE", 590);
     ctx.textAlign = "center";
-    ctx.fillText("Q3: RUTHLESS CUT TEST", 0, 158);
+    ctx.fillText("ZERO STORY PULSE", 0, 16);
+    ctx.restore();
   }
+
   ctx.restore();
-
-  const c1 = spring(localF, 60, { stiffness: 210, damping: 16 });
-  const c2 = spring(localF, 530, { stiffness: 210, damping: 16 });
-  const c3 = spring(localF, 930, { stiffness: 210, damping: 16 });
-
-  drawDashedSelectionBox(
-    ctx, 540, 1390, 920, 122,
-    "01 // 3-SECOND CURIOSITY GAP",
-    phase === 1 ? P.accent_highlight_lime : P.bg_elevated,
-    P.ink_primary, c1,
-    "Banned: 'Hey guys, welcome back' -> Instant Swipe!"
-  );
-
-  drawDashedSelectionBox(
-    ctx, 540, 1550, 920, 122,
-    "02 // THE 15-SECOND RULE",
-    phase === 2 ? P.accent_highlight_lime : P.bg_elevated,
-    P.ink_primary, c2,
-    "Every 15s: New Point, Twist, or Visual Pattern Shift"
-  );
-
-  drawDashedSelectionBox(
-    ctx, 540, 1710, 920, 122,
-    "03 // THE 2-HOUR CUT TEST",
-    phase === 3 ? P.accent_highlight_lime : P.bg_elevated,
-    P.ink_primary, c3,
-    "Does deleting the clip break the story? No -> DELETE IT."
-  );
-
-  drawFourPointStar(ctx, 120, 965, 36, frame * 0.04, P.accent_secondary);
-  drawFourPointStar(ctx, 960, 965, 36, -frame * 0.04, P.accent_primary);
 }
 
 // ============================================================================
-// BEAT 4 (f: 2858..3685): THE MIC-DROP OUTRO — -50% FX, +200% SCRIPT, DELETE INTRO!
+// SCENE 07 (f: 1179..1535): EDITOR FLEX (98%) VS VIEWER CARE (0%) BAR CHART
+// "Kyunki tum apne liye edit kar rahe ho... Audience ko keyframes se farak nahi padta."
 // ============================================================================
-function renderBeat04_MicDrop(ctx, frame, f0, dur) {
+function renderScene07(ctx, frame, localF) {
   const P = window.PAL;
-  const localF = frame - f0;
+  drawEditorialHeader(ctx, "editing to flex on other editors...", "WHO CARES?", P.accent_secondary, 300, localF);
+
+  ctx.save();
+  ctx.translate(540, 1080);
+
+  ctx.fillStyle = P.bg_elevated;
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 4.5;
+  ctx.shadowColor = "rgba(20,20,20,0.15)";
+  ctx.shadowBlur = 32;
+  ctx.shadowOffsetY = 14;
+  ctx.beginPath();
+  ctx.roundRect(-450, -450, 900, 900, 28);
+  ctx.fill();
+  ctx.stroke();
+  ctx.shadowColor = "transparent";
+
+  const baseY = 270;
+  const maxH = 540;
+  const g1 = spring(localF, 12, { stiffness: 180, damping: 15 });
+  const g2 = spring(localF, 35, { stiffness: 180, damping: 15 });
+
+  // Bar 1: EDITOR EGO (98%) centered at x = -215
+  const h1 = maxH * 0.96 * g1;
+  ctx.fillStyle = P.chart_gradients[2];
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.roundRect(-325, baseY - h1, 220, h1, 16);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = P.ink_primary;
+  ctx.font = `900 58px ${window.TYPO.font_mono}`;
+  ctx.textAlign = "center";
+  ctx.fillText("98%", -215, baseY - h1 - 28);
+  setFitFont(ctx, "900", 28, window.TYPO.font_display, "EDITOR FLEX", 360);
+  ctx.fillText("EDITOR FLEX", -215, baseY + 62);
+
+  // Bar 2: VIEWER CARE (0%) centered at x = +215
+  const h2 = 24 * g2;
+  ctx.fillStyle = P.accent_secondary;
+  ctx.beginPath();
+  ctx.roundRect(105, baseY - h2, 220, h2, 12);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = P.accent_secondary;
+  ctx.font = `900 64px ${window.TYPO.font_mono}`;
+  ctx.fillText("0%", 215, baseY - h2 - 28);
+  ctx.fillStyle = P.ink_primary;
+  setFitFont(ctx, "900", 28, window.TYPO.font_display, "VIEWER CARE", 360);
+  ctx.fillText("VIEWER CARE", 215, baseY + 62);
+
+  // Curved Vector Arrow from top-right pointing down to 0% VIEWER CARE
+  if (localF > 45) {
+    ctx.strokeStyle = P.accent_primary;
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(40, -210);
+    ctx.quadraticCurveTo(215, -210, 215, 110);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(197, 85);
+    ctx.lineTo(215, 115);
+    ctx.lineTo(233, 85);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+// ============================================================================
+// SCENE 08 (f: 1535..1812): MUTE TIMELINE + TURN OFF FX + 3 QUESTIONS
+// "Agli video render karne se pehle apne timeline ko mute karo, saare effects band karo..."
+// ============================================================================
+function renderScene08(ctx, frame, localF) {
+  const P = window.PAL;
+  drawEditorialHeader(ctx, "before you render, turn off...", "ALL EFFECTS", P.accent_primary, 300, localF);
+
+  const toggleT = easeInOutCubic(clamp((localF - 18) / 28, 0, 1));
+
+  // Two Giant Tactile Toggle Switches (TIMELINE MUTE & FX OFF)
+  ctx.save();
+  ctx.translate(540, 860);
+
+  drawDashedPedestal(ctx, 0, 0, 290, frame);
+
+  // Switch 1: FX TOGGLE -> OFF
+  ctx.fillStyle = toggleT > 0.5 ? "#D6D6D0" : P.accent_primary;
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 4.5;
+  ctx.beginPath();
+  ctx.roundRect(-190, -130, 380, 110, 55);
+  ctx.fill();
+  ctx.stroke();
+
+  const knobX = 135 - toggleT * 270;
+  ctx.fillStyle = toggleT > 0.5 ? P.accent_secondary : P.accent_highlight_lime;
+  ctx.beginPath();
+  ctx.arc(knobX, -75, 44, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = P.ink_primary;
+  setFitFont(ctx, "900", 40, window.TYPO.font_display, toggleT > 0.5 ? "FX: OFF" : "FX: ON", 320);
+  ctx.textAlign = "center";
+  ctx.fillText(toggleT > 0.5 ? "FX: OFF" : "FX: ON", 0, 95);
+
+  ctx.restore();
+
+  // Three Real Script Pillars in Transparent Dashed Selection Boxes (with clean 50px gaps!)
+  drawDashedSelectionBox(ctx, 195, 1460, 290, 108, "01: HOOK", P.accent_primary, spring(localF, 45), 0.08);
+  drawDashedSelectionBox(ctx, 540, 1460, 290, 108, "02: SHIFT", P.accent_secondary, spring(localF, 65), 0.08);
+  drawDashedSelectionBox(ctx, 885, 1460, 290, 108, "03: CUT", P.accent_tertiary, spring(localF, 85), 0.08);
+}
+
+// ============================================================================
+// SCENE 09 (f: 1812..2156): Q1 — 3-SECOND CURIOSITY GAP VS "HEY GUYS" CLIFF DROP
+// "Pehla, 3-Second Hook: Kya mera pehla sentence kisi ke dimaag mein khujli paida kar raha hai?"
+// ============================================================================
+function renderScene09(ctx, frame, localF) {
+  const P = window.PAL;
+  drawEditorialHeader(ctx, "question 01: first 3 seconds...", "CURIOSITY GAP", P.accent_highlight_lime, 290, localF);
+
+  drawAmberOdometer(ctx, 540, 555, "3.0 SEC", "HOOK DEADLINE", spring(localF, 6));
+
+  // Live Audience Retention Graph (Curiosity Hook stays 92% vs "Hey Guys" plunges to 8%)
+  const drawProg = clamp((localF - 20) / 70, 0, 1);
+
+  ctx.save();
+  ctx.translate(540, 1180);
+
+  ctx.fillStyle = P.bg_elevated;
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 4.5;
+  ctx.shadowColor = "rgba(20,20,20,0.15)";
+  ctx.shadowBlur = 32;
+  ctx.shadowOffsetY = 14;
+  ctx.beginPath();
+  ctx.roundRect(-440, -340, 880, 680, 28);
+  ctx.fill();
+  ctx.stroke();
+  ctx.shadowColor = "transparent";
+
+  // Axes
+  ctx.strokeStyle = "rgba(20,20,20,0.18)";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-360, -220); ctx.lineTo(-360, 220); ctx.lineTo(360, 220);
+  ctx.stroke();
+
+  // Curve 1: CURIOSITY GAP (High Flat Retention in Lime/Cobalt)
+  ctx.strokeStyle = P.accent_primary;
+  ctx.lineWidth = 10;
+  ctx.beginPath();
+  ctx.moveTo(-360, -180);
+  ctx.lineTo(-360 + 700 * drawProg, -180 + 30 * drawProg);
+  ctx.stroke();
+
+  // Curve 2: "HEY GUYS..." (Cliff-Dive Drop-Off in Orange)
+  ctx.strokeStyle = P.accent_secondary;
+  ctx.lineWidth = 10;
+  ctx.beginPath();
+  ctx.moveTo(-360, -180);
+  const dropX = -360 + 700 * drawProg;
+  const dropY = -180 + easeOutExpo(drawProg) * 370;
+  ctx.lineTo(dropX, dropY);
+  ctx.stroke();
+
+  if (drawProg > 0.5) {
+    ctx.fillStyle = P.accent_primary;
+    setFitFont(ctx, "900", 32, window.TYPO.font_display, "CURIOSITY (92%)", 480);
+    ctx.textAlign = "right";
+    ctx.fillText("CURIOSITY (92%)", 340, -185);
+
+    ctx.fillStyle = P.accent_secondary;
+    setFitFont(ctx, "900", 32, window.TYPO.font_display, "'HEY GUYS' (8%)", 480);
+    ctx.fillText("'HEY GUYS' (8%)", 340, 140);
+  }
+
+  ctx.restore();
+
+  drawDashedSelectionBox(ctx, 540, 1680, 560, 104, "NO 'HEY GUYS'", P.accent_secondary, spring(localF, 65), 0.10);
+}
+
+// ============================================================================
+// SCENE 10 (f: 2156..2549): Q2 — THE 15-SECOND DIRECTION TWIST
+// "Doosra, 15-Second Rule: Kya har 15 second mein story ki direction badal rahi hai?"
+// ============================================================================
+function renderScene10(ctx, frame, localF) {
+  const P = window.PAL;
+  drawEditorialHeader(ctx, "question 02: every 15 seconds...", "NEW DIRECTION", P.accent_primary, 290, localF);
+
+  drawAmberOdometer(ctx, 540, 555, "15 SEC", "PATTERN SHIFT", spring(localF, 6));
+
+  // Center 2D Vector Track with 90-Degree Turning Nodes at 0:15, 0:30, 0:45
+  ctx.save();
+  ctx.translate(540, 1160);
+
+  drawDashedPedestal(ctx, 0, 0, 340, frame);
+
+  const pts = [
+    [-200, 150, "0:00"],
+    [-70,  -120, "0:15"],
+    [70,   120, "0:30"],
+    [200,  -150, "0:45"]
+  ];
+
+  ctx.strokeStyle = P.accent_primary;
+  ctx.lineWidth = 24;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  for (let i = 0; i < pts.length; i++) {
+    if (i === 0) ctx.moveTo(pts[i][0], pts[i][1]);
+    else ctx.lineTo(pts[i][0], pts[i][1]);
+  }
+  ctx.stroke();
+
+  for (let i = 0; i < pts.length; i++) {
+    const [nx, ny, lbl] = pts[i];
+    const nS = spring(localF, 12 + i * 18, { stiffness: 230, damping: 15 });
+    ctx.save();
+    ctx.translate(nx, ny);
+    ctx.scale(nS, nS);
+
+    ctx.fillStyle = i % 2 === 1 ? P.accent_highlight_lime : P.accent_secondary;
+    ctx.strokeStyle = P.ink_primary;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(0, 0, 34, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = P.ink_primary;
+    ctx.font = `900 24px ${window.TYPO.font_mono}`;
+    ctx.textAlign = "center";
+    ctx.fillText(lbl, 0, 8);
+    ctx.restore();
+  }
+
+  ctx.restore();
+
+  drawDashedSelectionBox(ctx, 285, 1670, 410, 102, "NEW TWIST", P.accent_primary, spring(localF, 45));
+  drawDashedSelectionBox(ctx, 795, 1670, 410, 102, "NEW ANGLE", P.accent_tertiary, spring(localF, 65));
+}
+
+// ============================================================================
+// SCENE 11 (f: 2549..2858): Q3 — THE CUT TEST (SCISSORS SLICING OUT FLUFF)
+// "Teesra, The Cut Test: Agar main is clip ko hata doon, toh kya story tootegi?"
+// ============================================================================
+function renderScene11(ctx, frame, localF) {
+  const P = window.PAL;
+  drawEditorialHeader(ctx, "question 03: if you remove it...", "THE CUT TEST", P.accent_secondary, 290, localF);
+
+  const cutT = easeInOutCubic(clamp((localF - 95) / 45, 0, 1));
+
+  ctx.save();
+  ctx.translate(540, 1040);
+
+  drawDashedPedestal(ctx, 0, 0, 350, frame);
+
+  // Left [STORY A] & Right [STORY B] story blocks snapping together with a clean 30px gap when middle [2-HR CLIP] is cut!
+  const snapIn = cutT * 100;
+
+  // Left Block: STORY A (center moves from -205 to -105, width = 180)
+  ctx.fillStyle = P.accent_highlight_lime;
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.roundRect(-295 + snapIn, -62, 180, 124, 16);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = P.ink_primary;
+  setFitFont(ctx, "900", 26, window.TYPO.font_display, "STORY A", 154);
+  ctx.textAlign = "center";
+  ctx.fillText("STORY A", -205 + snapIn, 10);
+
+  // Right Block: STORY B (center moves from +205 to +105, width = 180)
+  ctx.fillStyle = P.accent_highlight_lime;
+  ctx.beginPath();
+  ctx.roundRect(115 - snapIn, -62, 180, 124, 16);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = P.ink_primary;
+  setFitFont(ctx, "900", 26, window.TYPO.font_display, "STORY B", 154);
+  ctx.fillText("STORY B", 205 - snapIn, 10);
+
+  // Middle Bloated Clip [2-HR CLIP] (center = 0, width = 180) getting sliced by Vector Scissors and dropping down
+  if (cutT < 0.98) {
+    ctx.save();
+    ctx.translate(0, cutT * 240);
+    ctx.rotate(cutT * 0.35);
+    ctx.globalAlpha = clamp(1 - cutT * 1.15, 0, 1);
+
+    ctx.fillStyle = P.accent_secondary;
+    ctx.strokeStyle = P.ink_primary;
+    ctx.lineWidth = 4;
+    ctx.setLineDash([10, 6]);
+    ctx.beginPath();
+    ctx.roundRect(-90, -62, 180, 124, 16);
+    ctx.fill();
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = P.ink_primary;
+    setFitFont(ctx, "900", 24, window.TYPO.font_display, "2-HR CLIP", 154);
+    ctx.fillText("2-HR CLIP", 0, 10);
+    ctx.restore();
+  }
+
+  // Recognizable 2D Vector Scissors Icon snipping above the middle clip!
+  const snipAngle = 0.35 - Math.sin(clamp(localF / 95, 0, 1) * Math.PI) * 0.28;
+  ctx.save();
+  ctx.translate(0, -175);
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 8;
+  // Left & Right Scissor Blades
+  ctx.save();
+  ctx.rotate(-snipAngle);
+  ctx.beginPath(); ctx.moveTo(0, -20); ctx.lineTo(-45, 75); ctx.stroke();
+  ctx.beginPath(); ctx.arc(-28, -45, 22, 0, Math.PI * 2); ctx.stroke();
+  ctx.restore();
+
+  ctx.save();
+  ctx.rotate(snipAngle);
+  ctx.beginPath(); ctx.moveTo(0, -20); ctx.lineTo(45, 75); ctx.stroke();
+  ctx.beginPath(); ctx.arc(28, -45, 22, 0, Math.PI * 2); ctx.stroke();
+  ctx.restore();
+  ctx.restore();
+
+  ctx.restore();
+
+  drawDashedSelectionBox(ctx, 540, 1640, 420, 108, "DELETE IT", P.accent_secondary, spring(localF, 110), 0.12);
+}
+
+// ============================================================================
+// SCENE 12 (f: 2858..3158): PROTECT THE STORY PATH (GUARDRAIL COMPASS)
+// "Editing ka kaam story ko chhupana nahi, story ko raste se bhatakne se rokna hai."
+// ============================================================================
+function renderScene12(ctx, frame, localF) {
+  const P = window.PAL;
+  drawEditorialHeader(ctx, "editing has only one job...", "PROTECT STORY", P.accent_primary, 300, localF);
+
+  ctx.save();
+  ctx.translate(540, 1060);
+
+  drawDashedPedestal(ctx, 0, 0, 340, frame);
+
+  // Left & Right Bold Guardrails keeping the story arrow laser-straight to the target
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 10;
+  ctx.setLineDash([20, 12]);
+  ctx.beginPath();
+  ctx.moveTo(-120, -220); ctx.lineTo(-120, 220);
+  ctx.moveTo(120, -220);  ctx.lineTo(120, 220);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // High-speed Lime & Cobalt Story Arrow shooting straight up the center channel
+  const arrowY = 140 - easeOutExpo(clamp(localF / 55, 0, 1)) * 240;
+  ctx.fillStyle = P.accent_primary;
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 4.5;
+  ctx.beginPath();
+  ctx.moveTo(0, arrowY - 95);
+  ctx.lineTo(75, arrowY + 25);
+  ctx.lineTo(28, arrowY + 25);
+  ctx.lineTo(28, arrowY + 145);
+  ctx.lineTo(-28, arrowY + 145);
+  ctx.lineTo(-28, arrowY + 25);
+  ctx.lineTo(-75, arrowY + 25);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.restore();
+
+  drawDashedSelectionBox(ctx, 285, 1630, 410, 104, "ZERO FLUFF", P.accent_primary, spring(localF, 25));
+  drawDashedSelectionBox(ctx, 795, 1630, 410, 104, "PURE SIGNAL", P.accent_tertiary, spring(localF, 45));
+}
+
+// ============================================================================
+// SCENE 13 (f: 3158..3409): -50% EFFECTS // +200% SCRIPT ODOMETERS & SCALE
+// "Agli video mein 50 percent kam effects lagao, aur 200 percent zyada dimaag..."
+// ============================================================================
+function renderScene13(ctx, frame, localF) {
+  const P = window.PAL;
+  drawEditorialHeader(ctx, "the new creator ratio...", "+200% SCRIPT", P.accent_highlight_lime, 300, localF);
+
+  const fxVal = Math.min(50, Math.round((localF / 35) * 50));
+  const scVal = Math.min(200, Math.round((localF / 45) * 200));
+
+  drawAmberOdometer(ctx, 295, 610, `-${fxVal}%`, "EFFECTS", spring(localF, 6));
+  drawAmberOdometer(ctx, 785, 610, `+${scVal}%`, "SCRIPT", spring(localF, 18));
+
+  // Vector Balance Scale tipping decisively toward SCRIPT & HOOK
+  const tilt = easeInOutCubic(clamp((localF - 20) / 45, 0, 1)) * 0.24;
+
+  ctx.save();
+  ctx.translate(540, 1260);
+
+  // Fulcrum Triangle
+  ctx.fillStyle = P.ink_primary;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(-75, 150);
+  ctx.lineTo(75, 150);
+  ctx.closePath();
+  ctx.fill();
+
+  // Tilting Beam
+  ctx.save();
+  ctx.rotate(tilt);
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 14;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(-310, 0);
+  ctx.lineTo(310, 0);
+  ctx.stroke();
+
+  // Left Light Pan: FX
+  ctx.fillStyle = P.bg_elevated;
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.roundRect(-390, -110, 160, 95, 14);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = P.ink_primary;
+  setFitFont(ctx, "900", 34, window.TYPO.font_display, "FX", 130);
+  ctx.textAlign = "center";
+  ctx.fillText("FX", -310, -50);
+
+  // Right Heavy Pan: HOOK + SCRIPT
+  ctx.fillStyle = P.accent_highlight_lime;
+  ctx.beginPath();
+  ctx.roundRect(180, -145, 260, 130, 18);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = P.ink_primary;
+  setFitFont(ctx, "900", 36, window.TYPO.font_display, "SCRIPT", 220);
+  ctx.fillText("SCRIPT", 310, -68);
+  ctx.restore();
+
+  ctx.restore();
+}
+
+// ============================================================================
+// SCENE 14 (f: 3409..3685): DELETE THAT FANCY INTRO (SLAM @ f=3503) -> BLACK CUT
+// "apna timeline kholo aur sabse pehle woh fancy intro udao."
+// ============================================================================
+function renderScene14(ctx, frame, localF) {
+  const P = window.PAL;
+  const T = window.TYPO;
 
   if (frame >= 3675) {
     ctx.fillStyle = "#141414";
-    ctx.fillRect(0, 0, 1080, 1920);
+    ctx.fillRect(-300, -300, 1680, 2520);
     ctx.fillStyle = P.accent_highlight_lime;
-    ctx.font = "900 64px 'Liberation Sans', sans-serif";
+    setFitFont(ctx, "900", 68, T.font_display, "DELETE THAT INTRO.", 900);
     ctx.textAlign = "center";
-    ctx.fillText("DELETE THAT FANCY INTRO.", 540, 960);
+    ctx.fillText("DELETE THAT INTRO.", 540, 960);
     return;
   }
 
-  const delTriggerF = 3503 - f0;
-  const delProgress = clamp((localF - delTriggerF) / 14, 0, 1);
-  const shake = (localF >= delTriggerF && localF <= delTriggerF + 18)
-    ? Math.sin(localF * 3.2) * 18 * (1 - (localF - delTriggerF) / 18)
+  const delTriggerF = 3503;
+  const isDeleted = frame >= delTriggerF;
+  const shake = (frame >= delTriggerF && frame <= delTriggerF + 18)
+    ? Math.sin((frame - delTriggerF) * 3.4) * 20 * (1 - (frame - delTriggerF) / 18)
     : 0;
 
   ctx.save();
   ctx.translate(shake, -shake * 0.6);
 
-  drawLightGraphPaperCanvas(ctx, frame);
-  drawIraaMentorBar(ctx, "04 // THE MIC-DROP RULE", frame);
-
   drawEditorialHeader(
     ctx,
-    "stop hiding weak writing behind effects...",
-    "-50% EFFECTS",
-    "+200% SCRIPT",
-    P.accent_highlight_lime,
-    305,
-    frame,
-    f0 + 4
+    "open your timeline right now &...",
+    isDeleted ? "INTRO DELETED" : "DELETE INTRO",
+    isDeleted ? P.accent_highlight_lime : P.accent_secondary,
+    300,
+    localF
   );
 
-  const fxNum = Math.min(50, Math.round((localF / 50) * 50));
-  const brNum = Math.min(200, Math.round((localF / 65) * 200));
-  drawAmberOdometer(ctx, 295, 610, `-${fxNum}%`, "FLUFF EFFECTS", spring(frame, f0 + 12, { stiffness: 210, damping: 16 }));
-  drawAmberOdometer(ctx, 785, 610, `+${brNum}%`, "HOOK & SCRIPT BRAIN", spring(frame, f0 + 28, { stiffness: 210, damping: 16 }));
-
+  // Single Centered Timeline Stage (NEVER two side-by-side boxes so ZERO overlap ever occurs!)
   ctx.save();
-  ctx.translate(540, 1020);
+  ctx.translate(540, 920);
 
   ctx.fillStyle = P.bg_elevated;
-  ctx.strokeStyle = P.border_dashed_vector;
-  ctx.lineWidth = 4;
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 4.5;
   ctx.shadowColor = "rgba(20,20,20,0.16)";
-  ctx.shadowBlur = 32;
+  ctx.shadowBlur = 34;
   ctx.shadowOffsetY = 14;
   ctx.beginPath();
-  ctx.roundRect(-460, -210, 920, 420, 24);
+  ctx.roundRect(-430, -210, 860, 420, 26);
   ctx.fill();
   ctx.stroke();
   ctx.shadowColor = "transparent";
 
-  ctx.fillStyle = P.ink_primary;
-  ctx.font = "900 30px 'DejaVu Sans Mono', monospace";
-  ctx.textAlign = "left";
-  ctx.fillText("TIMELINE // FINAL MASTER CUT", -415, -145);
-
-  if (delProgress >= 1.0) {
-    ctx.fillStyle = P.accent_secondary;
-    ctx.font = "900 26px 'DejaVu Sans Mono', monospace";
-    ctx.textAlign = "right";
-    ctx.fillText("FLUFF VAPORIZED ✓", 415, -145);
-  }
-
-  if (delProgress < 0.95) {
-    ctx.save();
-    ctx.translate(-195, 20);
-    ctx.scale(1 - delProgress, 1 - delProgress);
-    ctx.globalAlpha = clamp(1 - delProgress * 1.2, 0, 1);
-
-    drawDashedSelectionBox(
-      ctx, 0, 0, 390, 150,
-      "FANCY INTRO",
-      P.accent_secondary,
-      P.ink_primary,
-      1.0,
-      "0.5s Viewer Swipe Trap"
-    );
-    ctx.restore();
-  }
-
-  const slideLeft = easeOutExpo(delProgress) * 195;
-  ctx.save();
-  ctx.translate(195 - slideLeft, 20);
-  drawDashedSelectionBox(
-    ctx, 0, 0, 420 + slideLeft * 1.85, 150,
-    "00:00 // BRUTAL HOOK + STORY",
-    P.accent_highlight_lime,
-    P.ink_primary,
-    1.0,
-    "100% Pure Signal // Zero Fluff"
-  );
-  ctx.restore();
-
+  // Playhead needle at 00:00
   ctx.strokeStyle = P.accent_primary;
-  ctx.lineWidth = 5;
+  ctx.lineWidth = 6;
   ctx.beginPath();
-  ctx.moveTo(-405, -105);
-  ctx.lineTo(-405, 160);
+  ctx.moveTo(-360, -140);
+  ctx.lineTo(-360, 140);
   ctx.stroke();
 
+  if (!isDeleted) {
+    drawDashedSelectionBox(ctx, 20, 0, 620, 150, "FANCY INTRO", P.accent_secondary, 1.0, 0.14);
+  } else {
+    const snapS = spring(frame, delTriggerF, { stiffness: 280, damping: 15 });
+    drawDashedSelectionBox(ctx, 20, 0, 620, 150, "00:00 HOOK", P.accent_primary, snapS, 0.15);
+  }
+
   ctx.restore();
 
-  const keyPress = (localF >= delTriggerF)
-    ? spring(localF, delTriggerF, { stiffness: 320, damping: 14 })
-    : 0;
-  const keyY = 1525 + keyPress * 28;
-
+  // Giant Tactile 3D Mechanical [ DELETE ] Keycap at Y = 1480
+  const keyPress = isDeleted ? spring(frame, delTriggerF, { stiffness: 340, damping: 14 }) : 0;
   ctx.save();
-  ctx.translate(540, keyY);
+  ctx.translate(540, 1480 + keyPress * 28);
 
+  // 3D Keycap Base
   ctx.fillStyle = P.ink_primary;
   ctx.beginPath();
-  ctx.roundRect(-340, -70 + (1 - keyPress) * 26, 680, 165, 28);
+  ctx.roundRect(-310, -75 + (1 - keyPress) * 28, 620, 175, 30);
   ctx.fill();
 
-  ctx.fillStyle = keyPress > 0.1 ? P.accent_secondary : P.bg_elevated;
+  // 3D Keycap Top Surface
+  ctx.fillStyle = isDeleted ? P.accent_secondary : P.bg_elevated;
   ctx.strokeStyle = P.ink_primary;
   ctx.lineWidth = 5;
   ctx.beginPath();
-  ctx.roundRect(-340, -85, 680, 160, 26);
+  ctx.roundRect(-310, -90, 620, 170, 28);
   ctx.fill();
   ctx.stroke();
 
   ctx.fillStyle = P.ink_primary;
-  ctx.font = "900 54px 'DejaVu Sans Mono', monospace";
+  setFitFont(ctx, "900", 56, T.font_display, isDeleted ? "DELETED ✓" : "[ DELETE ]", 540);
   ctx.textAlign = "center";
-  ctx.fillText(keyPress > 0.1 ? "INTRO DELETED ✓" : "[ DELETE INTRO ]", 0, 14);
+  ctx.fillText(isDeleted ? "DELETED ✓" : "[ DELETE ]", 0, 16);
   ctx.restore();
-
-  drawFourPointStar(ctx, 115, 1520, 38, frame * 0.06, P.accent_highlight_lime);
-  drawFourPointStar(ctx, 965, 1520, 38, -frame * 0.06, P.accent_secondary);
 
   ctx.restore();
 }
 
-window.seekToFrame = function(frame) {
-  if (!window.BEAT_CLOCK) return false;
-  const beats = window.BEAT_CLOCK.beats;
-  const b1 = beats[0]; // 0..590
-  const b2 = beats[1]; // 590..1535
-  const b3 = beats[2]; // 1535..2858
-  const b4 = beats[3]; // 2858..3685
+// ============================================================================
+// MASTER FRAME DISPATCHER WITH LIVING 2D CANVAS CAMERA
+// ============================================================================
+const SCENE_RENDERERS = [
+  renderScene01, renderScene02, renderScene03, renderScene04,
+  renderScene05, renderScene06, renderScene07, renderScene08,
+  renderScene09, renderScene10, renderScene11, renderScene12,
+  renderScene13, renderScene14
+];
 
-  if (frame < b1.end_frame) {
-    renderBeat01_Hook(ctx, frame, b1.start_frame, b1.duration_frames);
-  } else if (frame < b2.end_frame) {
-    renderBeat02_RealityCheck(ctx, frame, b2.start_frame, b2.duration_frames);
-  } else if (frame < b3.end_frame) {
-    renderBeat03_TheFix(ctx, frame, b3.start_frame, b3.duration_frames);
-  } else {
-    renderBeat04_MicDrop(ctx, frame, b4.start_frame, b4.duration_frames);
+window.seekToFrame = function(frame) {
+  if (!window.BEAT_CLOCK || !window.BEAT_CLOCK.scenes) return false;
+  const scenes = window.BEAT_CLOCK.scenes;
+  let activeIdx = scenes.length - 1;
+  for (let i = 0; i < scenes.length; i++) {
+    if (frame >= scenes[i].start_frame && frame < scenes[i].end_frame) {
+      activeIdx = i;
+      break;
+    }
   }
+
+  const sc = scenes[activeIdx];
+  const localF = frame - sc.start_frame;
+
+  ctx.save();
+  ctx.clearRect(0, 0, 1080, 1920);
+
+  // Apply Living Camera Transform to the 2D Canvas
+  applyCanvasCamera(ctx, frame, sc.start_frame, sc.end_frame, sc.camera || "push_in", 540, 960);
+
+  // Scene 1 (0..90) has its own full-bleed Cobalt color-block background;
+  // Scenes 2..14 render over the Light Editorial Graph-Paper Grid
+  if (activeIdx > 0 && frame < 3675) {
+    drawLightGraphPaperCanvas(ctx, frame);
+  }
+
+  SCENE_RENDERERS[activeIdx](ctx, frame, localF);
+  ctx.restore();
   return true;
 };
 </script>

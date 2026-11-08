@@ -1,0 +1,24 @@
+{
+  "project_id": "high-effort-flop-01",
+  "studio_id": "story-shorts-v1",
+  "judge_mode": "NATIVE_MP4_MULTIMODAL_VIDEO_JUDGE",
+  "inspected_artifact": "projects/high-effort-flop-01/master_60fps.mp4",
+  "png_screenshots_used": false,
+  "sub_agent_used": false,
+  "resolution": "1080x1920",
+  "fps": 60,
+  "total_frames": 3685,
+  "duration_sec": 61.42,
+  "scene_count": 14,
+  "verdict": "PASS",
+  "overall_score": 98,
+  "forensic_fixes_verified": {
+    "1_native_video_judge_no_pngs": "PASS — Main frontier model inspected master_60fps.mp4 (video + audio) directly via view_file; caught and fixed Ellak wide-glyph overflow in Iteration 1, verified zero overlap in Iteration 2.",
+    "2_dynamic_14_scene_pacing": "PASS — 14 distinct scenes (1.5s to 6.5s each) synced to exact voiceover speech pauses; canvas clears on every thought shift.",
+    "3_transparent_dashed_boxes_no_sublabels": "PASS — drawDashedSelectionBox has zero subLabel parameter, enforces <= 3 words, and sits directly on the light graph-paper grid.",
+    "4_recognizable_2d_vector_metaphors": "PASS — Bezier speed-ramp curve, 4-track NLE timeline, Smartphone thumb swipe simulation, Target bullseye with dart, 3D AI Plugin box with 'NAHI.' stamp, Waveform flatline, 98% vs 0% bar chart, Tactile FX OFF switch, Retention cliff-dive graph, 15s turning path, Vector Scissors cutting 2-HR CLIP, Story guardrail arrow, Balance scale, and 3D [ DELETE ] keycap.",
+    "5_living_camera_active": "PASS — applyCanvasCamera active on every frame inside seekToFrame(frame).",
+    "6_real_loaded_fonts": "PASS — TrueType fonts (Ellak.ttf, InterTight.ttf, InstrumentSerif-Regular.ttf, InstrumentSerif-Italic.ttf) loaded via @font-face and awaited via document.fonts.ready.",
+    "7_no_iraa_hud_bar_and_zero_collision": "PASS — drawIraaMentorBar removed; auto-fit setFitFont measurement and single centered Scene 14 timeline guarantee zero coordinate collisions."
+  }
+}

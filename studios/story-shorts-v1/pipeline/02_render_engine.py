@@ -55,8 +55,10 @@ async def render_worker_chunk(worker_id, start_f, end_f, html_path, clock, studi
             "-r", str(fps),
             "-i", "-",
             "-c:v", "libx264",
-            "-preset", "ultrafast",
-            "-crf", "16",
+            "-preset", "fast",
+            "-crf", "23",
+            "-maxrate", "2400k",
+            "-bufsize", "4800k",
             "-pix_fmt", "yuv420p",
             out_ts
         ]
@@ -76,25 +78,31 @@ async def render_worker_chunk(worker_id, start_f, end_f, html_path, clock, studi
                         return data.get("result", {})
 
             await cdp_call("Runtime.enable")
-            await asyncio.sleep(0.15)
+            await asyncio.sleep(0.2)
 
             clock_json_str = json.dumps(clock)
             lock_json_str = json.dumps(studio_lock)
             await cdp_call("Runtime.evaluate", {
                 "expression": f"""
-                window.initClock({clock_json_str}, {lock_json_str});
-                window.renderBatchB64 = function(fStart, fEnd) {{
-                    const c = document.getElementById('stage');
-                    const out = [];
-                    for (let f = fStart; f < fEnd; f++) {{
-                        window.seekToFrame(f);
-                        const d = c.toDataURL('image/jpeg', 0.94);
-                        out.push(d.substring(23));
+                (async () => {{
+                    if (document.fonts && document.fonts.ready) {{
+                        await document.fonts.ready;
                     }}
-                    return out;
-                }};
-                true;
+                    window.initClock({clock_json_str}, {lock_json_str});
+                    window.renderBatchB64 = function(fStart, fEnd) {{
+                        const c = document.getElementById('stage');
+                        const out = [];
+                        for (let f = fStart; f < fEnd; f++) {{
+                            window.seekToFrame(f);
+                            const d = c.toDataURL('image/jpeg', 0.94);
+                            out.push(d.substring(23));
+                        }}
+                        return out;
+                    }};
+                    return true;
+                }})()
                 """,
+                "awaitPromise": True,
                 "returnByValue": True
             })
 
@@ -172,12 +180,10 @@ async def render_frames_via_cdp(html_path, clock_path, out_mp4):
         "-f", "concat", "-safe", "0",
         "-i", concat_list,
         "-i", audio_file,
-        "-c:v", "libx264",
-        "-preset", "fast",
-        "-crf", "17",
-        "-pix_fmt", "yuv420p",
+        "-c:v", "copy",
         "-c:a", "aac",
         "-b:a", "192k",
+        "-movflags", "+faststart",
         "-shortest",
         out_mp4
     ]

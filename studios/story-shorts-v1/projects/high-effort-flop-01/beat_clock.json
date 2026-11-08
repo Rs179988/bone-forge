@@ -12,174 +12,356 @@
   "beats": [
     {
       "beat_id": "beat_01_hook_pattern_interrupt",
-      "act_title": "THE HOOK // PATTERN INTERRUPT",
       "spoken_line": "Tumne apni pichli video ke 3-second ke transition par 4 ghante lagaye... aur viewer ne use 0.5 second mein swipe kar diya. Bura laga? Good. Ab sach suno.",
-      "headline": "4 HRS WORK -> 0.5s SWIPE",
-      "sub_caption": "BRUTAL REALITY CHECK",
       "start_frame": 0,
       "end_frame": 590,
       "duration_frames": 590,
       "start_sec": 0.0,
-      "end_sec": 9.833,
-      "sfx_cues": [
-        {
-          "frame": 0,
-          "sfx": "sub_impact.wav",
-          "gain": 0.46
-        },
-        {
-          "frame": 16,
-          "sfx": "ui_tick.wav",
-          "gain": 0.4
-        },
-        {
-          "frame": 247,
-          "sfx": "ui_tick.wav",
-          "gain": 0.4
-        },
-        {
-          "frame": 424,
-          "sfx": "ui_tick.wav",
-          "gain": 0.4
-        },
-        {
-          "frame": 581,
-          "sfx": "whoosh_fast.wav",
-          "gain": 0.44
-        },
-        {
-          "frame": 90,
-          "sfx": "sub_impact.wav",
-          "gain": 0.48
-        }
-      ]
+      "end_sec": 9.833
     },
     {
       "beat_id": "beat_02_reality_check_agitation",
-      "act_title": "THE REALITY CHECK // EDITOR FLEX",
       "spoken_line": "90 percent naye creators ko lagta hai ki unhe ek viral editing pack ya naye AI plugin ki zaroorat hai. Nahi. Tumhara color grade cinematic hai, sound design crispy hai\u2014par tumhari video boring hai. Kyunki tum apne liye edit kar rahe ho, dusre editors ko flex dikhane ke liye. Audience ko tumhare keyframes se ghanta farak nahi padta.",
-      "headline": "90% CHASE PLUGINS",
-      "sub_caption": "AUDIENCE DOESN'T CARE ABOUT KEYFRAMES",
       "start_frame": 590,
       "end_frame": 1535,
       "duration_frames": 945,
       "start_sec": 9.833,
-      "end_sec": 25.583,
-      "sfx_cues": [
-        {
-          "frame": 590,
-          "sfx": "sub_impact.wav",
-          "gain": 0.46
-        },
-        {
-          "frame": 606,
-          "sfx": "ui_tick.wav",
-          "gain": 0.4
-        },
-        {
-          "frame": 986,
-          "sfx": "ui_tick.wav",
-          "gain": 0.4
-        },
-        {
-          "frame": 1270,
-          "sfx": "ui_tick.wav",
-          "gain": 0.4
-        },
-        {
-          "frame": 1526,
-          "sfx": "whoosh_fast.wav",
-          "gain": 0.44
-        }
-      ]
+      "end_sec": 25.583
     },
     {
       "beat_id": "beat_03_the_fix_three_questions",
-      "act_title": "THE FIX // 3 BRUTAL QUESTIONS",
       "spoken_line": "Agli video render karne se pehle apne timeline ko mute karo, saare effects band karo, aur khud se yeh teen sawaal poocho. Pehla, 3-Second Hook: Kya mera pehla sentence kisi ke dimaag mein khujli paida kar raha hai? Agar tum Hey guys welcome back bol rahe ho, toh wahin khel khatam hai. Doosra, 15-Second Rule: Kya har 15 second mein story ki direction badal rahi hai? Teesra, The Cut Test: Agar main is clip ko hata doon, toh kya story tootegi? Agar nahi, toh delete maaro.",
-      "headline": "FASTER. SHARPER. EFFECTIVE.",
-      "sub_caption": "3-SEC HOOK // 15-SEC SHIFT // CUT TEST",
       "start_frame": 1535,
       "end_frame": 2858,
       "duration_frames": 1323,
       "start_sec": 25.583,
-      "end_sec": 47.633,
-      "sfx_cues": [
-        {
-          "frame": 1535,
-          "sfx": "sub_impact.wav",
-          "gain": 0.46
-        },
-        {
-          "frame": 1551,
-          "sfx": "ui_tick.wav",
-          "gain": 0.4
-        },
-        {
-          "frame": 2090,
-          "sfx": "ui_tick.wav",
-          "gain": 0.4
-        },
-        {
-          "frame": 2487,
-          "sfx": "ui_tick.wav",
-          "gain": 0.4
-        },
-        {
-          "frame": 2849,
-          "sfx": "whoosh_fast.wav",
-          "gain": 0.44
-        }
-      ]
+      "end_sec": 47.633
     },
     {
       "beat_id": "beat_04_mic_drop_outro",
-      "act_title": "MIC-DROP // DELETE THE FLUFF",
       "spoken_line": "Editing ka kaam story ko chhupana nahi, story ko raste se bhatakne se rokna hai. Agli video mein 50 percent kam effects lagao, aur 200 percent zyada dimaag apne hook aur script par lagao. Ab yeh Reel save karke mat chhod dena\u2014apna timeline kholo aur sabse pehle woh fancy intro udao.",
-      "headline": "-50% FX // +200% SCRIPT",
-      "sub_caption": "DELETE THAT FANCY INTRO NOW",
       "start_frame": 2858,
       "end_frame": 3685,
       "duration_frames": 827,
       "start_sec": 47.633,
-      "end_sec": 61.417,
-      "sfx_cues": [
-        {
-          "frame": 2858,
-          "sfx": "sub_impact.wav",
-          "gain": 0.46
-        },
-        {
-          "frame": 2874,
-          "sfx": "ui_tick.wav",
-          "gain": 0.4
-        },
-        {
-          "frame": 3205,
-          "sfx": "ui_tick.wav",
-          "gain": 0.4
-        },
-        {
-          "frame": 3453,
-          "sfx": "ui_tick.wav",
-          "gain": 0.4
-        },
-        {
-          "frame": 3676,
-          "sfx": "whoosh_fast.wav",
-          "gain": 0.44
-        },
-        {
-          "frame": 3503,
-          "sfx": "sub_impact.wav",
-          "gain": 0.58
-        },
-        {
-          "frame": 3507,
-          "sfx": "lock_chime.wav",
-          "gain": 0.45
-        }
-      ]
+      "end_sec": 61.417
+    }
+  ],
+  "scenes": [
+    {
+      "scene_id": "s01_hook_card",
+      "start_frame": 0,
+      "end_frame": 90,
+      "camera": "snap_zoom",
+      "spoken_focus": "Tumne apni pichli video ke 3-second ke transition..."
+    },
+    {
+      "scene_id": "s02_four_hours_nle",
+      "start_frame": 90,
+      "end_frame": 258,
+      "camera": "push_in",
+      "spoken_focus": "...par 4 ghante lagaye..."
+    },
+    {
+      "scene_id": "s03_half_sec_swipe",
+      "start_frame": 258,
+      "end_frame": 449,
+      "camera": "pan_up",
+      "spoken_focus": "...aur viewer ne use 0.5 second mein swipe kar diya."
+    },
+    {
+      "scene_id": "s04_bura_laga_truth",
+      "start_frame": 449,
+      "end_frame": 590,
+      "camera": "snap_zoom",
+      "spoken_focus": "Bura laga? Good. Ab sach suno."
+    },
+    {
+      "scene_id": "s05_ninety_pct_trap",
+      "start_frame": 590,
+      "end_frame": 906,
+      "camera": "push_in",
+      "spoken_focus": "90% naye creators ko lagta hai viral pack ya AI plugin chahiye. Nahi."
+    },
+    {
+      "scene_id": "s06_grade_vs_boring",
+      "start_frame": 906,
+      "end_frame": 1179,
+      "camera": "tilt_focus",
+      "spoken_focus": "Color grade cinematic hai, sound crispy hai\u2014par video boring hai."
+    },
+    {
+      "scene_id": "s07_editor_ego_bars",
+      "start_frame": 1179,
+      "end_frame": 1535,
+      "camera": "pan_up",
+      "spoken_focus": "Dusre editors ko flex dikhane ke liye. Audience ko keyframes se farak nahi padta."
+    },
+    {
+      "scene_id": "s08_mute_three_q",
+      "start_frame": 1535,
+      "end_frame": 1812,
+      "camera": "snap_zoom",
+      "spoken_focus": "Timeline mute karo, effects band karo, aur yeh 3 sawaal poocho."
+    },
+    {
+      "scene_id": "s09_q1_curiosity",
+      "start_frame": 1812,
+      "end_frame": 2156,
+      "camera": "push_in",
+      "spoken_focus": "Pehle 3 second: Curiosity gap vs Hey guys welcome back drop-off."
+    },
+    {
+      "scene_id": "s10_q2_15sec_twist",
+      "start_frame": 2156,
+      "end_frame": 2549,
+      "camera": "tilt_focus",
+      "spoken_focus": "The 15-Second Rule: Har 15 second mein story direction shift."
+    },
+    {
+      "scene_id": "s11_q3_cut_test",
+      "start_frame": 2549,
+      "end_frame": 2858,
+      "camera": "snap_zoom",
+      "spoken_focus": "The Cut Test: Clip hatane se story na toote toh delete maaro."
+    },
+    {
+      "scene_id": "s12_story_compass",
+      "start_frame": 2858,
+      "end_frame": 3158,
+      "camera": "push_in",
+      "spoken_focus": "Editing ka kaam story ko chhupana nahi, bhatakne se rokna hai."
+    },
+    {
+      "scene_id": "s13_fx_vs_script",
+      "start_frame": 3158,
+      "end_frame": 3409,
+      "camera": "pan_up",
+      "spoken_focus": "50% kam effects lagao, aur 200% zyada dimaag hook aur script par."
+    },
+    {
+      "scene_id": "s14_delete_intro",
+      "start_frame": 3409,
+      "end_frame": 3685,
+      "camera": "snap_zoom",
+      "spoken_focus": "Timeline kholo aur sabse pehle woh fancy intro udao."
+    }
+  ],
+  "sfx_cues": [
+    {
+      "frame": 0,
+      "sfx": "sub_impact.wav",
+      "gain": 0.46
+    },
+    {
+      "frame": 12,
+      "sfx": "ui_tick.wav",
+      "gain": 0.38
+    },
+    {
+      "frame": 90,
+      "sfx": "sub_impact.wav",
+      "gain": 0.46
+    },
+    {
+      "frame": 102,
+      "sfx": "ui_tick.wav",
+      "gain": 0.38
+    },
+    {
+      "frame": 258,
+      "sfx": "whoosh_fast.wav",
+      "gain": 0.46
+    },
+    {
+      "frame": 270,
+      "sfx": "ui_tick.wav",
+      "gain": 0.38
+    },
+    {
+      "frame": 353,
+      "sfx": "ui_tick.wav",
+      "gain": 0.36
+    },
+    {
+      "frame": 449,
+      "sfx": "sub_impact.wav",
+      "gain": 0.46
+    },
+    {
+      "frame": 461,
+      "sfx": "ui_tick.wav",
+      "gain": 0.38
+    },
+    {
+      "frame": 590,
+      "sfx": "sub_impact.wav",
+      "gain": 0.46
+    },
+    {
+      "frame": 602,
+      "sfx": "ui_tick.wav",
+      "gain": 0.38
+    },
+    {
+      "frame": 748,
+      "sfx": "ui_tick.wav",
+      "gain": 0.36
+    },
+    {
+      "frame": 906,
+      "sfx": "whoosh_fast.wav",
+      "gain": 0.46
+    },
+    {
+      "frame": 918,
+      "sfx": "ui_tick.wav",
+      "gain": 0.38
+    },
+    {
+      "frame": 1042,
+      "sfx": "ui_tick.wav",
+      "gain": 0.36
+    },
+    {
+      "frame": 1179,
+      "sfx": "whoosh_fast.wav",
+      "gain": 0.46
+    },
+    {
+      "frame": 1191,
+      "sfx": "ui_tick.wav",
+      "gain": 0.38
+    },
+    {
+      "frame": 1357,
+      "sfx": "ui_tick.wav",
+      "gain": 0.36
+    },
+    {
+      "frame": 1535,
+      "sfx": "sub_impact.wav",
+      "gain": 0.46
+    },
+    {
+      "frame": 1547,
+      "sfx": "ui_tick.wav",
+      "gain": 0.38
+    },
+    {
+      "frame": 1673,
+      "sfx": "ui_tick.wav",
+      "gain": 0.36
+    },
+    {
+      "frame": 1812,
+      "sfx": "whoosh_fast.wav",
+      "gain": 0.46
+    },
+    {
+      "frame": 1824,
+      "sfx": "ui_tick.wav",
+      "gain": 0.38
+    },
+    {
+      "frame": 1984,
+      "sfx": "ui_tick.wav",
+      "gain": 0.36
+    },
+    {
+      "frame": 2156,
+      "sfx": "whoosh_fast.wav",
+      "gain": 0.46
+    },
+    {
+      "frame": 2168,
+      "sfx": "ui_tick.wav",
+      "gain": 0.38
+    },
+    {
+      "frame": 2352,
+      "sfx": "ui_tick.wav",
+      "gain": 0.36
+    },
+    {
+      "frame": 2549,
+      "sfx": "whoosh_fast.wav",
+      "gain": 0.46
+    },
+    {
+      "frame": 2561,
+      "sfx": "ui_tick.wav",
+      "gain": 0.38
+    },
+    {
+      "frame": 2703,
+      "sfx": "ui_tick.wav",
+      "gain": 0.36
+    },
+    {
+      "frame": 2858,
+      "sfx": "whoosh_fast.wav",
+      "gain": 0.46
+    },
+    {
+      "frame": 2870,
+      "sfx": "ui_tick.wav",
+      "gain": 0.38
+    },
+    {
+      "frame": 3008,
+      "sfx": "ui_tick.wav",
+      "gain": 0.36
+    },
+    {
+      "frame": 3158,
+      "sfx": "whoosh_fast.wav",
+      "gain": 0.46
+    },
+    {
+      "frame": 3170,
+      "sfx": "ui_tick.wav",
+      "gain": 0.38
+    },
+    {
+      "frame": 3283,
+      "sfx": "ui_tick.wav",
+      "gain": 0.36
+    },
+    {
+      "frame": 3409,
+      "sfx": "sub_impact.wav",
+      "gain": 0.46
+    },
+    {
+      "frame": 3421,
+      "sfx": "ui_tick.wav",
+      "gain": 0.38
+    },
+    {
+      "frame": 3547,
+      "sfx": "ui_tick.wav",
+      "gain": 0.36
+    },
+    {
+      "frame": 865,
+      "sfx": "sub_impact.wav",
+      "gain": 0.5
+    },
+    {
+      "frame": 2680,
+      "sfx": "lock_chime.wav",
+      "gain": 0.46
+    },
+    {
+      "frame": 3503,
+      "sfx": "sub_impact.wav",
+      "gain": 0.62
+    },
+    {
+      "frame": 3507,
+      "sfx": "lock_chime.wav",
+      "gain": 0.48
     }
   ]
 }

@@ -39,6 +39,9 @@ def trim_silence(audio_2ch, thresh=0.018, pad_samples=int(0.05 * SR)):
     return audio_2ch[start:end]
 
 def generate_female_tts_segment(client, text, out_wav_44k):
+    if os.path.exists(out_wav_44k) and os.path.getsize(out_wav_44k) > 10000:
+        return load_wav_stereo(out_wav_44k)
+
     raw_24k = out_wav_44k + ".24k.wav"
     untight_44k = out_wav_44k + ".raw44k.wav"
 
@@ -90,31 +93,19 @@ def build_flop_master_clock(project_dir, sfx_dir):
     raw_beats = [
         {
             "beat_id": "beat_01_hook_pattern_interrupt",
-            "act_title": "THE HOOK // PATTERN INTERRUPT",
-            "spoken_line": "Tumne apni pichli video ke 3-second ke transition par 4 ghante lagaye... aur viewer ne use 0.5 second mein swipe kar diya. Bura laga? Good. Ab sach suno.",
-            "headline": "4 HRS WORK -> 0.5s SWIPE",
-            "sub_caption": "BRUTAL REALITY CHECK"
+            "spoken_line": "Tumne apni pichli video ke 3-second ke transition par 4 ghante lagaye... aur viewer ne use 0.5 second mein swipe kar diya. Bura laga? Good. Ab sach suno."
         },
         {
             "beat_id": "beat_02_reality_check_agitation",
-            "act_title": "THE REALITY CHECK // EDITOR FLEX",
-            "spoken_line": "90 percent naye creators ko lagta hai ki unhe ek viral editing pack ya naye AI plugin ki zaroorat hai. Nahi. Tumhara color grade cinematic hai, sound design crispy hai—par tumhari video boring hai. Kyunki tum apne liye edit kar rahe ho, dusre editors ko flex dikhane ke liye. Audience ko tumhare keyframes se ghanta farak nahi padta.",
-            "headline": "90% CHASE PLUGINS",
-            "sub_caption": "AUDIENCE DOESN'T CARE ABOUT KEYFRAMES"
+            "spoken_line": "90 percent naye creators ko lagta hai ki unhe ek viral editing pack ya naye AI plugin ki zaroorat hai. Nahi. Tumhara color grade cinematic hai, sound design crispy hai—par tumhari video boring hai. Kyunki tum apne liye edit kar rahe ho, dusre editors ko flex dikhane ke liye. Audience ko tumhare keyframes se ghanta farak nahi padta."
         },
         {
             "beat_id": "beat_03_the_fix_three_questions",
-            "act_title": "THE FIX // 3 BRUTAL QUESTIONS",
-            "spoken_line": "Agli video render karne se pehle apne timeline ko mute karo, saare effects band karo, aur khud se yeh teen sawaal poocho. Pehla, 3-Second Hook: Kya mera pehla sentence kisi ke dimaag mein khujli paida kar raha hai? Agar tum Hey guys welcome back bol rahe ho, toh wahin khel khatam hai. Doosra, 15-Second Rule: Kya har 15 second mein story ki direction badal rahi hai? Teesra, The Cut Test: Agar main is clip ko hata doon, toh kya story tootegi? Agar nahi, toh delete maaro.",
-            "headline": "FASTER. SHARPER. EFFECTIVE.",
-            "sub_caption": "3-SEC HOOK // 15-SEC SHIFT // CUT TEST"
+            "spoken_line": "Agli video render karne se pehle apne timeline ko mute karo, saare effects band karo, aur khud se yeh teen sawaal poocho. Pehla, 3-Second Hook: Kya mera pehla sentence kisi ke dimaag mein khujli paida kar raha hai? Agar tum Hey guys welcome back bol rahe ho, toh wahin khel khatam hai. Doosra, 15-Second Rule: Kya har 15 second mein story ki direction badal rahi hai? Teesra, The Cut Test: Agar main is clip ko hata doon, toh kya story tootegi? Agar nahi, toh delete maaro."
         },
         {
             "beat_id": "beat_04_mic_drop_outro",
-            "act_title": "MIC-DROP // DELETE THE FLUFF",
-            "spoken_line": "Editing ka kaam story ko chhupana nahi, story ko raste se bhatakne se rokna hai. Agli video mein 50 percent kam effects lagao, aur 200 percent zyada dimaag apne hook aur script par lagao. Ab yeh Reel save karke mat chhod dena—apna timeline kholo aur sabse pehle woh fancy intro udao.",
-            "headline": "-50% FX // +200% SCRIPT",
-            "sub_caption": "DELETE THAT FANCY INTRO NOW"
+            "spoken_line": "Editing ka kaam story ko chhupana nahi, story ko raste se bhatakne se rokna hai. Agli video mein 50 percent kam effects lagao, aur 200 percent zyada dimaag apne hook aur script par lagao. Ab yeh Reel save karke mat chhod dena—apna timeline kholo aur sabse pehle woh fancy intro udao."
         }
     ]
 
@@ -124,7 +115,6 @@ def build_flop_master_clock(project_dir, sfx_dir):
 
     for idx, b in enumerate(raw_beats):
         seg_wav = os.path.join(project_dir, f"vo_beat_{idx+1}.wav")
-        print(f"[TTS-IRAA] Generating female voiceover for {b['beat_id']}...")
         seg_audio = generate_female_tts_segment(client, b["spoken_line"], seg_wav)
         seg_dur = len(seg_audio) / SR
         seg_frames = int(np.ceil(seg_dur * FPS))
@@ -139,32 +129,52 @@ def build_flop_master_clock(project_dir, sfx_dir):
         end_f = curr_frame + seg_frames
         curr_frame = end_f
 
-        sfx_cues = [
-            {"frame": start_f, "sfx": "sub_impact.wav", "gain": 0.46},
-            {"frame": start_f + 16, "sfx": "ui_tick.wav", "gain": 0.40},
-            {"frame": start_f + int(seg_frames * 0.42), "sfx": "ui_tick.wav", "gain": 0.40},
-            {"frame": start_f + int(seg_frames * 0.72), "sfx": "ui_tick.wav", "gain": 0.40},
-            {"frame": max(start_f, end_f - 9), "sfx": "whoosh_fast.wav", "gain": 0.44}
-        ]
-        if idx == 0:
-            # Snap from 90-frame bold color-block card into Light Graph Grid at frame 90
-            sfx_cues.append({"frame": min(end_f - 5, 90), "sfx": "sub_impact.wav", "gain": 0.48})
-        if idx == 3:
-            # Loud THUD when pressing DELETE key on the bloated timeline chunk
-            del_frame = start_f + int(seg_frames * 0.78)
-            sfx_cues.append({"frame": del_frame, "sfx": "sub_impact.wav", "gain": 0.58})
-            sfx_cues.append({"frame": del_frame + 4, "sfx": "lock_chime.wav", "gain": 0.45})
-
         beats_locked.append({
             **b,
             "start_frame": start_f,
             "end_frame": end_f,
             "duration_frames": seg_frames,
             "start_sec": round(start_f / FPS, 3),
-            "end_sec": round(end_f / FPS, 3),
-            "sfx_cues": sfx_cues
+            "end_sec": round(end_f / FPS, 3)
         })
         voice_segments.append(seg_audio)
+
+    # 14 Dynamic Story Scenes synced to exact voiceover speech pauses (0..3685)
+    scenes = [
+        {"scene_id": "s01_hook_card",       "start_frame": 0,    "end_frame": 90,   "camera": "snap_zoom",  "spoken_focus": "Tumne apni pichli video ke 3-second ke transition..."},
+        {"scene_id": "s02_four_hours_nle",  "start_frame": 90,   "end_frame": 258,  "camera": "push_in",    "spoken_focus": "...par 4 ghante lagaye..."},
+        {"scene_id": "s03_half_sec_swipe",  "start_frame": 258,  "end_frame": 449,  "camera": "pan_up",     "spoken_focus": "...aur viewer ne use 0.5 second mein swipe kar diya."},
+        {"scene_id": "s04_bura_laga_truth", "start_frame": 449,  "end_frame": 590,  "camera": "snap_zoom",  "spoken_focus": "Bura laga? Good. Ab sach suno."},
+        {"scene_id": "s05_ninety_pct_trap", "start_frame": 590,  "end_frame": 906,  "camera": "push_in",    "spoken_focus": "90% naye creators ko lagta hai viral pack ya AI plugin chahiye. Nahi."},
+        {"scene_id": "s06_grade_vs_boring", "start_frame": 906,  "end_frame": 1179, "camera": "tilt_focus", "spoken_focus": "Color grade cinematic hai, sound crispy hai—par video boring hai."},
+        {"scene_id": "s07_editor_ego_bars", "start_frame": 1179, "end_frame": 1535, "camera": "pan_up",     "spoken_focus": "Dusre editors ko flex dikhane ke liye. Audience ko keyframes se farak nahi padta."},
+        {"scene_id": "s08_mute_three_q",    "start_frame": 1535, "end_frame": 1812, "camera": "snap_zoom",  "spoken_focus": "Timeline mute karo, effects band karo, aur yeh 3 sawaal poocho."},
+        {"scene_id": "s09_q1_curiosity",    "start_frame": 1812, "end_frame": 2156, "camera": "push_in",    "spoken_focus": "Pehle 3 second: Curiosity gap vs Hey guys welcome back drop-off."},
+        {"scene_id": "s10_q2_15sec_twist",  "start_frame": 2156, "end_frame": 2549, "camera": "tilt_focus", "spoken_focus": "The 15-Second Rule: Har 15 second mein story direction shift."},
+        {"scene_id": "s11_q3_cut_test",     "start_frame": 2549, "end_frame": 2858, "camera": "snap_zoom",  "spoken_focus": "The Cut Test: Clip hatane se story na toote toh delete maaro."},
+        {"scene_id": "s12_story_compass",   "start_frame": 2858, "end_frame": 3158, "camera": "push_in",    "spoken_focus": "Editing ka kaam story ko chhupana nahi, bhatakne se rokna hai."},
+        {"scene_id": "s13_fx_vs_script",    "start_frame": 3158, "end_frame": 3409, "camera": "pan_up",     "spoken_focus": "50% kam effects lagao, aur 200% zyada dimaag hook aur script par."},
+        {"scene_id": "s14_delete_intro",    "start_frame": 3409, "end_frame": 3685, "camera": "snap_zoom",  "spoken_focus": "Timeline kholo aur sabse pehle woh fancy intro udao."}
+    ]
+
+    # Build frame-accurate SFX cues across all 14 dynamic scene cuts
+    all_sfx_cues = []
+    for idx, sc in enumerate(scenes):
+        sf = sc["start_frame"]
+        ef = sc["end_frame"]
+        all_sfx_cues.append({"frame": sf, "sfx": "sub_impact.wav" if idx in (0, 1, 3, 4, 7, 13) else "whoosh_fast.wav", "gain": 0.46})
+        all_sfx_cues.append({"frame": sf + 12, "sfx": "ui_tick.wav", "gain": 0.38})
+        if (ef - sf) > 180:
+            all_sfx_cues.append({"frame": sf + (ef - sf) // 2, "sfx": "ui_tick.wav", "gain": 0.36})
+
+    # Special action SFX cues:
+    # 1) "Nahi." stamp in Scene 5 at f=865
+    all_sfx_cues.append({"frame": 865, "sfx": "sub_impact.wav", "gain": 0.50})
+    # 2) Scissor snip in Scene 11 at f=2680
+    all_sfx_cues.append({"frame": 2680, "sfx": "lock_chime.wav", "gain": 0.46})
+    # 3) Giant 3D [DELETE] keycap slam in Scene 14 at f=3503
+    all_sfx_cues.append({"frame": 3503, "sfx": "sub_impact.wav", "gain": 0.62})
+    all_sfx_cues.append({"frame": 3507, "sfx": "lock_chime.wav", "gain": 0.48})
 
     full_voice = np.vstack(voice_segments)
     total_samples = len(full_voice)
@@ -175,20 +185,18 @@ def build_flop_master_clock(project_dir, sfx_dir):
     if v_peak > 0:
         full_voice = (full_voice / v_peak) * 0.86
 
-    # Subtle tactile rhythmic pulse under voiceover
     t = np.linspace(0, total_sec, total_samples, endpoint=False)
-    bed = 0.018 * np.sin(2 * np.pi * 65.0 * t)
+    bed = 0.016 * np.sin(2 * np.pi * 65.0 * t)
     master_mix = full_voice + np.column_stack((bed, bed))
 
-    for b in beats_locked:
-        for cue in b["sfx_cues"]:
-            sfx_path = os.path.join(sfx_dir, cue["sfx"])
-            if os.path.exists(sfx_path):
-                sfx_data = load_wav_stereo(sfx_path) * cue.get("gain", 0.4)
-                s_idx = int((cue["frame"] / FPS) * SR)
-                e_idx = min(len(master_mix), s_idx + len(sfx_data))
-                if e_idx > s_idx:
-                    master_mix[s_idx:e_idx] += sfx_data[:e_idx - s_idx]
+    for cue in all_sfx_cues:
+        sfx_path = os.path.join(sfx_dir, cue["sfx"])
+        if os.path.exists(sfx_path):
+            sfx_data = load_wav_stereo(sfx_path) * cue.get("gain", 0.4)
+            s_idx = int((cue["frame"] / FPS) * SR)
+            e_idx = min(len(master_mix), s_idx + len(sfx_data))
+            if e_idx > s_idx:
+                master_mix[s_idx:e_idx] += sfx_data[:e_idx - s_idx]
 
     peak = np.max(np.abs(master_mix))
     if peak > 0.95:
@@ -213,13 +221,15 @@ def build_flop_master_clock(project_dir, sfx_dir):
         "total_frames": total_frames,
         "total_duration_sec": round(total_sec, 3),
         "audio_file": master_wav,
-        "beats": beats_locked
+        "beats": beats_locked,
+        "scenes": scenes,
+        "sfx_cues": all_sfx_cues
     }
     clock_path = os.path.join(project_dir, "beat_clock.json")
     with open(clock_path, "w") as f:
         json.dump(clock_data, f, indent=2)
 
-    print(f"[IRAA MASTER CLOCK LOCKED] {total_frames} frames ({total_sec:.2f}s @ {FPS}fps) -> {clock_path}")
+    print(f"[IRAA DYNAMIC 14-SCENE CLOCK LOCKED] {total_frames} frames ({total_sec:.2f}s @ {FPS}fps) -> {clock_path}")
 
 if __name__ == "__main__":
     build_flop_master_clock(

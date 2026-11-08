@@ -1,4 +1,4 @@
-// Deterministic 60fps Spring Solver & Camera Choreography Rig
+// Deterministic 60fps Spring Solver & 2D Canvas Living Camera Rig
 window.StudioRig = (function() {
   function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
@@ -42,53 +42,49 @@ window.StudioRig = (function() {
     return outMin + (outMax - outMin) * eased;
   }
 
-  // Camera shake & subtle organic handheld drift so ZERO frames are ever dead-static
-  function computeCameraTransform(frame, beatStart, beatEnd, mode = "punch_in") {
-    const localF = frame - beatStart;
-    const dur = Math.max(1, beatEnd - beatStart);
+  // Applies Living Camera directly onto a 1080x1920 2D Canvas Context:
+  // - Subtle handheld breathing so zero frames are ever dead-static
+  // - Dynamic push-in / pull-out / pan per scene
+  // - Crisp whip-zoom transition on scene boundaries
+  function applyCanvasCamera(ctx, frame, sceneStart, sceneEnd, mode = "push_in", focusX = 540, focusY = 960) {
+    const localF = frame - sceneStart;
+    const dur = Math.max(1, sceneEnd - sceneStart);
     const progress = clamp(localF / dur, 0, 1);
 
-    // Continuous subtle organic breathing (prevents static dead frames)
-    const driftX = Math.sin(frame * 0.055) * 4.5 + Math.cos(frame * 0.028) * 2.5;
-    const driftY = Math.cos(frame * 0.048) * 5.0 + Math.sin(frame * 0.031) * 2.5;
-    const driftRot = Math.sin(frame * 0.035) * 0.28;
+    const driftX = Math.sin(frame * 0.052) * 5.0 + Math.cos(frame * 0.027) * 3.0;
+    const driftY = Math.cos(frame * 0.046) * 5.5 + Math.sin(frame * 0.033) * 3.0;
+    const driftRot = Math.sin(frame * 0.032) * 0.0035;
 
-    // Entry impact punch on beat boundary
-    const entrySpring = spring(frame, beatStart, { stiffness: 260, damping: 16, mass: 0.9 });
-    let scale = 1.0 + progress * 0.045;
-    let tx = driftX;
-    let ty = driftY;
+    const entryS = spring(frame, sceneStart, { stiffness: 240, damping: 17 });
+    let scale = 1.0;
+    let panX = 0;
+    let panY = 0;
     let rot = driftRot;
 
-    if (mode === "punch_in") {
-      scale = (0.91 + 0.09 * entrySpring) + progress * 0.04;
-    } else if (mode === "tilt_left") {
-      scale = (0.94 + 0.06 * entrySpring) + progress * 0.035;
-      rot = driftRot - 1.15 * (1 - progress * 0.5);
-    } else if (mode === "zoom_node") {
-      scale = (0.88 + 0.12 * entrySpring) + easeInOutCubic(progress) * 0.06;
-    } else if (mode === "payoff_lock") {
-      scale = (0.92 + 0.08 * entrySpring) + progress * 0.03;
+    if (mode === "push_in") {
+      scale = (0.94 + 0.06 * entryS) + progress * 0.065;
+    } else if (mode === "snap_zoom") {
+      scale = (0.88 + 0.12 * entryS) + easeInOutCubic(progress) * 0.08;
+    } else if (mode === "pan_up") {
+      scale = (0.96 + 0.04 * entryS) + progress * 0.04;
+      panY = (1 - easeOutExpo(clamp(localF / 35, 0, 1))) * 70 - progress * 24;
+    } else if (mode === "tilt_focus") {
+      scale = (0.95 + 0.05 * entryS) + progress * 0.05;
+      rot = driftRot - 0.012 * (1 - progress);
     }
 
-    // Whip-bridge transition in the final 10 frames of a beat
-    const framesLeft = beatEnd - frame;
-    let bridgeBlur = 0;
-    if (framesLeft <= 8 && framesLeft >= 0) {
-      const whip = easeInOutCubic((8 - framesLeft) / 8);
-      scale += whip * 0.14;
-      bridgeBlur = whip * 6;
-    } else if (localF <= 6 && beatStart > 0) {
-      const whipIn = 1 - easeOutExpo(localF / 6);
-      scale -= whipIn * 0.10;
-      bridgeBlur = whipIn * 5;
+    // Subtle whip-push in final 6 frames of a scene
+    const rem = sceneEnd - frame;
+    if (rem <= 6 && rem >= 0) {
+      const w = easeInOutCubic((6 - rem) / 6);
+      scale += w * 0.09;
     }
 
-    return {
-      transform: `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) scale(${scale.toFixed(4)}) rotate(${rot.toFixed(3)}deg)`,
-      filter: bridgeBlur > 0.2 ? `blur(${bridgeBlur.toFixed(2)}px)` : "none"
-    };
+    ctx.translate(540 + driftX + panX, 960 + driftY + panY);
+    ctx.rotate(rot);
+    ctx.scale(scale, scale);
+    ctx.translate(-focusX, -focusY);
   }
 
-  return { spring, easeOutExpo, easeInOutCubic, interpolate, computeCameraTransform, clamp };
+  return { spring, easeOutExpo, easeInOutCubic, interpolate, applyCanvasCamera, clamp };
 })();
