@@ -29,12 +29,28 @@ from typing import Any
 
 import websockets
 
-STUDIO_ROOT = Path("/workspace/studios/code-higgsfield")
+STUDIO_ROOT = Path(__file__).resolve().parents[2]
 ENGINE_TOOLS_DIR = STUDIO_ROOT / "backend" / "engine" / "tools"
 sys.path.insert(0, str(ENGINE_TOOLS_DIR))
 
 from glow import apply_linear_glow_and_halation  # type: ignore
 from textures import read_png_rgb8, write_png_rgb8  # type: ignore
+
+
+def find_chrome_binary() -> str:
+    for cand in [
+        os.environ.get("CHROME_BIN"),
+        shutil.which("google-chrome"),
+        shutil.which("google-chrome-stable"),
+        shutil.which("chromium-browser"),
+        shutil.which("chromium"),
+        "/usr/bin/google-chrome",
+        "/usr/bin/chromium-browser",
+        "/usr/bin/chromium",
+    ]:
+        if cand and os.path.exists(cand):
+            return cand
+    raise RuntimeError("No Chrome/Chromium binary found. Install chromium or google-chrome.")
 
 
 class QuietStaticServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
@@ -72,7 +88,7 @@ async def render_worker_chunk(
     user_dir.mkdir(parents=True, exist_ok=True)
 
     chrome_cmd = [
-        "/usr/bin/google-chrome",
+        find_chrome_binary(),
         "--headless=new",
         "--no-sandbox",
         "--disable-gpu",
@@ -241,7 +257,7 @@ async def capture_single_png_frames(
     user_dir.mkdir(parents=True, exist_ok=True)
 
     chrome_cmd = [
-        "/usr/bin/google-chrome",
+        find_chrome_binary(),
         "--headless=new",
         "--no-sandbox",
         "--disable-gpu",

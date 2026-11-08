@@ -21,7 +21,7 @@ from typing import Any
 
 from validate_motion_script import compute_script_digest, validate_script
 
-STUDIO_ROOT = Path("/workspace/studios/code-higgsfield")
+STUDIO_ROOT = Path(__file__).resolve().parents[2]
 JOBS_DIR = STUDIO_ROOT / "jobs"
 BRANDKITS_DIR = STUDIO_ROOT / "brandkits"
 CAST_DIR = STUDIO_ROOT / "cast"

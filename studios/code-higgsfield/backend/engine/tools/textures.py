@@ -22,7 +22,7 @@ import zlib
 from pathlib import Path
 import numpy as np
 
-DEFAULT_OUT = Path("/workspace/studios/code-higgsfield/assets/tex")
+DEFAULT_OUT = Path(__file__).resolve().parents[3] / "assets" / "tex"
 
 
 def write_png_rgb8(path: Path, arr_float: np.ndarray) -> None:

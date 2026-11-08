@@ -157,8 +157,8 @@ window.handleSurgicalPatch = async function () {
 window.handleKatanaDecompile = async function () {
   const pathEl = document.getElementById('inp-katana-path');
   const defaultPath = state.activeJob
-    ? `/workspace/studios/code-higgsfield/jobs/${state.activeJob.job_id}/master_60fps.mp4`
-    : '/workspace/studios/story-shorts-v1/output/casino_psychology/master_60fps.mp4';
+    ? `jobs/${state.activeJob.job_id}/master_60fps.mp4`
+    : 'jobs/hf_flagship_demo_v1/master_60fps.mp4';
   const vPath = pathEl && pathEl.value.trim() ? pathEl.value.trim() : defaultPath;
 
   try {
@@ -281,7 +281,7 @@ function renderLeftPanel() {
       <div class="control-group">
         <div class="control-label"><span>Reference Video Path</span></div>
         <input id="inp-katana-path" type="text" value="${
-          job ? `/workspace/studios/code-higgsfield/jobs/${job.job_id}/master_60fps.mp4` : ''
+          job ? `jobs/${job.job_id}/master_60fps.mp4` : ''
         }" />
       </div>
       <button class="btn-primary" onclick="handleKatanaDecompile()">

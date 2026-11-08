@@ -33,7 +33,7 @@ import urllib.parse
 from pathlib import Path
 from typing import Any
 
-STUDIO_ROOT = Path("/workspace/studios/code-higgsfield")
+STUDIO_ROOT = Path(__file__).resolve().parents[1]
 BACKEND_DIR = STUDIO_ROOT / "backend"
 JOBS_DIR = STUDIO_ROOT / "jobs"
 FRONTEND_DIR = STUDIO_ROOT / "frontend"
@@ -534,8 +534,8 @@ def main() -> int:
         return 0
 
     if args.http:
-        server = StudioHTTPServer(("127.0.0.1", args.port), StudioHTTPHandler)
-        print(f"[code-higgsfield-mcp] Studio HTTP & MCP Bridge listening on http://127.0.0.1:{args.port}", flush=True)
+        server = StudioHTTPServer(("0.0.0.0", args.port), StudioHTTPHandler)
+        print(f"[code-higgsfield-mcp] Studio HTTP & MCP Bridge listening on http://0.0.0.0:{args.port} (Local: http://127.0.0.1:{args.port})", flush=True)
         try:
             server.serve_forever()
         except KeyboardInterrupt:

@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-STUDIO_ROOT = Path("/workspace/studios/code-higgsfield")
+STUDIO_ROOT = Path(__file__).resolve().parents[2]
 BRANDKITS_DIR = STUDIO_ROOT / "brandkits"
 CAST_DIR = STUDIO_ROOT / "cast"
 
