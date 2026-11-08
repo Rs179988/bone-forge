@@ -1,0 +1,201 @@
+{
+  "project_id": "test-01-retention",
+  "fps": 60,
+  "width": 1080,
+  "height": 1920,
+  "total_frames": 480,
+  "total_duration_sec": 8.0,
+  "audio_file": "/workspace/studios/story-shorts-v1/projects/test-01-retention/master_audio.wav",
+  "beats": [
+    {
+      "beat_id": "beat_01_hook",
+      "archetype": "Archetype_01_HookTension",
+      "camera_mode": "punch_in",
+      "start_sec": 0.0,
+      "end_sec": 2.0,
+      "start_frame": 0,
+      "end_frame": 120,
+      "spoken_line": "Ninety-seven percent of AI videos fail in the first ninety frames.",
+      "punch_words": [
+        "97% FAIL",
+        "IN 90 FRAMES"
+      ],
+      "sub_metric": {
+        "value": 97,
+        "unit": "%",
+        "label": "DROP-OFF BEFORE 1.5s"
+      },
+      "sfx_cues": [
+        {
+          "frame": 0,
+          "sfx": "sub_impact.wav",
+          "gain": 0.95
+        },
+        {
+          "frame": 18,
+          "sfx": "ui_tick.wav",
+          "gain": 0.7
+        },
+        {
+          "frame": 42,
+          "sfx": "ui_tick.wav",
+          "gain": 0.7
+        },
+        {
+          "frame": 112,
+          "sfx": "whoosh_fast.wav",
+          "gain": 0.85
+        }
+      ]
+    },
+    {
+      "beat_id": "beat_02_contrast",
+      "archetype": "Archetype_02_SplitCompare",
+      "camera_mode": "tilt_left",
+      "start_sec": 2.0,
+      "end_sec": 4.0,
+      "start_frame": 120,
+      "end_frame": 240,
+      "spoken_line": "Why? Because raw prompts dump walls of text instead of visual physics.",
+      "punch_words": [
+        "WALL OF TEXT",
+        "VS VISUAL RIG"
+      ],
+      "compare_cards": {
+        "bad": {
+          "tag": "RAW PROMPT SLOP",
+          "stat": "12% RETENTION",
+          "flaw": "Static captions + linear boxes"
+        },
+        "good": {
+          "tag": "STUDIO ARCHETYPE",
+          "stat": "84% RETENTION",
+          "edge": "Audio-locked spring choreography"
+        }
+      },
+      "sfx_cues": [
+        {
+          "frame": 120,
+          "sfx": "sub_impact.wav",
+          "gain": 0.85
+        },
+        {
+          "frame": 152,
+          "sfx": "ui_tick.wav",
+          "gain": 0.8
+        },
+        {
+          "frame": 232,
+          "sfx": "whoosh_fast.wav",
+          "gain": 0.85
+        }
+      ]
+    },
+    {
+      "beat_id": "beat_03_pipeline",
+      "archetype": "Archetype_03_NodeArchitecture",
+      "camera_mode": "zoom_node",
+      "start_sec": 4.0,
+      "end_sec": 6.0,
+      "start_frame": 240,
+      "end_frame": 360,
+      "spoken_line": "A real editor locks the audio master-clock before a single pixel moves.",
+      "punch_words": [
+        "AUDIO CLOCK",
+        "DRIVES PIXELS"
+      ],
+      "nodes": [
+        {
+          "step": "01",
+          "title": "BEAT SCRIPT",
+          "ms": "0ms DRIFT"
+        },
+        {
+          "step": "02",
+          "title": "60FPS CLOCK",
+          "ms": "FRAME LOCKED"
+        },
+        {
+          "step": "03",
+          "title": "FLOW CRITIC",
+          "ms": "AUTO-VERIFIED"
+        }
+      ],
+      "sfx_cues": [
+        {
+          "frame": 240,
+          "sfx": "sub_impact.wav",
+          "gain": 0.8
+        },
+        {
+          "frame": 265,
+          "sfx": "ui_tick.wav",
+          "gain": 0.75
+        },
+        {
+          "frame": 295,
+          "sfx": "ui_tick.wav",
+          "gain": 0.75
+        },
+        {
+          "frame": 300,
+          "sfx": "riser_tension.wav",
+          "gain": 0.7
+        },
+        {
+          "frame": 352,
+          "sfx": "whoosh_fast.wav",
+          "gain": 0.9
+        }
+      ]
+    },
+    {
+      "beat_id": "beat_04_payoff",
+      "archetype": "Archetype_04_MetricPayoff",
+      "camera_mode": "payoff_lock",
+      "start_sec": 6.0,
+      "end_sec": 8.0,
+      "start_frame": 360,
+      "end_frame": 480,
+      "spoken_line": "Zero random code. Deterministic sixty frames per second studio output.",
+      "punch_words": [
+        "60 FPS LOCKED",
+        "STUDIO GRADE"
+      ],
+      "chart_bars": [
+        {
+          "label": "GENERIC AI",
+          "pct": 18,
+          "color": "#8E95A8"
+        },
+        {
+          "label": "TEMPLATE",
+          "pct": 46,
+          "color": "#FFB800"
+        },
+        {
+          "label": "STUDIO ENGINE",
+          "pct": 94,
+          "color": "#10B981"
+        }
+      ],
+      "sfx_cues": [
+        {
+          "frame": 360,
+          "sfx": "sub_impact.wav",
+          "gain": 0.95
+        },
+        {
+          "frame": 385,
+          "sfx": "lock_chime.wav",
+          "gain": 0.9
+        },
+        {
+          "frame": 415,
+          "sfx": "ui_tick.wav",
+          "gain": 0.7
+        }
+      ]
+    }
+  ]
+}

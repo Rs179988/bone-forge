@@ -1,0 +1,39 @@
+{
+  "studio_id": "story-shorts-v1",
+  "channel_name": "KINETIC ARCHITECT",
+  "resolution": { "width": 1080, "height": 1920, "fps": 60 },
+  "persona": {
+    "name": "Kael (Systems Dissector)",
+    "tone": "Direct, forensic, high-status, zero fluff",
+    "hook_rule": "First 90 frames (1.5s) must expose a brutal numeric anomaly or visual contradiction.",
+    "pacing_rule": "No visual element may remain static for more than 75 frames (1.25s). Camera or focal state must shift."
+  },
+  "design_system": {
+    "palette": {
+      "bg_obsidian": "#08090D",
+      "bg_elevated": "#11141D",
+      "surface_glass": "rgba(22, 26, 38, 0.86)",
+      "border_subtle": "rgba(244, 241, 234, 0.14)",
+      "ink_primary": "#F4F1EA",
+      "ink_muted": "#8E95A8",
+      "accent_vermilion": "#FF3B30",
+      "accent_gold": "#FFB800",
+      "accent_emerald": "#10B981"
+    },
+    "typography": {
+      "font_display": "'Liberation Sans', 'Nimbus Sans', sans-serif",
+      "font_mono": "'DejaVu Sans Mono', 'Liberation Mono', monospace"
+    },
+    "hard_constraints": {
+      "min_whitespace_ratio": 0.42,
+      "max_simultaneous_focal_groups": 2,
+      "max_punch_words_per_beat": 4,
+      "banned_patterns": [
+        "Full spoken sentence subtitles pasted across center screen",
+        "Linear easing (must use spring solver or cubic-bezier)",
+        "Default purple/blue neon AI gradients",
+        "Unbounded floating boxes without grid alignment"
+      ]
+    }
+  }
+}

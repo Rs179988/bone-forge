@@ -1,0 +1,50 @@
+{
+  "physics_telemetry": {
+    "total_frames_analyzed": 480,
+    "max_dead_frame_streak": 1,
+    "motion_pass": true,
+    "avg_whitespace_ratio": 0.887,
+    "min_whitespace_ratio": 0.789,
+    "whitespace_pass": true,
+    "beat_sync": [
+      {
+        "beat_id": "beat_01_hook",
+        "frame": 0,
+        "audio_transient_peak": 0.528,
+        "synced": true
+      },
+      {
+        "beat_id": "beat_02_contrast",
+        "frame": 120,
+        "audio_transient_peak": 0.61,
+        "synced": true
+      },
+      {
+        "beat_id": "beat_03_pipeline",
+        "frame": 240,
+        "audio_transient_peak": 0.594,
+        "synced": true
+      },
+      {
+        "beat_id": "beat_04_payoff",
+        "frame": 360,
+        "audio_transient_peak": 0.84,
+        "synced": true
+      }
+    ],
+    "audio_sync_pass": true
+  },
+  "multimodal_critic": {
+    "score": 74,
+    "verdict": "PASS",
+    "strengths": [
+      "High-impact typography adhering to word limits with clear visual hierarchy.",
+      "Flawless archetype progression across all four distinct beat structures.",
+      "Excellent spatial balance with healthy whitespace distribution."
+    ],
+    "issues": [
+      "Slightly uniform dark background aesthetic across all beats.",
+      "Minor text density on lower metadata tags."
+    ]
+  }
+}

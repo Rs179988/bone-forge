@@ -11,6 +11,8 @@ if [ -z "${GITHUB_REPO_URL:-}" ]; then
 fi
 
 export GIT_TERMINAL_PROMPT=0
+git config --global user.name "Iraa"
+git config --global user.email "iraa@studio.local"
 
 case "$CMD" in
   push)
