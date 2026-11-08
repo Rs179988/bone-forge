@@ -1,0 +1,38 @@
+{
+  "job_id": "hf_flagship_demo_v1",
+  "job_dir": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1",
+  "status": "QA_ACCEPTED",
+  "created_at": "2026-11-08T21:33:06Z",
+  "studio_mode": "vibe_motion",
+  "prompt": "Quantum Fintech & Cyber-Director Studio Engine launch with 3D glass telemetry cards, spring overshoot physics, and 99.8% frame accuracy.",
+  "aspect_ratio": "9:16",
+  "width": 1080,
+  "height": 1920,
+  "fps": 60,
+  "duration_sec": 10.0,
+  "total_frames": 600,
+  "palette_id": "higgsfield_obsidian_lime",
+  "camera_preset": "dynamic_cinema",
+  "physics": {
+    "stiffness": 220.0,
+    "damping": 17.0
+  },
+  "script_lock_sha256": "bcc6298620991ef7e9203543b69a939bd9d68a35927b6bb828a3e271246bfe93",
+  "artifacts": {
+    "script_json": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/script.json",
+    "script_lock": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/script.lock",
+    "story_mjs": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/shots/story.mjs",
+    "film_mjs": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/shots/film.mjs",
+    "render_job_mjs": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/shots/render_job.mjs",
+    "beatmap_json": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/audio/beatmap.json",
+    "narration_json": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/audio/narration_timing.json",
+    "master_audio_wav": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/audio/master_mix.wav",
+    "master_mp4": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/master_60fps.mp4",
+    "contact_sheet_png": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/qa/contact_sheet.png",
+    "qa_report_json": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/qa/qa_report.json"
+  },
+  "warnings": [],
+  "last_render_sec": 75.59,
+  "qa_verdict": "ACCEPT",
+  "qa_score": 98
+}

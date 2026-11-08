@@ -1,0 +1,101 @@
+{
+  "source_video": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/master_60fps.mp4",
+  "width": 1080,
+  "height": 1920,
+  "source_fps": 60.0,
+  "duration_sec": 10.112,
+  "cut_count": 4,
+  "detected_cuts_sec": [
+    2.022,
+    4.045,
+    6.067,
+    8.09
+  ],
+  "extracted_palette": {
+    "bg_primary": "#000301",
+    "accent_primary": "#295336"
+  },
+  "beatmap": {
+    "bpm": 120.2,
+    "downbeats": [
+      0.7176,
+      2.7142,
+      4.7109,
+      6.7076,
+      8.7042
+    ],
+    "drop": 6.7076,
+    "hits": [
+      0.7546,
+      1.7531,
+      2.2872,
+      3.7965,
+      4.0519,
+      4.8298,
+      5.329,
+      5.8282
+    ]
+  },
+  "shots": [
+    {
+      "id": "S1",
+      "in_sec": 0.0,
+      "out_sec": 2.022,
+      "duration_sec": 2.022,
+      "in_frame_60fps": 0,
+      "out_frame_60fps": 121,
+      "shot_size": "WIDE",
+      "estimated_camera_move": "dolly_in",
+      "optical_motion_score": 3.54,
+      "mean_luminance": 18.8
+    },
+    {
+      "id": "S2",
+      "in_sec": 2.022,
+      "out_sec": 4.045,
+      "duration_sec": 2.023,
+      "in_frame_60fps": 121,
+      "out_frame_60fps": 243,
+      "shot_size": "CU",
+      "estimated_camera_move": "orbital_arc",
+      "optical_motion_score": 1.37,
+      "mean_luminance": 14.5
+    },
+    {
+      "id": "S3",
+      "in_sec": 4.045,
+      "out_sec": 6.067,
+      "duration_sec": 2.022,
+      "in_frame_60fps": 243,
+      "out_frame_60fps": 364,
+      "shot_size": "DETAIL",
+      "estimated_camera_move": "macro_rack_focus",
+      "optical_motion_score": 6.3,
+      "mean_luminance": 23.9
+    },
+    {
+      "id": "S4",
+      "in_sec": 6.067,
+      "out_sec": 8.09,
+      "duration_sec": 2.023,
+      "in_frame_60fps": 364,
+      "out_frame_60fps": 485,
+      "shot_size": "MEDIUM",
+      "estimated_camera_move": "whip_pan",
+      "optical_motion_score": 2.27,
+      "mean_luminance": 18.4
+    },
+    {
+      "id": "S5",
+      "in_sec": 8.09,
+      "out_sec": 10.112,
+      "duration_sec": 2.022,
+      "in_frame_60fps": 485,
+      "out_frame_60fps": 607,
+      "shot_size": "OTS",
+      "estimated_camera_move": "dolly_in",
+      "optical_motion_score": 3.62,
+      "mean_luminance": 19.2
+    }
+  ]
+}

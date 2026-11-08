@@ -1,0 +1,21 @@
+{
+  "id": "higgsfield_obsidian_lime",
+  "name": "Higgsfield Obsidian & Acid Lime",
+  "typography": {
+    "heading": "Inter",
+    "mono": "JetBrains Mono"
+  },
+  "motion_physics": {
+    "stiffness": 210.0,
+    "damping": 18.0,
+    "primary_curve": "backOut"
+  },
+  "palette": {
+    "bg_primary": "#09090B",
+    "bg_secondary": "#121318",
+    "accent_primary": "#D4FF00",
+    "accent_secondary": "#00F5D4",
+    "text_primary": "#F8FAFC",
+    "texture": "brushed_metal"
+  }
+}

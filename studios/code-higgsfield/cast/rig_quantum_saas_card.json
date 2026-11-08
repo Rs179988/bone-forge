@@ -1,0 +1,9 @@
+{
+  "id": "rig_quantum_saas_card",
+  "name": "Quantum // 3D Glass Telemetry Deck",
+  "kind": "saas_3d_card",
+  "blurb": "Glassmorphic 3D SaaS dashboard card with odometer counter, live sparkline spline, and frequency bars.",
+  "accent_color": "#00F5D4",
+  "default_stiffness": 210.0,
+  "default_damping": 18.0
+}

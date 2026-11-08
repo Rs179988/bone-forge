@@ -1,0 +1,9 @@
+{
+  "id": "soul_felt_pip",
+  "name": "Chik & Wool // Tactile Felt Rig",
+  "kind": "character_rig",
+  "blurb": "Stop-motion felt character rig with spring squash-and-stretch hops and damped ring oscillation.",
+  "accent_color": "#FBBF24",
+  "default_stiffness": 260.0,
+  "default_damping": 14.0
+}

@@ -1,0 +1,9 @@
+{
+  "id": "rig_fintech_terminal",
+  "name": "Apex // Fintech Orderbook Rig",
+  "kind": "saas_3d_card",
+  "blurb": "High-contrast titanium trading & metrics rig with velocity-trailed cursor and click ripple.",
+  "accent_color": "#38BDF8",
+  "default_stiffness": 195.0,
+  "default_damping": 20.0
+}

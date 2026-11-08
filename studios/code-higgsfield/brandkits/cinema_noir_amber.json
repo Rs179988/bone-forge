@@ -1,0 +1,21 @@
+{
+  "id": "cinema_noir_amber",
+  "name": "Cinema Noir & Warm Amber",
+  "typography": {
+    "heading": "Inter",
+    "mono": "JetBrains Mono"
+  },
+  "motion_physics": {
+    "stiffness": 160.0,
+    "damping": 16.0,
+    "primary_curve": "ring"
+  },
+  "palette": {
+    "bg_primary": "#0A0807",
+    "bg_secondary": "#1A1412",
+    "accent_primary": "#F59E0B",
+    "accent_secondary": "#EF4444",
+    "text_primary": "#FEF3C7",
+    "texture": "paper_a"
+  }
+}

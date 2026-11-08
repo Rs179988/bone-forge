@@ -1,0 +1,9 @@
+{
+  "id": "soul_cyber_architect",
+  "name": "Aegis // Cyber Director Rig",
+  "kind": "character_rig",
+  "blurb": "Articulated 2.5D studio director puppet with audio-reactive lip-sync, visor blink timer, and dual rim-light.",
+  "accent_color": "#D4FF00",
+  "default_stiffness": 220.0,
+  "default_damping": 17.0
+}

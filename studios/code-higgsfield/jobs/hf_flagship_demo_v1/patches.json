@@ -1,0 +1,33 @@
+[
+  {
+    "shot_id": "S1",
+    "mode": "keep",
+    "start_sec": 0.0,
+    "end_sec": 1.8
+  },
+  {
+    "shot_id": "S2",
+    "mode": "keep",
+    "start_sec": 1.8,
+    "end_sec": 3.9
+  },
+  {
+    "shot_id": "S3",
+    "mode": "patch",
+    "start_sec": 3.9,
+    "end_sec": 5.8,
+    "patch_video": "/workspace/studios/code-higgsfield/jobs/hf_flagship_demo_v1/patch_S3_234_348.mp4"
+  },
+  {
+    "shot_id": "S4",
+    "mode": "keep",
+    "start_sec": 5.8,
+    "end_sec": 8.0
+  },
+  {
+    "shot_id": "S5",
+    "mode": "keep",
+    "start_sec": 8.0,
+    "end_sec": 10.0
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "id": "felt_stopmotion_craft",
+  "name": "Tactile Felt & Warm Daylight",
+  "typography": {
+    "heading": "Inter",
+    "mono": "JetBrains Mono"
+  },
+  "motion_physics": {
+    "stiffness": 240.0,
+    "damping": 15.0,
+    "primary_curve": "backOut"
+  },
+  "palette": {
+    "bg_primary": "#141824",
+    "bg_secondary": "#22293E",
+    "accent_primary": "#FBBF24",
+    "accent_secondary": "#34D399",
+    "text_primary": "#FFFBEB",
+    "texture": "felt_a"
+  }
+}

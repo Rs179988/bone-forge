@@ -1,0 +1,380 @@
+{
+  "job_id": "hf_flagship_demo_v1",
+  "title": "Code-Higgsfield // QUANTUM FINTECH CYBER-DIRECTOR",
+  "prompt": "Quantum Fintech & Cyber-Director Studio Engine launch with 3D glass telemetry cards, spring overshoot physics, and 99.8% frame accuracy.",
+  "studio_mode": "vibe_motion",
+  "genre": "vibe_motion_tech",
+  "aspect_ratio": "9:16",
+  "width": 1080,
+  "height": 1920,
+  "fps": 60,
+  "duration_sec": 10.0,
+  "total_frames": 600,
+  "brand_kit": "higgsfield_obsidian_lime",
+  "palette": {
+    "name": "Higgsfield Obsidian & Acid Lime",
+    "bg_primary": "#09090B",
+    "bg_secondary": "#121318",
+    "accent_primary": "#D4FF00",
+    "accent_secondary": "#00F5D4",
+    "alert_color": "#FF3366",
+    "text_primary": "#F8FAFC",
+    "text_muted": "#94A3B8",
+    "surface_glass": "rgba(24, 26, 34, 0.78)",
+    "texture": "brushed_metal"
+  },
+  "physics": {
+    "stiffness": 220.0,
+    "damping": 17.0,
+    "overshoot_k": 1.9
+  },
+  "cast": [
+    {
+      "id": "hero_primary",
+      "kind": "saas_3d_card",
+      "name": "QUANTUM Core Rig",
+      "soul_id": "soul_cyber_architect",
+      "accent_color": "#D4FF00"
+    },
+    {
+      "id": "telemetry_orb",
+      "kind": "through_line_prop",
+      "name": "Pulse Chrono-Core",
+      "accent_color": "#00F5D4"
+    }
+  ],
+  "through_line": {
+    "object_id": "telemetry_orb",
+    "name": "Quantum Pulse Core",
+    "progression": [
+      "S1: Ignites at center of wide architectural grid at t=0.15s",
+      "S2: Locks into Hero Subject interface socket with spring ring oscillation",
+      "S3: Expands into macro internal waveform & metric counter array",
+      "S4: Synchronizes multi-node kinetic beam across secondary props",
+      "S5: Stabilizes into final Brand Seal & high-contrast CTA emblem"
+    ]
+  },
+  "arc": {
+    "hook": "S1 (0.0s-1.8s): Immediate WIDE kinetic ignition of QUANTUM.",
+    "build": "S2-S3: Escalating CU & DETAIL inspection with synced spring physics and telemetry proof.",
+    "turn": "S4: High-energy whip_pan cut on musical drop.",
+    "payoff": "S5: Resolved Establishing Lock with persistent through-line seal."
+  },
+  "shots": [
+    {
+      "id": "S1",
+      "index": 0,
+      "in_sec": 0.0,
+      "out_sec": 1.8,
+      "in_frame": 0,
+      "out_frame": 108,
+      "shot_size": "WIDE",
+      "subject": "hero_primary_angle_1",
+      "camera_move": "dolly_in",
+      "primary_curve": "backOut",
+      "spoken_line": "Look closely at Quantum. Every frame is engineered with zero latency.",
+      "sfx_trigger": {
+        "type": "whoosh",
+        "offset_sec": 0.08
+      },
+      "layers": {
+        "L0_Backdrop": {
+          "palette_bg": "#09090B",
+          "palette_secondary": "#121318",
+          "texture": "brushed_metal",
+          "ray_intensity": 0.35
+        },
+        "L1_Environment": {
+          "grid_mode": "perspective_vault",
+          "parallax_depth": 1.0,
+          "accent_color": "#00F5D4"
+        },
+        "L2_HeroSubject": {
+          "cast_id": "hero_primary",
+          "kind": "saas_3d_card",
+          "pose_mode": "establish_rise",
+          "metric_value": 128.4,
+          "metric_unit": "MS",
+          "stiffness": 220.0,
+          "damping": 17.0,
+          "accent_color": "#D4FF00"
+        },
+        "L3_MotionProps": {
+          "through_line_id": "telemetry_orb",
+          "through_line_state": 0,
+          "cursor_active": false,
+          "floating_badges": [
+            "QUANTUM",
+            "SHOT 01 // WIDE"
+          ]
+        },
+        "L4_TypographyHUD": {
+          "headline": "QUANTUM // ZERO SLOP",
+          "sub_caption": "Look closely at Quantum. Every frame is engineered with zero latency.",
+          "safe_margin_pct": 0.08,
+          "text_color": "#F8FAFC",
+          "accent_color": "#D4FF00",
+          "badge_tag": "S1 \u2022 WIDE \u2022 DOLLY_IN"
+        },
+        "L5_PostFX": {
+          "bloom_intensity": 0.42,
+          "vignette": 0.22,
+          "chromatic_aberration": 0.001,
+          "beat_flash": true
+        }
+      }
+    },
+    {
+      "id": "S2",
+      "index": 1,
+      "in_sec": 1.8,
+      "out_sec": 3.9,
+      "in_frame": 108,
+      "out_frame": 234,
+      "shot_size": "CU",
+      "subject": "hero_primary_angle_2",
+      "camera_move": "orbital_arc",
+      "primary_curve": "ring",
+      "spoken_line": "Inside the middle layer, deterministic curves lock motion to the exact millisecond.",
+      "sfx_trigger": {
+        "type": "ui_pop",
+        "offset_sec": 0.08
+      },
+      "layers": {
+        "L0_Backdrop": {
+          "palette_bg": "#09090B",
+          "palette_secondary": "#121318",
+          "texture": "brushed_metal",
+          "ray_intensity": 0.47
+        },
+        "L1_Environment": {
+          "grid_mode": "radial_matrix",
+          "parallax_depth": 1.35,
+          "accent_color": "#00F5D4"
+        },
+        "L2_HeroSubject": {
+          "cast_id": "hero_primary",
+          "kind": "character_rig",
+          "pose_mode": "close_inspect",
+          "metric_value": 492.0,
+          "metric_unit": "FPS",
+          "stiffness": 310.0,
+          "damping": 14.0,
+          "accent_color": "#00FF66"
+        },
+        "L3_MotionProps": {
+          "through_line_id": "telemetry_orb",
+          "through_line_state": 1,
+          "cursor_active": true,
+          "floating_badges": [
+            "FINTECH",
+            "SHOT 02 // CU"
+          ]
+        },
+        "L4_TypographyHUD": {
+          "headline": "SPRING LOCKED: 220 N/m",
+          "sub_caption": "Inside the middle layer, deterministic curves lock motion to the exact millisecond.",
+          "safe_margin_pct": 0.08,
+          "text_color": "#F8FAFC",
+          "accent_color": "#00FF66",
+          "badge_tag": "S2 \u2022 CU \u2022 ORBITAL_ARC"
+        },
+        "L5_PostFX": {
+          "bloom_intensity": 0.42,
+          "vignette": 0.22,
+          "chromatic_aberration": 0.001,
+          "beat_flash": false
+        }
+      }
+    },
+    {
+      "id": "S3",
+      "index": 2,
+      "in_sec": 3.9,
+      "out_sec": 5.8,
+      "in_frame": 234,
+      "out_frame": 348,
+      "shot_size": "DETAIL",
+      "subject": "hero_primary_angle_3",
+      "camera_move": "macro_rack_focus",
+      "primary_curve": "springDamper",
+      "spoken_line": "Watch the real-time telemetry spike past ninety-nine point eight percent precision.",
+      "sfx_trigger": {
+        "type": "mechanical_click",
+        "offset_sec": 0.08
+      },
+      "layers": {
+        "L0_Backdrop": {
+          "palette_bg": "#09090B",
+          "palette_secondary": "#121318",
+          "texture": "brushed_metal",
+          "ray_intensity": 0.59
+        },
+        "L1_Environment": {
+          "grid_mode": "perspective_vault",
+          "parallax_depth": 1.7,
+          "accent_color": "#00F5D4"
+        },
+        "L2_HeroSubject": {
+          "cast_id": "hero_primary",
+          "kind": "saas_3d_card",
+          "pose_mode": "macro_pulse",
+          "metric_value": 99.8,
+          "metric_unit": "%",
+          "stiffness": 220.0,
+          "damping": 17.0,
+          "accent_color": "#00F5D4"
+        },
+        "L3_MotionProps": {
+          "through_line_id": "telemetry_orb",
+          "through_line_state": 2,
+          "cursor_active": true,
+          "floating_badges": [
+            "CYBER-DIRECTOR",
+            "SHOT 03 // DETAIL"
+          ]
+        },
+        "L4_TypographyHUD": {
+          "headline": "99.8% FRAME ACCURACY",
+          "sub_caption": "Watch the real-time telemetry spike past ninety-nine point eight percent precision.",
+          "safe_margin_pct": 0.08,
+          "text_color": "#F8FAFC",
+          "accent_color": "#D4FF00",
+          "badge_tag": "S3 \u2022 DETAIL \u2022 MACRO_RACK_FOCUS"
+        },
+        "L5_PostFX": {
+          "bloom_intensity": 0.42,
+          "vignette": 0.22,
+          "chromatic_aberration": 0.001,
+          "beat_flash": false
+        }
+      }
+    },
+    {
+      "id": "S4",
+      "index": 3,
+      "in_sec": 5.8,
+      "out_sec": 8.0,
+      "in_frame": 348,
+      "out_frame": 480,
+      "shot_size": "MEDIUM",
+      "subject": "hero_primary_angle_4",
+      "camera_move": "whip_pan",
+      "primary_curve": "backOut",
+      "spoken_line": "Click any isolated layer to patch physics, lighting, or typography on the fly.",
+      "sfx_trigger": {
+        "type": "bass_sub_drop",
+        "offset_sec": 0.08
+      },
+      "layers": {
+        "L0_Backdrop": {
+          "palette_bg": "#09090B",
+          "palette_secondary": "#121318",
+          "texture": "brushed_metal",
+          "ray_intensity": 0.35
+        },
+        "L1_Environment": {
+          "grid_mode": "radial_matrix",
+          "parallax_depth": 2.05,
+          "accent_color": "#00F5D4"
+        },
+        "L2_HeroSubject": {
+          "cast_id": "hero_primary",
+          "kind": "saas_3d_card",
+          "pose_mode": "action_turn",
+          "metric_value": 1024.0,
+          "metric_unit": "OPS",
+          "stiffness": 220.0,
+          "damping": 17.0,
+          "accent_color": "#D4FF00"
+        },
+        "L3_MotionProps": {
+          "through_line_id": "telemetry_orb",
+          "through_line_state": 3,
+          "cursor_active": true,
+          "floating_badges": [
+            "STUDIO",
+            "SHOT 04 // MEDIUM"
+          ]
+        },
+        "L4_TypographyHUD": {
+          "headline": "6-LAYER SURGICAL AST",
+          "sub_caption": "Click any isolated layer to patch physics, lighting, or typography on the fly.",
+          "safe_margin_pct": 0.08,
+          "text_color": "#F8FAFC",
+          "accent_color": "#D4FF00",
+          "badge_tag": "S4 \u2022 MEDIUM \u2022 WHIP_PAN"
+        },
+        "L5_PostFX": {
+          "bloom_intensity": 0.58,
+          "vignette": 0.22,
+          "chromatic_aberration": 0.0025,
+          "beat_flash": true
+        }
+      }
+    },
+    {
+      "id": "S5",
+      "index": 4,
+      "in_sec": 8.0,
+      "out_sec": 10.0,
+      "in_frame": 480,
+      "out_frame": 600,
+      "shot_size": "OTS",
+      "subject": "hero_primary_angle_5",
+      "camera_move": "dutch_tilt",
+      "primary_curve": "easeInOut",
+      "spoken_line": "Code Higgsfield Studio. Pure procedural cinema at sixty frames per second.",
+      "sfx_trigger": {
+        "type": "tada",
+        "offset_sec": 0.08
+      },
+      "layers": {
+        "L0_Backdrop": {
+          "palette_bg": "#09090B",
+          "palette_secondary": "#121318",
+          "texture": "brushed_metal",
+          "ray_intensity": 0.47
+        },
+        "L1_Environment": {
+          "grid_mode": "perspective_vault",
+          "parallax_depth": 2.4,
+          "accent_color": "#00F5D4"
+        },
+        "L2_HeroSubject": {
+          "cast_id": "hero_primary",
+          "kind": "saas_3d_card",
+          "pose_mode": "hero_lock",
+          "metric_value": 60.0,
+          "metric_unit": "FPS",
+          "stiffness": 220.0,
+          "damping": 17.0,
+          "accent_color": "#D4FF00"
+        },
+        "L3_MotionProps": {
+          "through_line_id": "telemetry_orb",
+          "through_line_state": 4,
+          "cursor_active": false,
+          "floating_badges": [
+            "ENGINE",
+            "SHOT 05 // OTS"
+          ]
+        },
+        "L4_TypographyHUD": {
+          "headline": "CODE-HIGGSFIELD // 9:16",
+          "sub_caption": "Code Higgsfield Studio. Pure procedural cinema at sixty frames per second.",
+          "safe_margin_pct": 0.08,
+          "text_color": "#F8FAFC",
+          "accent_color": "#D4FF00",
+          "badge_tag": "S5 \u2022 OTS \u2022 DUTCH_TILT"
+        },
+        "L5_PostFX": {
+          "bloom_intensity": 0.42,
+          "vignette": 0.22,
+          "chromatic_aberration": 0.001,
+          "beat_flash": false
+        }
+      }
+    }
+  ]
+}

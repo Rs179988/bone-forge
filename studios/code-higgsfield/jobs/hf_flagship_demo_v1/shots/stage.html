@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Code-Higgsfield Stage // hf_flagship_demo_v1</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 1080px; height: 1920px; overflow: hidden; background: #09090B; }
+    canvas { display: block; width: 1080px; height: 1920px; }
+  </style>
+</head>
+<body>
+  <canvas id="stage" width="1080" height="1920"></canvas>
+  <script type="module">
+    import { sceneFor, FPS, FRAMES, WIDTH, HEIGHT, SHOTS } from './film.mjs';
+    import { renderSceneLayers } from '/backend/engine/lib/geo_and_rigs.mjs';
+
+    const canvas = document.getElementById('stage');
+    const ctx = canvas.getContext('2d', { alpha: false });
+
+    window.__STUDIO_META = { FPS, FRAMES, WIDTH, HEIGHT, SHOTS };
+
+    window.__renderFrame = function(frameIndex, activeLayerFilter = null) {
+      const desc = sceneFor(frameIndex, { width: WIDTH, height: HEIGHT });
+      renderSceneLayers(ctx, desc, activeLayerFilter);
+      return desc;
+    };
+
+    // Render frame 0 immediately on boot
+    window.__renderFrame(0, null);
+    window.__STAGE_READY = true;
+  </script>
+</body>
+</html>

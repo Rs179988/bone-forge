@@ -1,0 +1,21 @@
+{
+  "id": "cupertino_titanium",
+  "name": "Cupertino Titanium & Cyan",
+  "typography": {
+    "heading": "Inter",
+    "mono": "JetBrains Mono"
+  },
+  "motion_physics": {
+    "stiffness": 185.0,
+    "damping": 22.0,
+    "primary_curve": "springDamper"
+  },
+  "palette": {
+    "bg_primary": "#06080E",
+    "bg_secondary": "#0F172A",
+    "accent_primary": "#38BDF8",
+    "accent_secondary": "#818CF8",
+    "text_primary": "#FFFFFF",
+    "texture": "frosted_glass"
+  }
+}
