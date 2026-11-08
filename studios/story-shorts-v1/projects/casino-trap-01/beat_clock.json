@@ -1,0 +1,117 @@
+{
+  "project_id": "casino-trap-01",
+  "topic": "Why Vegas Casinos Have No Clocks, Windows, or 90-Degree Corners",
+  "fps": 60,
+  "width": 1080,
+  "height": 1920,
+  "total_frames": 985,
+  "total_duration_sec": 16.417,
+  "audio_file": "/workspace/studios/story-shorts-v1/projects/casino-trap-01/master_audio.wav",
+  "beats": [
+    {
+      "beat_id": "scene_01_time_trap",
+      "scene_fn": "Scene_01_TimeTrap",
+      "camera_mode": "punch_in",
+      "spoken_line": "Walk into any Vegas casino and look at the walls. No clocks. No windows.",
+      "headline": "NO CLOCKS. NO WINDOWS.",
+      "sub_caption": "SENSORY DEPRIVATION TRAP",
+      "start_frame": 0,
+      "end_frame": 297,
+      "duration_frames": 297,
+      "start_sec": 0.0,
+      "end_sec": 4.95,
+      "sfx_cues": [
+        {
+          "frame": 0,
+          "sfx": "sub_impact.wav",
+          "gain": 0.45
+        },
+        {
+          "frame": 95,
+          "sfx": "ui_tick.wav",
+          "gain": 0.35
+        },
+        {
+          "frame": 184,
+          "sfx": "ui_tick.wav",
+          "gain": 0.42
+        },
+        {
+          "frame": 288,
+          "sfx": "whoosh_fast.wav",
+          "gain": 0.44
+        }
+      ]
+    },
+    {
+      "beat_id": "scene_02_curved_maze",
+      "scene_fn": "Scene_02_CurvedMaze",
+      "camera_mode": "tilt_left",
+      "spoken_line": "Architects banned ninety degree corners, curving every walkway so your brain never hits a decision point to leave.",
+      "headline": "ZERO 90\u00b0 CORNERS",
+      "sub_caption": "FRIEDMAN'S LABYRINTH DESIGN",
+      "start_frame": 297,
+      "end_frame": 655,
+      "duration_frames": 358,
+      "start_sec": 4.95,
+      "end_sec": 10.917,
+      "sfx_cues": [
+        {
+          "frame": 297,
+          "sfx": "sub_impact.wav",
+          "gain": 0.45
+        },
+        {
+          "frame": 411,
+          "sfx": "ui_tick.wav",
+          "gain": 0.35
+        },
+        {
+          "frame": 518,
+          "sfx": "ui_tick.wav",
+          "gain": 0.42
+        },
+        {
+          "frame": 646,
+          "sfx": "whoosh_fast.wav",
+          "gain": 0.44
+        }
+      ]
+    },
+    {
+      "beat_id": "scene_03_plastic_illusion",
+      "scene_fn": "Scene_03_ChipIllusion",
+      "camera_mode": "zoom_node",
+      "spoken_line": "Even your cash is swapped for weightless plastic chips, numbing the neural pain of losing real money.",
+      "headline": "CASH TO PLASTIC",
+      "sub_caption": "NUMBING THE PAIN OF PAYING",
+      "start_frame": 655,
+      "end_frame": 985,
+      "duration_frames": 330,
+      "start_sec": 10.917,
+      "end_sec": 16.417,
+      "sfx_cues": [
+        {
+          "frame": 655,
+          "sfx": "sub_impact.wav",
+          "gain": 0.45
+        },
+        {
+          "frame": 760,
+          "sfx": "ui_tick.wav",
+          "gain": 0.35
+        },
+        {
+          "frame": 859,
+          "sfx": "lock_chime.wav",
+          "gain": 0.42
+        },
+        {
+          "frame": 976,
+          "sfx": "whoosh_fast.wav",
+          "gain": 0.44
+        }
+      ]
+    }
+  ]
+}

@@ -128,7 +128,7 @@ async def render_frames_via_cdp(html_path, clock_path, out_mp4):
         chrome_proc.wait()
 
 if __name__ == "__main__":
-    proj = "/workspace/studios/story-shorts-v1/projects/test-01-retention"
+    proj = sys.argv[1] if len(sys.argv) > 1 else "/workspace/studios/story-shorts-v1/projects/casino-trap-01"
     asyncio.run(render_frames_via_cdp(
         os.path.join(proj, "stage.html"),
         os.path.join(proj, "beat_clock.json"),

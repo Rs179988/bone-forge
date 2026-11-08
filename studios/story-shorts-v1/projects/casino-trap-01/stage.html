@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Casino Psychological Trap — 1080x1920</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 1080px;
+    height: 1920px;
+    overflow: hidden;
+    background: #07080C;
+    font-family: 'Liberation Sans', 'Nimbus Sans', sans-serif;
+  }
+  canvas {
+    display: block;
+    width: 1080px;
+    height: 1920px;
+  }
+</style>
+</head>
+<body>
+<canvas id="stage" width="1080" height="1920"></canvas>
+<script src="../../rig/studio_rig.js"></script>
+<script>
+const canvas = document.getElementById("stage");
+const ctx = canvas.getContext("2d");
+const { spring, easeOutExpo, easeInOutCubic, clamp } = window.StudioRig;
+
+window.BEAT_CLOCK = null;
+window.initClock = function(clockData) {
+  window.BEAT_CLOCK = clockData;
+  window.seekToFrame(0);
+  return true;
+};
+
+function drawRoundedRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+// Illustrated Character Host (Kael) — Animated silhouette with glowing glasses & gesture
+function drawHostCharacter(ctx, frame, x, y, scale, mood) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(scale, scale);
+
+  const breathe = Math.sin(frame * 0.08) * 4;
+  ctx.translate(0, breathe);
+
+  // Subtle rim aura behind host
+  const aura = ctx.createRadialGradient(0, -40, 10, 0, -40, 160);
+  aura.addColorStop(0, "rgba(255, 59, 48, 0.28)");
+  aura.addColorStop(1, "rgba(255, 59, 48, 0)");
+  ctx.fillStyle = aura;
+  ctx.beginPath();
+  ctx.arc(0, -40, 160, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Trench/Suit Shoulders
+  ctx.fillStyle = "#12151F";
+  ctx.strokeStyle = "#F4F1EA";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(-115, 140);
+  ctx.quadraticCurveTo(-105, 10, -45, -5);
+  ctx.lineTo(45, -5);
+  ctx.quadraticCurveTo(105, 10, 115, 140);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Red Crimson Tie / Collar V
+  ctx.fillStyle = "#FF3B30";
+  ctx.beginPath();
+  ctx.moveTo(-22, -5);
+  ctx.lineTo(22, -5);
+  ctx.lineTo(0, 68);
+  ctx.closePath();
+  ctx.fill();
+
+  // Head Silhouette
+  ctx.fillStyle = "#0B0D14";
+  ctx.strokeStyle = "#F4F1EA";
+  ctx.lineWidth = 4;
+  drawRoundedRect(ctx, -46, -122, 92, 105, 38);
+  ctx.fill();
+  ctx.stroke();
+
+  // Glowing Detective Glasses (signature persona feature)
+  const glare = 0.8 + 0.2 * Math.sin(frame * 0.2);
+  ctx.shadowColor = "#FFB800";
+  ctx.shadowBlur = 18;
+  ctx.fillStyle = `rgba(255, 184, 0, ${glare})`;
+  drawRoundedRect(ctx, -36, -84, 30, 16, 4);
+  ctx.fill();
+  drawRoundedRect(ctx, 6, -84, 30, 16, 4);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Bridge of glasses
+  ctx.strokeStyle = "#FFB800";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-6, -76);
+  ctx.lineTo(6, -76);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawCinematicStageHeader(ctx, frame, beat, localF) {
+  const sIn = spring(frame, beat.start_frame, { stiffness: 220, damping: 17 });
+  ctx.save();
+  ctx.translate(0, (1 - sIn) * -50);
+  ctx.globalAlpha = clamp(sIn, 0, 1);
+
+  // Subtle top pill
+  ctx.fillStyle = "rgba(255, 59, 48, 0.16)";
+  ctx.strokeStyle = "rgba(255, 59, 48, 0.55)";
+  ctx.lineWidth = 2;
+  drawRoundedRect(ctx, 84, 120, 440, 48, 24);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = "#FFB800";
+  ctx.font = "bold 21px 'DejaVu Sans Mono', monospace";
+  ctx.fillText(beat.sub_caption, 112, 151);
+
+  // Bold 3-4 word cinematic title
+  ctx.fillStyle = "#F4F1EA";
+  ctx.font = "900 66px 'Liberation Sans', sans-serif";
+  ctx.shadowColor = "rgba(0,0,0,0.85)";
+  ctx.shadowBlur = 24;
+  ctx.fillText(beat.headline, 84, 258);
+  ctx.shadowBlur = 0;
+  ctx.restore();
+}
+
+// ============================================================================
+// SCENE 1: NO CLOCKS. NO WINDOWS. (Sensory Deprivation Wall & Slot Hypnosis)
+// ============================================================================
+function renderScene01(ctx, frame, beat) {
+  const f0 = beat.start_frame;
+  const localF = frame - f0;
+  const dur = beat.duration_frames;
+  const prog = clamp(localF / dur, 0, 1);
+
+  // Camera slowly pushes into the casino wall & slot machine
+  const camScale = 1.0 + prog * 0.14;
+  ctx.save();
+  ctx.translate(540, 960);
+  ctx.scale(camScale, camScale);
+  ctx.translate(-540, -960);
+
+  // Deep crimson carpet floor perspective lines
+  const floorY = 1380;
+  const floorGrad = ctx.createLinearGradient(0, floorY, 0, 1920);
+  floorGrad.addColorStop(0, "#1A090D");
+  floorGrad.addColorStop(1, "#060408");
+  ctx.fillStyle = floorGrad;
+  ctx.fillRect(0, floorY, 1080, 1920 - floorY);
+
+  ctx.strokeStyle = "rgba(255, 59, 48, 0.15)";
+  ctx.lineWidth = 2;
+  for (let i = -6; i <= 6; i++) {
+    ctx.beginPath();
+    ctx.moveTo(540 + i * 70, floorY);
+    ctx.lineTo(540 + i * 260, 1920);
+    ctx.stroke();
+  }
+
+  // PHASE A (f: 0..150): Wall Clock & Window exist, then get BRICKED OVER / SHATTERED
+  const vanishProg = clamp((localF - 55) / 55, 0, 1);
+  const shutterClose = easeInOutCubic(vanishProg);
+
+  // 1. LEFT OBJECT: THE WALL CLOCK (X=290, Y=620)
+  ctx.save();
+  ctx.translate(290, 620);
+  const clockS = spring(frame, f0 + 4, { stiffness: 200, damping: 15 });
+  ctx.scale(clockS, clockS);
+
+  // Clock Outer Rim
+  ctx.fillStyle = "#10131C";
+  ctx.strokeStyle = vanishProg > 0.4 ? "#FF3B30" : "#F4F1EA";
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.arc(0, 0, 145, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Tick marks
+  for (let h = 0; h < 12; h++) {
+    const ang = (h / 12) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(ang) * 115, Math.sin(ang) * 115);
+    ctx.lineTo(Math.cos(ang) * 130, Math.sin(ang) * 130);
+    ctx.stroke();
+  }
+
+  // Spinning clock hands that freeze & snap backward
+  const handAng = localF < 55 ? localF * 0.22 : 55 * 0.22 - Math.sin((localF - 55) * 0.3) * 0.2;
+  ctx.strokeStyle = "#FFB800";
+  ctx.lineWidth = 7;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(Math.cos(handAng) * 95, Math.sin(handAng) * 95);
+  ctx.stroke();
+
+  // Heavy Red Ban X & Iron Shutter slamming over the clock
+  if (shutterClose > 0.01) {
+    ctx.fillStyle = `rgba(12, 14, 22, ${shutterClose * 0.88})`;
+    ctx.beginPath();
+    ctx.arc(0, 0, 145, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = "#FF3B30";
+    ctx.lineWidth = 14;
+    ctx.shadowColor = "#FF3B30";
+    ctx.shadowBlur = 24;
+    const xLen = 110 * shutterClose;
+    ctx.beginPath();
+    ctx.moveTo(-xLen, -xLen);
+    ctx.lineTo(xLen, xLen);
+    ctx.moveTo(xLen, -xLen);
+    ctx.lineTo(-xLen, xLen);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = "#FF3B30";
+    ctx.font = "900 28px 'DejaVu Sans Mono', monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("TIME ERASED", 0, 195);
+  }
+  ctx.restore();
+
+  // 2. RIGHT OBJECT: DAYLIGHT WINDOW (X=790, Y=620) Getting Sealed by Casino Wall
+  ctx.save();
+  ctx.translate(790, 620);
+  const winS = spring(frame, f0 + 14, { stiffness: 200, damping: 15 });
+  ctx.scale(winS, winS);
+
+  // Sky glow inside window before shutter slams
+  const skyGrad = ctx.createLinearGradient(0, -145, 0, 145);
+  skyGrad.addColorStop(0, "#38BDF8");
+  skyGrad.addColorStop(1, "#FDE047");
+  ctx.fillStyle = skyGrad;
+  drawRoundedRect(ctx, -135, -145, 270, 290, 20);
+  ctx.fill();
+
+  // Sun inside window
+  ctx.fillStyle = "#FEF08A";
+  ctx.beginPath();
+  ctx.arc(0, -35, 42, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Heavy Steel Casino Shutter slamming down over window
+  const slamH = 290 * easeOutExpo(clamp((localF - 85) / 40, 0, 1));
+  if (slamH > 1) {
+    ctx.fillStyle = "#11141E";
+    drawRoundedRect(ctx, -135, -145, 270, slamH, 16);
+    ctx.fill();
+
+    ctx.strokeStyle = "#FF3B30";
+    ctx.lineWidth = 10;
+    drawRoundedRect(ctx, -135, -145, 270, 290, 20);
+    ctx.stroke();
+
+    if (slamH > 220) {
+      ctx.strokeStyle = "#FF3B30";
+      ctx.lineWidth = 14;
+      ctx.beginPath();
+      ctx.moveTo(-90, -90); ctx.lineTo(90, 90);
+      ctx.moveTo(90, -90); ctx.lineTo(-90, 90);
+      ctx.stroke();
+
+      ctx.fillStyle = "#FF3B30";
+      ctx.font = "900 28px 'DejaVu Sans Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.fillText("DAYLIGHT BLOCKED", 0, 195);
+    }
+  } else {
+    ctx.strokeStyle = "#F4F1EA";
+    ctx.lineWidth = 8;
+    drawRoundedRect(ctx, -135, -145, 270, 290, 20);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // 3. CENTER FOREGROUND: GLOWING GOLDEN SLOT MACHINE & HYPNOTIZED HOST
+  const slotS = spring(frame, f0 + 22, { stiffness: 180, damping: 16 });
+  ctx.save();
+  ctx.translate(540, 1180);
+  ctx.scale(slotS, slotS);
+
+  // Golden Neon Halo
+  const slotGlow = ctx.createRadialGradient(0, -60, 20, 0, -60, 320);
+  slotGlow.addColorStop(0, "rgba(255, 184, 0, 0.34)");
+  slotGlow.addColorStop(1, "rgba(255, 184, 0, 0)");
+  ctx.fillStyle = slotGlow;
+  ctx.beginPath();
+  ctx.arc(0, -60, 320, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Slot Cabinet
+  ctx.fillStyle = "#161926";
+  ctx.strokeStyle = "#FFB800";
+  ctx.lineWidth = 7;
+  drawRoundedRect(ctx, -210, -240, 420, 340, 32);
+  ctx.fill();
+  ctx.stroke();
+
+  // 3 Spinning Reel Windows
+  const symbols = ["7", "$", "7", "★"];
+  for (let r = 0; r < 3; r++) {
+    const rx = -155 + r * 110;
+    ctx.fillStyle = "#090B10";
+    ctx.strokeStyle = "rgba(244,241,234,0.25)";
+    ctx.lineWidth = 3;
+    drawRoundedRect(ctx, rx, -175, 90, 150, 14);
+    ctx.fill();
+    ctx.stroke();
+
+    const scrollOffset = ((frame * (12 + r * 4)) % 120) - 60;
+    ctx.fillStyle = r === 1 ? "#FF3B30" : "#FFB800";
+    ctx.font = "900 68px 'Liberation Sans', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("7", rx + 45, -78 + scrollOffset * 0.25);
+  }
+
+  // Eternal Twilight Label on Cabinet
+  ctx.fillStyle = "#F4F1EA";
+  ctx.font = "bold 24px 'DejaVu Sans Mono', monospace";
+  ctx.textAlign = "center";
+  ctx.fillText("LOCKED AT ETERNAL 7:00 PM", 0, 48);
+  ctx.restore();
+
+  // Draw Host Character standing in front left observing the trap
+  drawHostCharacter(ctx, frame, 230, 1540, 1.35, "alert");
+
+  ctx.restore();
+  drawCinematicStageHeader(ctx, frame, beat, localF);
+}
+
+// ============================================================================
+// SCENE 2: ZERO 90° CORNERS (Architectural Blueprint Morphing into Curved Maze)
+// ============================================================================
+function renderScene02(ctx, frame, beat) {
+  const f0 = beat.start_frame;
+  const localF = frame - f0;
+  const dur = beat.duration_frames;
+  const prog = clamp(localF / dur, 0, 1);
+
+  // Morph factor: 0 = 90-degree sharp exit corridor, 1 = curved labyrinth loop
+  const morph = easeInOutCubic(clamp((localF - 45) / 70, 0, 1));
+
+  ctx.save();
+  // Blueprint architectural grid background
+  ctx.strokeStyle = "rgba(16, 185, 129, 0.08)";
+  ctx.lineWidth = 2;
+  for (let x = 0; x < 1080; x += 60) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1920); ctx.stroke();
+  }
+  for (let y = 0; y < 1920; y += 60) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1080, y); ctx.stroke();
+  }
+
+  // TOP SECTION (Y=460..840): THE REJECTED 90° CORNER (DECISION POINT TO EXIT)
+  const sTop = spring(frame, f0 + 6, { stiffness: 200, damping: 16 });
+  ctx.save();
+  ctx.translate(540, 610);
+  ctx.scale(sTop, sTop);
+
+  ctx.fillStyle = "rgba(17, 20, 29, 0.92)";
+  ctx.strokeStyle = "rgba(255, 59, 48, 0.55)";
+  ctx.lineWidth = 4;
+  drawRoundedRect(ctx, -430, -190, 860, 360, 28);
+  ctx.fill();
+  ctx.stroke();
+
+  // 90-degree L-corridor walls
+  ctx.strokeStyle = "#F4F1EA";
+  ctx.lineWidth = 10;
+  ctx.beginPath();
+  ctx.moveTo(-340, 90);
+  ctx.lineTo(-40, 90);
+  ctx.lineTo(-40, -120);
+  ctx.stroke();
+
+  // 90 degree red angle square marker
+  ctx.strokeStyle = "#FF3B30";
+  ctx.lineWidth = 5;
+  ctx.strokeRect(-85, 45, 45, 45);
+
+  ctx.fillStyle = "#FF3B30";
+  ctx.font = "900 32px 'DejaVu Sans Mono', monospace";
+  ctx.font = "900 28px 'DejaVu Sans Mono', monospace"; ctx.fillText("90° TURN = BRAIN WAKES UP", 5, -35);
+  ctx.fillStyle = "#8E95A8";
+  ctx.font = "bold 25px 'Liberation Sans', sans-serif";
+  ctx.fillText("Sharp corner forces a conscious", 5, 15);
+  ctx.fillText("exit decision: 'Should I leave?'", 5, 52);
+
+  // Red BANNED stamp
+  if (localF > 35) {
+    const stampS = spring(frame, f0 + 35, { stiffness: 280, damping: 14 });
+    ctx.save();
+    ctx.translate(-190, -20);
+    ctx.rotate(-0.18);
+    ctx.scale(stampS, stampS);
+    ctx.fillStyle = "rgba(255, 59, 48, 0.22)";
+    ctx.strokeStyle = "#FF3B30";
+    ctx.lineWidth = 6;
+    drawRoundedRect(ctx, -130, -38, 260, 76, 12);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = "#FF3B30";
+    ctx.font = "900 36px 'DejaVu Sans Mono', monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("BANNED", 0, 13);
+    ctx.restore();
+  }
+  ctx.restore();
+
+  // BOTTOM SECTION (Y=880..1580): THE CURVED LABYRINTH LOOP (DOPAMINE VORTEX)
+  const sBot = spring(frame, f0 + 24, { stiffness: 190, damping: 16 });
+  ctx.save();
+  ctx.translate(540, 1240);
+  ctx.scale(sBot, sBot);
+
+  // Glowing S-Curve / Spiral Walkway where traveler dot flows endlessly inward
+  for (let ring = 3; ring >= 1; ring--) {
+    const rad = ring * 105;
+    ctx.strokeStyle = ring === 2 ? "#FFB800" : "rgba(244, 241, 234, 0.22)";
+    ctx.lineWidth = ring === 2 ? 46 : 6;
+    ctx.beginPath();
+    ctx.arc(0, -20, rad, 0, Math.PI * 1.75);
+    ctx.stroke();
+  }
+
+  // Glowing slot machine nodes along the curved path so eye is always pulled 15° ahead
+  const numNodes = 8;
+  for (let i = 0; i < numNodes; i++) {
+    const a = (i / numNodes) * Math.PI * 2 + frame * 0.015;
+    const nx = Math.cos(a) * 210;
+    const ny = -20 + Math.sin(a) * 210;
+    ctx.fillStyle = i % 2 === 0 ? "#10B981" : "#FFB800";
+    ctx.shadowColor = ctx.fillStyle;
+    ctx.shadowBlur = 16;
+    ctx.beginPath();
+    ctx.arc(nx, ny, 16, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  // Animated human walker dot following the endless curve
+  const walkerAngle = localF * 0.055;
+  const wx = Math.cos(walkerAngle) * 210;
+  const wy = -20 + Math.sin(walkerAngle) * 210;
+  ctx.fillStyle = "#FF3B30";
+  ctx.shadowColor = "#FF3B30";
+  ctx.shadowBlur = 28;
+  ctx.beginPath();
+  ctx.arc(wx, wy, 24, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Center Core Label
+  ctx.fillStyle = "#F4F1EA";
+  ctx.font = "900 34px 'DejaVu Sans Mono', monospace";
+  ctx.textAlign = "center";
+  ctx.fillText("INFINITE CURVE", 0, -15);
+  ctx.fillStyle = "#10B981";
+  ctx.font = "bold 24px 'DejaVu Sans Mono', monospace";
+  ctx.fillText("NO EXIT VECTOR", 0, 22);
+
+  ctx.restore();
+
+  // Host Character on bottom right pointing at the labyrinth
+  drawHostCharacter(ctx, frame, 855, 1600, 1.25, "explain");
+
+  ctx.restore();
+  drawCinematicStageHeader(ctx, frame, beat, localF);
+}
+
+// ============================================================================
+// SCENE 3: CASH TO PLASTIC (Real $100 Bill Dissolving into Casino Chips & Brain Meter)
+// ============================================================================
+function renderScene03(ctx, frame, beat) {
+  const f0 = beat.start_frame;
+  const localF = frame - f0;
+  const dur = beat.duration_frames;
+  const prog = clamp(localF / dur, 0, 1);
+
+  ctx.save();
+
+  // LEFT/TOP STAGE: REAL $100 CASH BILL MORPHING INTO TOY PLASTIC CHIPS
+  const morphT = easeInOutCubic(clamp((localF - 35) / 65, 0, 1));
+  const billScale = spring(frame, f0 + 5, { stiffness: 200, damping: 15 });
+
+  ctx.save();
+  ctx.translate(540, 620);
+  ctx.scale(billScale, billScale);
+
+  // Cash Bill fading/shrinking as chips burst out
+  ctx.save();
+  ctx.globalAlpha = clamp(1 - morphT * 0.85, 0.15, 1);
+  ctx.scale(1 - morphT * 0.25, 1 - morphT * 0.25);
+  ctx.fillStyle = "#0F2E22";
+  ctx.strokeStyle = "#10B981";
+  ctx.lineWidth = 8;
+  drawRoundedRect(ctx, -310, -150, 620, 300, 24);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.strokeStyle = "rgba(16, 185, 129, 0.35)";
+  ctx.lineWidth = 4;
+  drawRoundedRect(ctx, -280, -120, 560, 240, 16);
+  ctx.stroke();
+
+  ctx.fillStyle = "#10B981";
+  ctx.font = "900 110px 'DejaVu Sans Mono', monospace";
+  ctx.textAlign = "center";
+  ctx.fillText("$100", 0, 38);
+  ctx.font = "bold 24px 'DejaVu Sans Mono', monospace";
+  ctx.fillText("REAL HARD-EARNED CASH (HIGH LOSS PAIN)", 0, 102);
+  ctx.restore();
+
+  // Casino Chips erupting into the foreground as morphT -> 1
+  if (morphT > 0.05) {
+    const chipPositions = [
+      { x: -180, y: -20, col: "#FF3B30", val: "100" },
+      { x: 0,    y: -45, col: "#FFB800", val: "500" },
+      { x: 180,  y: -15, col: "#10B981", val: "100" }
+    ];
+    chipPositions.forEach((cp, idx) => {
+      const cSpring = spring(frame, f0 + 38 + idx * 12, { stiffness: 220, damping: 14 });
+      ctx.save();
+      ctx.translate(cp.x * cSpring, cp.y * cSpring);
+      ctx.scale(cSpring, cSpring);
+
+      ctx.shadowColor = "rgba(0,0,0,0.75)";
+      ctx.shadowBlur = 28;
+      ctx.fillStyle = cp.col;
+      ctx.beginPath();
+      ctx.arc(0, 0, 108, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Dashed white casino chip edge stripes
+      ctx.strokeStyle = "#F4F1EA";
+      ctx.lineWidth = 14;
+      ctx.setLineDash([22, 22]);
+      ctx.beginPath();
+      ctx.arc(0, 0, 92, frame * 0.02, Math.PI * 2 + frame * 0.02);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Inner dark recess
+      ctx.fillStyle = "#0B0D14";
+      ctx.beginPath();
+      ctx.arc(0, 0, 68, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#F4F1EA";
+      ctx.font = "900 44px 'DejaVu Sans Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(cp.val, 0, 16);
+      ctx.restore();
+    });
+  }
+  ctx.restore();
+
+  // LOWER STAGE (Y=1020..1460): INSULA BRAIN PAIN METER DROPPING FROM 92% -> 8%
+  const cardS = spring(frame, f0 + 25, { stiffness: 200, damping: 17 });
+  ctx.save();
+  ctx.translate(540, 1210);
+  ctx.scale(cardS, cardS);
+
+  ctx.fillStyle = "rgba(17, 20, 29, 0.94)";
+  ctx.strokeStyle = "rgba(244, 241, 234, 0.18)";
+  ctx.lineWidth = 4;
+  drawRoundedRect(ctx, -430, -195, 860, 390, 32);
+  ctx.fill();
+  ctx.stroke();
+
+  const painVal = Math.round(92 - 84 * morphT);
+  ctx.fillStyle = "#8E95A8";
+  ctx.font = "bold 25px 'DejaVu Sans Mono', monospace";
+  ctx.textAlign = "left";
+  ctx.fillText("NEURAL 'PAIN OF PAYING' (INSULA CORTEX)", -370, -115);
+
+  // Huge live dropping percentage
+  ctx.fillStyle = painVal < 30 ? "#FF3B30" : "#FFB800";
+  ctx.font = "900 105px 'Liberation Sans', sans-serif";
+  ctx.fillText(`${painVal}%`, -370, 5);
+
+  ctx.fillStyle = "#F4F1EA";
+  ctx.font = "bold 32px 'Liberation Sans', sans-serif";
+  ctx.font = "bold 27px 'Liberation Sans', sans-serif"; ctx.fillText(painVal < 30 ? "FEELS LIKE TOY PLASTIC TOKENS" : "REAL LOSS AVERSION ACTIVE", -135, -25);
+
+  // Meter Bar
+  ctx.fillStyle = "rgba(244,241,234,0.1)";
+  drawRoundedRect(ctx, -370, 65, 740, 48, 24);
+  ctx.fill();
+
+  const barW = Math.max(48, (painVal / 100) * 740);
+  ctx.fillStyle = painVal < 30 ? "#FF3B30" : "#10B981";
+  drawRoundedRect(ctx, -370, 65, barW, 48, 24);
+  ctx.fill();
+
+  ctx.restore();
+
+  // Host Character centered bottom locking the final takeaway
+  drawHostCharacter(ctx, frame, 540, 1610, 1.35, "lock");
+
+  ctx.restore();
+  drawCinematicStageHeader(ctx, frame, beat, localF);
+}
+
+window.seekToFrame = function(frame) {
+  if (!window.BEAT_CLOCK) return false;
+  const beats = window.BEAT_CLOCK.beats;
+  let activeBeat = beats[beats.length - 1];
+  for (let i = 0; i < beats.length; i++) {
+    if (frame >= beats[i].start_frame && frame < beats[i].end_frame) {
+      activeBeat = beats[i];
+      break;
+    }
+  }
+
+  // Clear stage with deep obsidian radial vignette
+  const bg = ctx.createRadialGradient(540, 720, 80, 540, 960, 1100);
+  bg.addColorStop(0, "#141826");
+  bg.addColorStop(1, "#07080C");
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, 1080, 1920);
+
+  if (activeBeat.scene_fn === "Scene_01_TimeTrap") {
+    renderScene01(ctx, frame, activeBeat);
+  } else if (activeBeat.scene_fn === "Scene_02_CurvedMaze") {
+    renderScene02(ctx, frame, activeBeat);
+  } else {
+    renderScene03(ctx, frame, activeBeat);
+  }
+  return true;
+};
+</script>
+</body>
+</html>

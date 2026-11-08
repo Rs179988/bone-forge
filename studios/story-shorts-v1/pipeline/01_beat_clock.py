@@ -2,12 +2,15 @@
 import os
 import json
 import wave
+import subprocess
 import numpy as np
+from google import genai
+from google.genai import types
 
 SR = 44100
 FPS = 60
 
-def load_wav_mono(path):
+def load_wav_stereo(path):
     with wave.open(path, 'r') as wf:
         frames = wf.readframes(wf.getnframes())
         arr = np.frombuffer(frames, dtype=np.int16).astype(np.float32) / 32768.0
@@ -17,159 +20,179 @@ def load_wav_mono(path):
             arr = np.column_stack((arr, arr))
         return arr
 
-def synth_syllabic_cadence(duration_sec, syllables_per_sec=5.5, pitch_hz=125.0):
-    """Synthesizes a warm editorial vocal-cadence pulse track + bass bed so audio envelope matches speech beats."""
-    n = int(SR * duration_sec)
-    t = np.linspace(0, duration_sec, n, endpoint=False)
-    # Syllabic amplitude envelope
-    syl_env = np.maximum(0, np.sin(2 * np.pi * syllables_per_sec * t)) ** 2.4
-    # Formant-like warm harmonic pulse
-    f0 = pitch_hz + 12.0 * np.sin(2 * np.pi * 1.3 * t)
-    phase = 2 * np.pi * np.cumsum(f0) / SR
-    carrier = (
-        0.55 * np.sin(phase) +
-        0.30 * np.sin(2 * phase) +
-        0.15 * np.sin(3 * phase)
-    )
-    # Subtle dark cinema sub-drone bed (55Hz A1)
-    drone = 0.14 * np.sin(2 * np.pi * 55.0 * t) + 0.07 * np.sin(2 * np.pi * 110.0 * t)
-    sig = carrier * syl_env * 0.22 + drone
-    return np.column_stack((sig, sig))
+def trim_silence(audio_2ch, thresh=0.015, pad_samples=int(0.08 * SR)):
+    env = np.max(np.abs(audio_2ch), axis=1)
+    idx = np.where(env > thresh)[0]
+    if len(idx) == 0:
+        return audio_2ch
+    start = max(0, idx[0] - int(0.03 * SR))
+    end = min(len(audio_2ch), idx[-1] + pad_samples)
+    return audio_2ch[start:end]
 
-def build_beat_clock(project_dir, sfx_dir):
+def generate_tts_segment(client, text, out_wav_44k):
+    raw_24k = out_wav_44k + ".24k.wav"
+    resp = client.models.generate_content(
+        model="gemini-2.5-flash-preview-tts",
+        contents=f"Read in a gripping, brisk, cinematic documentary storyteller voice: {text}",
+        config={"response_modalities": ["AUDIO"]}
+    )
+    pcm_bytes = resp.candidates[0].content.parts[0].inline_data.data
+    with wave.open(raw_24k, "w") as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)
+        wf.setframerate(24000)
+        wf.writeframes(pcm_bytes)
+
+    # Resample to 44.1kHz stereo via FFmpeg
+    subprocess.run([
+        "ffmpeg", "-y", "-v", "error",
+        "-i", raw_24k,
+        "-ar", str(SR),
+        "-ac", "2",
+        out_wav_44k
+    ], check=True)
+    os.remove(raw_24k)
+    audio = load_wav_stereo(out_wav_44k)
+    audio = trim_silence(audio)
+    # Save trimmed
+    pcm = (np.clip(audio, -1.0, 1.0) * 32767).astype(np.int16)
+    with wave.open(out_wav_44k, "w") as wf:
+        wf.setnchannels(2)
+        wf.setsampwidth(2)
+        wf.setframerate(SR)
+        wf.writeframes(pcm.tobytes())
+    return audio
+
+def build_casino_master_clock(project_dir, sfx_dir):
     os.makedirs(project_dir, exist_ok=True)
-    # 4 Tight Editorial Beats = 8.0 seconds total (480 frames @ 60fps)
-    beats = [
-      {
-        "beat_id": "beat_01_hook",
-        "archetype": "Archetype_01_HookTension",
-        "camera_mode": "punch_in",
-        "start_sec": 0.0,
-        "end_sec": 2.0,
-        "start_frame": 0,
-        "end_frame": 120,
-        "spoken_line": "Ninety-seven percent of AI videos fail in the first ninety frames.",
-        "punch_words": ["97% FAIL", "IN 90 FRAMES"],
-        "sub_metric": {"value": 97, "unit": "%", "label": "DROP-OFF BEFORE 1.5s"},
-        "sfx_cues": [
-          {"frame": 0, "sfx": "sub_impact.wav", "gain": 0.95},
-          {"frame": 18, "sfx": "ui_tick.wav", "gain": 0.70},
-          {"frame": 42, "sfx": "ui_tick.wav", "gain": 0.70},
-          {"frame": 112, "sfx": "whoosh_fast.wav", "gain": 0.85}
-        ]
-      },
-      {
-        "beat_id": "beat_02_contrast",
-        "archetype": "Archetype_02_SplitCompare",
-        "camera_mode": "tilt_left",
-        "start_sec": 2.0,
-        "end_sec": 4.0,
-        "start_frame": 120,
-        "end_frame": 240,
-        "spoken_line": "Why? Because raw prompts dump walls of text instead of visual physics.",
-        "punch_words": ["WALL OF TEXT", "VS VISUAL RIG"],
-        "compare_cards": {
-          "bad": {"tag": "RAW PROMPT SLOP", "stat": "12% RETENTION", "flaw": "Static captions + linear boxes"},
-          "good": {"tag": "STUDIO ARCHETYPE", "stat": "84% RETENTION", "edge": "Audio-locked spring choreography"}
+    client = genai.Client(http_options=types.HttpOptions(api_version='v1alpha', timeout=30000))
+
+    raw_beats = [
+        {
+            "beat_id": "scene_01_time_trap",
+            "scene_fn": "Scene_01_TimeTrap",
+            "camera_mode": "punch_in",
+            "spoken_line": "Walk into any Vegas casino and look at the walls. No clocks. No windows.",
+            "headline": "NO CLOCKS. NO WINDOWS.",
+            "sub_caption": "SENSORY DEPRIVATION TRAP"
         },
-        "sfx_cues": [
-          {"frame": 120, "sfx": "sub_impact.wav", "gain": 0.85},
-          {"frame": 152, "sfx": "ui_tick.wav", "gain": 0.80},
-          {"frame": 232, "sfx": "whoosh_fast.wav", "gain": 0.85}
-        ]
-      },
-      {
-        "beat_id": "beat_03_pipeline",
-        "archetype": "Archetype_03_NodeArchitecture",
-        "camera_mode": "zoom_node",
-        "start_sec": 4.0,
-        "end_sec": 6.0,
-        "start_frame": 240,
-        "end_frame": 360,
-        "spoken_line": "A real editor locks the audio master-clock before a single pixel moves.",
-        "punch_words": ["AUDIO CLOCK", "DRIVES PIXELS"],
-        "nodes": [
-          {"step": "01", "title": "BEAT SCRIPT", "ms": "0ms DRIFT"},
-          {"step": "02", "title": "60FPS CLOCK", "ms": "FRAME LOCKED"},
-          {"step": "03", "title": "FLOW CRITIC", "ms": "AUTO-VERIFIED"}
-        ],
-        "sfx_cues": [
-          {"frame": 240, "sfx": "sub_impact.wav", "gain": 0.80},
-          {"frame": 265, "sfx": "ui_tick.wav", "gain": 0.75},
-          {"frame": 295, "sfx": "ui_tick.wav", "gain": 0.75},
-          {"frame": 300, "sfx": "riser_tension.wav", "gain": 0.70},
-          {"frame": 352, "sfx": "whoosh_fast.wav", "gain": 0.90}
-        ]
-      },
-      {
-        "beat_id": "beat_04_payoff",
-        "archetype": "Archetype_04_MetricPayoff",
-        "camera_mode": "payoff_lock",
-        "start_sec": 6.0,
-        "end_sec": 8.0,
-        "start_frame": 360,
-        "end_frame": 480,
-        "spoken_line": "Zero random code. Deterministic sixty frames per second studio output.",
-        "punch_words": ["60 FPS LOCKED", "STUDIO GRADE"],
-        "chart_bars": [
-          {"label": "GENERIC AI", "pct": 18, "color": "#8E95A8"},
-          {"label": "TEMPLATE", "pct": 46, "color": "#FFB800"},
-          {"label": "STUDIO ENGINE", "pct": 94, "color": "#10B981"}
-        ],
-        "sfx_cues": [
-          {"frame": 360, "sfx": "sub_impact.wav", "gain": 0.95},
-          {"frame": 385, "sfx": "lock_chime.wav", "gain": 0.90},
-          {"frame": 415, "sfx": "ui_tick.wav", "gain": 0.70}
-        ]
-      }
+        {
+            "beat_id": "scene_02_curved_maze",
+            "scene_fn": "Scene_02_CurvedMaze",
+            "camera_mode": "tilt_left",
+            "spoken_line": "Architects banned ninety degree corners, curving every walkway so your brain never hits a decision point to leave.",
+            "headline": "ZERO 90° CORNERS",
+            "sub_caption": "FRIEDMAN'S LABYRINTH DESIGN"
+        },
+        {
+            "beat_id": "scene_03_plastic_illusion",
+            "scene_fn": "Scene_03_ChipIllusion",
+            "camera_mode": "zoom_node",
+            "spoken_line": "Even your cash is swapped for weightless plastic chips, numbing the neural pain of losing real money.",
+            "headline": "CASH TO PLASTIC",
+            "sub_caption": "NUMBING THE PAIN OF PAYING"
+        }
     ]
 
-    total_sec = 8.0
-    total_frames = int(total_sec * FPS)
-    master_audio = synth_syllabic_cadence(total_sec)
+    voice_segments = []
+    beats_locked = []
+    curr_frame = 0
 
-    # Mix coupled SFX cues at exact frame sample offsets
-    for b in beats:
+    for idx, b in enumerate(raw_beats):
+        seg_wav = os.path.join(project_dir, f"vo_beat_{idx+1}.wav")
+        print(f"[TTS] Generating real human voiceover for {b['beat_id']}...")
+        seg_audio = generate_tts_segment(client, b["spoken_line"], seg_wav)
+        seg_dur = len(seg_audio) / SR
+        seg_frames = int(np.ceil(seg_dur * FPS))
+        # Pad audio to exact frame multiple
+        target_samples = int((seg_frames / FPS) * SR)
+        if len(seg_audio) < target_samples:
+            pad = np.zeros((target_samples - len(seg_audio), 2), dtype=np.float32)
+            seg_audio = np.vstack((seg_audio, pad))
+        else:
+            seg_audio = seg_audio[:target_samples]
+
+        start_f = curr_frame
+        end_f = curr_frame + seg_frames
+        curr_frame = end_f
+
+        sfx_cues = [
+            {"frame": start_f, "sfx": "sub_impact.wav", "gain": 0.48},
+            {"frame": start_f + 14, "sfx": "ui_tick.wav", "gain": 0.38},
+            {"frame": max(start_f, end_f - 10), "sfx": "whoosh_fast.wav", "gain": 0.45}
+        ]
+        if idx == 2:
+            sfx_cues.append({"frame": start_f + int(seg_frames * 0.45), "sfx": "lock_chime.wav", "gain": 0.45})
+
+        beats_locked.append({
+            **b,
+            "start_frame": start_f,
+            "end_frame": end_f,
+            "duration_frames": seg_frames,
+            "start_sec": round(start_f / FPS, 3),
+            "end_sec": round(end_f / FPS, 3),
+            "sfx_cues": sfx_cues
+        })
+        voice_segments.append(seg_audio)
+
+    full_voice = np.vstack(voice_segments)
+    total_samples = len(full_voice)
+    total_sec = total_samples / SR
+    total_frames = curr_frame
+
+    # Normalize voiceover cleanly
+    v_peak = np.max(np.abs(full_voice))
+    if v_peak > 0:
+        full_voice = (full_voice / v_peak) * 0.82
+
+    # Subtle dark tension sub-bass drone under the voiceover
+    t = np.linspace(0, total_sec, total_samples, endpoint=False)
+    drone = (0.045 * np.sin(2 * np.pi * 52.0 * t) + 0.025 * np.sin(2 * np.pi * 104.0 * t))
+    master_mix = full_voice + np.column_stack((drone, drone))
+
+    # Mix coupled SFX cues under the voiceover
+    for b in beats_locked:
         for cue in b["sfx_cues"]:
             sfx_path = os.path.join(sfx_dir, cue["sfx"])
             if os.path.exists(sfx_path):
-                sfx_data = load_wav_mono(sfx_path) * cue.get("gain", 0.8)
-                start_sample = int((cue["frame"] / FPS) * SR)
-                end_sample = min(len(master_audio), start_sample + len(sfx_data))
-                if end_sample > start_sample:
-                    master_audio[start_sample:end_sample] += sfx_data[:end_sample - start_sample]
+                sfx_data = load_wav_stereo(sfx_path) * cue.get("gain", 0.4)
+                s_idx = int((cue["frame"] / FPS) * SR)
+                e_idx = min(len(master_mix), s_idx + len(sfx_data))
+                if e_idx > s_idx:
+                    master_mix[s_idx:e_idx] += sfx_data[:e_idx - s_idx]
 
-    # Peak limiter / normalization to -1.5 dBFS
-    peak = np.max(np.abs(master_audio))
-    if peak > 0:
-        master_audio = (master_audio / peak) * 0.84
+    # Final soft limiter
+    peak = np.max(np.abs(master_mix))
+    if peak > 0.94:
+        master_mix = (master_mix / peak) * 0.94
 
-    wav_out = os.path.join(project_dir, "master_audio.wav")
-    pcm = (np.clip(master_audio, -1.0, 1.0) * 32767).astype(np.int16)
-    with wave.open(wav_out, 'w') as wf:
+    master_wav = os.path.join(project_dir, "master_audio.wav")
+    pcm = (np.clip(master_mix, -1.0, 1.0) * 32767).astype(np.int16)
+    with wave.open(master_wav, "w") as wf:
         wf.setnchannels(2)
         wf.setsampwidth(2)
         wf.setframerate(SR)
         wf.writeframes(pcm.tobytes())
 
-    clock_payload = {
-        "project_id": "test-01-retention",
+    clock_data = {
+        "project_id": "casino-trap-01",
+        "topic": "Why Vegas Casinos Have No Clocks, Windows, or 90-Degree Corners",
         "fps": FPS,
         "width": 1080,
         "height": 1920,
         "total_frames": total_frames,
-        "total_duration_sec": total_sec,
-        "audio_file": wav_out,
-        "beats": beats
+        "total_duration_sec": round(total_sec, 3),
+        "audio_file": master_wav,
+        "beats": beats_locked
     }
     clock_path = os.path.join(project_dir, "beat_clock.json")
     with open(clock_path, "w") as f:
-        json.dump(clock_payload, f, indent=2)
+        json.dump(clock_data, f, indent=2)
 
-    print(f"[MASTER CLOCK] Locked {total_frames} frames ({total_sec}s @ {FPS}fps) + mixed audio -> {clock_path}")
+    print(f"[MASTER CLOCK LOCKED] {total_frames} frames ({total_sec:.2f}s) with REAL HUMAN VOICEOVER -> {clock_path}")
 
 if __name__ == "__main__":
-    build_beat_clock(
-        "/workspace/studios/story-shorts-v1/projects/test-01-retention",
+    build_casino_master_clock(
+        "/workspace/studios/story-shorts-v1/projects/casino-trap-01",
         "/workspace/studios/story-shorts-v1/assets/sfx"
     )
