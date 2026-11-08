@@ -1,5 +1,7 @@
-{
-  "score": 100,
-  "verdict": "PASS",
-  "summary": "The 6-keyframe contact sheet perfectly matches all brand design system requirements and custom user rules. Keyframe 1 opens with the specified Cobalt/Lime color-block reality check card before transitioning into the #EAEAE6 graph-paper grid across Keyframes 2-6. Typography accurately pairs Italic Editorial Serif lead-ins with heavy Bold Sans punch words. Selection containers feature dashed borders with 4-corner anchor dots on list items ('Faster', 'Sharper', 'Effective') and rule cards. Visual metaphors (dashed circular 3D bullseye, brain puzzle piece, 4-bar audience telemetry chart with curved drop arrow, and mechanical keycap slam) are clearly rendered. Numeric stats consistently use glowing Amber (#FF9500) odometer cards with zero text clipping or overlapping."
-}
+[
+  {
+    "score": 100,
+    "verdict": "PASS",
+    "summary": "The contact sheet perfectly adheres to all design system rules and visual specifications: Keyframe 1 opens with the Cobalt/Lime reality check card before transitioning into the light off-white (#EAEAE6) graph-paper grid for Keyframes 2-6; Italic Editorial Serif lead-ins pair with heavy Bold Sans punch words; selection boxes with 4 corner anchor dots frame key list words ('Faster', 'Sharper', 'Effective') and rule cards; visual metaphors (3D bullseye, puzzle/brain graphic, 4-bar telemetry chart with curved arrow, and [INTRO DELETED] button) are rendered inside clean dashed frames; numbers ('4.0 HRS', '0.5 SEC', '90%', '35,000', '-50%', '+200%') feature glowing Amber (#FF9500) outer glow cards; and layout contains zero text clipping or overlap."
+  }
+]

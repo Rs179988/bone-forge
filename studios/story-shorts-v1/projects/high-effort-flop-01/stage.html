@@ -750,9 +750,9 @@ function renderBeat03_TheFix(ctx, frame, f0, dur) {
     ctx.restore();
 
     ctx.fillStyle = P.ink_primary;
-    ctx.font = "900 32px 'DejaVu Sans Mono', monospace";
+    ctx.font = "900 27px 'DejaVu Sans Mono', monospace";
     ctx.textAlign = "center";
-    ctx.fillText("Q1: 3-SEC CURIOSITY GAP", 0, 195);
+    ctx.fillText("Q1: 3-SEC CURIOSITY GAP", 0, 158);
   } else if (phase === 2) {
     const pS = spring(localF, 525, { stiffness: 210, damping: 15 });
     ctx.scale(pS, pS);
@@ -762,13 +762,13 @@ function renderBeat03_TheFix(ctx, frame, f0, dur) {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.beginPath();
-    ctx.moveTo(-165, 95);
-    ctx.lineTo(-55, -75);
-    ctx.lineTo(55, 65);
+    ctx.moveTo(-165, 80);
+    ctx.lineTo(-55, -80);
+    ctx.lineTo(55, 50);
     ctx.lineTo(165, -95);
     ctx.stroke();
 
-    const nodes = [[-165, 95], [-55, -75], [55, 65], [165, -95]];
+    const nodes = [[-165, 80], [-55, -80], [55, 50], [165, -95]];
     for (const [nx, ny] of nodes) {
       ctx.fillStyle = P.accent_secondary;
       ctx.strokeStyle = P.ink_primary;
@@ -780,9 +780,9 @@ function renderBeat03_TheFix(ctx, frame, f0, dur) {
     }
 
     ctx.fillStyle = P.ink_primary;
-    ctx.font = "900 32px 'DejaVu Sans Mono', monospace";
+    ctx.font = "900 27px 'DejaVu Sans Mono', monospace";
     ctx.textAlign = "center";
-    ctx.fillText("Q2: 15-SEC DIRECTION TWIST", 0, 195);
+    ctx.fillText("Q2: 15-SEC DIRECTION TWIST", 0, 158);
   } else {
     const pS = spring(localF, 925, { stiffness: 210, damping: 15 });
     const ejectT = easeInOutCubic(clamp((localF - 1010) / 50, 0, 1));
@@ -793,14 +793,14 @@ function renderBeat03_TheFix(ctx, frame, f0, dur) {
     ctx.strokeStyle = P.ink_primary;
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.roundRect(-210 + pullIn, -55, 130, 110, 14);
-    ctx.roundRect(80 - pullIn, -55, 130, 110, 14);
+    ctx.roundRect(-210 + pullIn, -65, 130, 110, 14);
+    ctx.roundRect(80 - pullIn, -65, 130, 110, 14);
     ctx.fill();
     ctx.stroke();
 
     if (ejectT < 0.95) {
       ctx.save();
-      ctx.translate(0, -ejectT * 140);
+      ctx.translate(0, -10 - ejectT * 140);
       ctx.scale(1 - ejectT * 0.5, 1 - ejectT * 0.5);
       ctx.globalAlpha = clamp(1 - ejectT * 1.1, 0, 1);
       ctx.fillStyle = P.accent_secondary;
@@ -820,9 +820,9 @@ function renderBeat03_TheFix(ctx, frame, f0, dur) {
     }
 
     ctx.fillStyle = P.ink_primary;
-    ctx.font = "900 32px 'DejaVu Sans Mono', monospace";
+    ctx.font = "900 27px 'DejaVu Sans Mono', monospace";
     ctx.textAlign = "center";
-    ctx.fillText("Q3: THE RUTHLESS CUT TEST", 0, 195);
+    ctx.fillText("Q3: RUTHLESS CUT TEST", 0, 158);
   }
   ctx.restore();
 
@@ -876,7 +876,6 @@ function renderBeat04_MicDrop(ctx, frame, f0, dur) {
   }
 
   const delTriggerF = 3503 - f0;
-  // Fast 14-frame vaporize so at f=3525 (delProgress=1.0) the intro block is 100% gone with zero overlap!
   const delProgress = clamp((localF - delTriggerF) / 14, 0, 1);
   const shake = (localF >= delTriggerF && localF <= delTriggerF + 18)
     ? Math.sin(localF * 3.2) * 18 * (1 - (localF - delTriggerF) / 18)
@@ -904,7 +903,6 @@ function renderBeat04_MicDrop(ctx, frame, f0, dur) {
   drawAmberOdometer(ctx, 295, 610, `-${fxNum}%`, "FLUFF EFFECTS", spring(frame, f0 + 12, { stiffness: 210, damping: 16 }));
   drawAmberOdometer(ctx, 785, 610, `+${brNum}%`, "HOOK & SCRIPT BRAIN", spring(frame, f0 + 28, { stiffness: 210, damping: 16 }));
 
-  // Interactive NLE Timeline where the bloated [ FANCY INTRO ] chunk is selected and DELETED cleanly
   ctx.save();
   ctx.translate(540, 1020);
 
@@ -932,7 +930,6 @@ function renderBeat04_MicDrop(ctx, frame, f0, dur) {
     ctx.fillText("FLUFF VAPORIZED ✓", 415, -145);
   }
 
-  // Before delete completes: show the bloated [ FANCY 3D INTRO ] shrinking in place (never crossing header!)
   if (delProgress < 0.95) {
     ctx.save();
     ctx.translate(-195, 20);
@@ -940,8 +937,8 @@ function renderBeat04_MicDrop(ctx, frame, f0, dur) {
     ctx.globalAlpha = clamp(1 - delProgress * 1.2, 0, 1);
 
     drawDashedSelectionBox(
-      ctx, 0, 0, 410, 150,
-      "FANCY 3D INTRO",
+      ctx, 0, 0, 390, 150,
+      "FANCY INTRO",
       P.accent_secondary,
       P.ink_primary,
       1.0,
@@ -950,13 +947,12 @@ function renderBeat04_MicDrop(ctx, frame, f0, dur) {
     ctx.restore();
   }
 
-  // Clean High-Retention Story Track snapping to 00:00 when intro is deleted!
-  const slideLeft = easeOutExpo(delProgress) * 205;
+  const slideLeft = easeOutExpo(delProgress) * 195;
   ctx.save();
-  ctx.translate(205 - slideLeft, 20);
+  ctx.translate(195 - slideLeft, 20);
   drawDashedSelectionBox(
-    ctx, 0, 0, 420 + slideLeft * 1.6, 150,
-    "00:00 // BRUTAL HOOK + PURE STORY",
+    ctx, 0, 0, 420 + slideLeft * 1.85, 150,
+    "00:00 // BRUTAL HOOK + STORY",
     P.accent_highlight_lime,
     P.ink_primary,
     1.0,
@@ -964,7 +960,6 @@ function renderBeat04_MicDrop(ctx, frame, f0, dur) {
   );
   ctx.restore();
 
-  // Playhead needle locked at 00:00
   ctx.strokeStyle = P.accent_primary;
   ctx.lineWidth = 5;
   ctx.beginPath();
@@ -974,7 +969,6 @@ function renderBeat04_MicDrop(ctx, frame, f0, dur) {
 
   ctx.restore();
 
-  // Giant Tactile 3D [ DELETE ] Mechanical Keycap slamming down at frame 3503!
   const keyPress = (localF >= delTriggerF)
     ? spring(localF, delTriggerF, { stiffness: 320, damping: 14 })
     : 0;
@@ -985,25 +979,25 @@ function renderBeat04_MicDrop(ctx, frame, f0, dur) {
 
   ctx.fillStyle = P.ink_primary;
   ctx.beginPath();
-  ctx.roundRect(-290, -70 + (1 - keyPress) * 26, 580, 165, 28);
+  ctx.roundRect(-340, -70 + (1 - keyPress) * 26, 680, 165, 28);
   ctx.fill();
 
   ctx.fillStyle = keyPress > 0.1 ? P.accent_secondary : P.bg_elevated;
   ctx.strokeStyle = P.ink_primary;
   ctx.lineWidth = 5;
   ctx.beginPath();
-  ctx.roundRect(-290, -85, 580, 160, 26);
+  ctx.roundRect(-340, -85, 680, 160, 26);
   ctx.fill();
   ctx.stroke();
 
   ctx.fillStyle = P.ink_primary;
-  ctx.font = "900 68px 'DejaVu Sans Mono', monospace";
+  ctx.font = "900 54px 'DejaVu Sans Mono', monospace";
   ctx.textAlign = "center";
-  ctx.fillText(keyPress > 0.1 ? "INTRO DELETED ✓" : "[ DELETE INTRO ]", 0, 16);
+  ctx.fillText(keyPress > 0.1 ? "INTRO DELETED ✓" : "[ DELETE INTRO ]", 0, 14);
   ctx.restore();
 
-  drawFourPointStar(ctx, 140, 1520, 42, frame * 0.06, P.accent_highlight_lime);
-  drawFourPointStar(ctx, 940, 1520, 42, -frame * 0.06, P.accent_secondary);
+  drawFourPointStar(ctx, 115, 1520, 38, frame * 0.06, P.accent_highlight_lime);
+  drawFourPointStar(ctx, 965, 1520, 38, -frame * 0.06, P.accent_secondary);
 
   ctx.restore();
 }
