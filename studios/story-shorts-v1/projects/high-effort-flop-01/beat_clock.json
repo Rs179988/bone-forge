@@ -1,0 +1,185 @@
+{
+  "project_id": "high-effort-flop-01",
+  "topic": "Tumhare 'High-Effort' Videos Flop Kyun Ho Rahe Hain?",
+  "host": "Iraa",
+  "persona": "The Brutally Honest Critic (Female No-BS Mentor)",
+  "fps": 60,
+  "width": 1080,
+  "height": 1920,
+  "total_frames": 3685,
+  "total_duration_sec": 61.417,
+  "audio_file": "/workspace/studios/story-shorts-v1/projects/high-effort-flop-01/master_audio.wav",
+  "beats": [
+    {
+      "beat_id": "beat_01_hook_pattern_interrupt",
+      "act_title": "THE HOOK // PATTERN INTERRUPT",
+      "spoken_line": "Tumne apni pichli video ke 3-second ke transition par 4 ghante lagaye... aur viewer ne use 0.5 second mein swipe kar diya. Bura laga? Good. Ab sach suno.",
+      "headline": "4 HRS WORK -> 0.5s SWIPE",
+      "sub_caption": "BRUTAL REALITY CHECK",
+      "start_frame": 0,
+      "end_frame": 590,
+      "duration_frames": 590,
+      "start_sec": 0.0,
+      "end_sec": 9.833,
+      "sfx_cues": [
+        {
+          "frame": 0,
+          "sfx": "sub_impact.wav",
+          "gain": 0.46
+        },
+        {
+          "frame": 16,
+          "sfx": "ui_tick.wav",
+          "gain": 0.4
+        },
+        {
+          "frame": 247,
+          "sfx": "ui_tick.wav",
+          "gain": 0.4
+        },
+        {
+          "frame": 424,
+          "sfx": "ui_tick.wav",
+          "gain": 0.4
+        },
+        {
+          "frame": 581,
+          "sfx": "whoosh_fast.wav",
+          "gain": 0.44
+        },
+        {
+          "frame": 90,
+          "sfx": "sub_impact.wav",
+          "gain": 0.48
+        }
+      ]
+    },
+    {
+      "beat_id": "beat_02_reality_check_agitation",
+      "act_title": "THE REALITY CHECK // EDITOR FLEX",
+      "spoken_line": "90 percent naye creators ko lagta hai ki unhe ek viral editing pack ya naye AI plugin ki zaroorat hai. Nahi. Tumhara color grade cinematic hai, sound design crispy hai\u2014par tumhari video boring hai. Kyunki tum apne liye edit kar rahe ho, dusre editors ko flex dikhane ke liye. Audience ko tumhare keyframes se ghanta farak nahi padta.",
+      "headline": "90% CHASE PLUGINS",
+      "sub_caption": "AUDIENCE DOESN'T CARE ABOUT KEYFRAMES",
+      "start_frame": 590,
+      "end_frame": 1535,
+      "duration_frames": 945,
+      "start_sec": 9.833,
+      "end_sec": 25.583,
+      "sfx_cues": [
+        {
+          "frame": 590,
+          "sfx": "sub_impact.wav",
+          "gain": 0.46
+        },
+        {
+          "frame": 606,
+          "sfx": "ui_tick.wav",
+          "gain": 0.4
+        },
+        {
+          "frame": 986,
+          "sfx": "ui_tick.wav",
+          "gain": 0.4
+        },
+        {
+          "frame": 1270,
+          "sfx": "ui_tick.wav",
+          "gain": 0.4
+        },
+        {
+          "frame": 1526,
+          "sfx": "whoosh_fast.wav",
+          "gain": 0.44
+        }
+      ]
+    },
+    {
+      "beat_id": "beat_03_the_fix_three_questions",
+      "act_title": "THE FIX // 3 BRUTAL QUESTIONS",
+      "spoken_line": "Agli video render karne se pehle apne timeline ko mute karo, saare effects band karo, aur khud se yeh teen sawaal poocho. Pehla, 3-Second Hook: Kya mera pehla sentence kisi ke dimaag mein khujli paida kar raha hai? Agar tum Hey guys welcome back bol rahe ho, toh wahin khel khatam hai. Doosra, 15-Second Rule: Kya har 15 second mein story ki direction badal rahi hai? Teesra, The Cut Test: Agar main is clip ko hata doon, toh kya story tootegi? Agar nahi, toh delete maaro.",
+      "headline": "FASTER. SHARPER. EFFECTIVE.",
+      "sub_caption": "3-SEC HOOK // 15-SEC SHIFT // CUT TEST",
+      "start_frame": 1535,
+      "end_frame": 2858,
+      "duration_frames": 1323,
+      "start_sec": 25.583,
+      "end_sec": 47.633,
+      "sfx_cues": [
+        {
+          "frame": 1535,
+          "sfx": "sub_impact.wav",
+          "gain": 0.46
+        },
+        {
+          "frame": 1551,
+          "sfx": "ui_tick.wav",
+          "gain": 0.4
+        },
+        {
+          "frame": 2090,
+          "sfx": "ui_tick.wav",
+          "gain": 0.4
+        },
+        {
+          "frame": 2487,
+          "sfx": "ui_tick.wav",
+          "gain": 0.4
+        },
+        {
+          "frame": 2849,
+          "sfx": "whoosh_fast.wav",
+          "gain": 0.44
+        }
+      ]
+    },
+    {
+      "beat_id": "beat_04_mic_drop_outro",
+      "act_title": "MIC-DROP // DELETE THE FLUFF",
+      "spoken_line": "Editing ka kaam story ko chhupana nahi, story ko raste se bhatakne se rokna hai. Agli video mein 50 percent kam effects lagao, aur 200 percent zyada dimaag apne hook aur script par lagao. Ab yeh Reel save karke mat chhod dena\u2014apna timeline kholo aur sabse pehle woh fancy intro udao.",
+      "headline": "-50% FX // +200% SCRIPT",
+      "sub_caption": "DELETE THAT FANCY INTRO NOW",
+      "start_frame": 2858,
+      "end_frame": 3685,
+      "duration_frames": 827,
+      "start_sec": 47.633,
+      "end_sec": 61.417,
+      "sfx_cues": [
+        {
+          "frame": 2858,
+          "sfx": "sub_impact.wav",
+          "gain": 0.46
+        },
+        {
+          "frame": 2874,
+          "sfx": "ui_tick.wav",
+          "gain": 0.4
+        },
+        {
+          "frame": 3205,
+          "sfx": "ui_tick.wav",
+          "gain": 0.4
+        },
+        {
+          "frame": 3453,
+          "sfx": "ui_tick.wav",
+          "gain": 0.4
+        },
+        {
+          "frame": 3676,
+          "sfx": "whoosh_fast.wav",
+          "gain": 0.44
+        },
+        {
+          "frame": 3503,
+          "sfx": "sub_impact.wav",
+          "gain": 0.58
+        },
+        {
+          "frame": 3507,
+          "sfx": "lock_chime.wav",
+          "gain": 0.45
+        }
+      ]
+    }
+  ]
+}

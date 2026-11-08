@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Iraa — Why Your High-Effort Videos Flop (Light Editorial Graph-Paper Cut)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 1080px;
+    height: 1920px;
+    overflow: hidden;
+    background: #EAEAE6;
+  }
+  canvas {
+    display: block;
+    width: 1080px;
+    height: 1920px;
+  }
+</style>
+</head>
+<body>
+<canvas id="stage" width="1080" height="1920"></canvas>
+<script src="../../rig/studio_rig.js"></script>
+<script>
+const canvas = document.getElementById("stage");
+const ctx = canvas.getContext("2d");
+const { spring, easeOutExpo, easeInOutCubic, clamp } = window.StudioRig;
+
+window.BEAT_CLOCK = null;
+window.STUDIO_LOCK = null;
+
+// Default palette & typography bound to the user's studio_lock.json
+window.PAL = {
+  bg_obsidian: "#EAEAE6",
+  bg_elevated: "#FFFFFF",
+  surface_glass: "rgba(255, 255, 255, 0.88)",
+  border_subtle: "rgba(17, 17, 17, 0.08)",
+  border_dashed_vector: "#141414",
+  ink_primary: "#141414",
+  ink_muted: "#8E8E93",
+  accent_primary: "#1D18A8",
+  accent_secondary: "#FF9500",
+  accent_tertiary: "#8014D8",
+  accent_highlight_lime: "#BCE368",
+  chart_gradients: ["#38A3A5", "#5E60CE", "#E05297", "#FF7B00"]
+};
+
+window.GRID_SIZE = 64;
+
+window.initClock = function(clockData, studioLockData) {
+  window.BEAT_CLOCK = clockData;
+  if (studioLockData) {
+    window.STUDIO_LOCK = studioLockData;
+    const ds = studioLockData["3_design_system"] || {};
+    if (ds.palette) {
+      window.PAL = Object.assign({}, window.PAL, ds.palette);
+      document.body.style.background = window.PAL.bg_obsidian;
+    }
+    if (ds.canvas_and_motion_effects && ds.canvas_and_motion_effects.grid_cell_size_px) {
+      window.GRID_SIZE = ds.canvas_and_motion_effects.grid_cell_size_px;
+    }
+  }
+  window.seekToFrame(0);
+  return true;
+};
+
+function hexRgba(hex, alpha) {
+  const h = (hex || "#141414").replace("#", "");
+  const r = parseInt(h.substring(0, 2), 16) || 20;
+  const g = parseInt(h.substring(2, 4), 16) || 20;
+  const b = parseInt(h.substring(4, 6), 16) || 20;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+// ============================================================================
+// SHARED COMPONENT 1: LIGHT EDITORIAL GRAPH-PAPER GRID + SUBTLE CURVED RIBBONS
+// ============================================================================
+function drawLightGraphPaperCanvas(ctx, frame) {
+  const P = window.PAL;
+  const gs = window.GRID_SIZE || 64;
+
+  // Base warm off-white / light grey (#EAEAE6)
+  ctx.fillStyle = P.bg_obsidian;
+  ctx.fillRect(0, 0, 1080, 1920);
+
+  // Subtle animated drift on graph-paper grid so zero frames are ever static
+  const shiftX = (frame * 0.45) % gs;
+  const shiftY = (frame * 0.35) % gs;
+
+  ctx.save();
+  ctx.strokeStyle = P.border_subtle || "rgba(17, 17, 17, 0.08)";
+  ctx.lineWidth = 1.5;
+  for (let x = -gs + shiftX; x < 1080 + gs; x += gs) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, 1920);
+    ctx.stroke();
+  }
+  for (let y = -gs + shiftY; y < 1920 + gs; y += gs) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(1080, y);
+    ctx.stroke();
+  }
+
+  // Major grid crosshairs every 4 cells
+  ctx.strokeStyle = "rgba(20, 20, 20, 0.15)";
+  ctx.lineWidth = 2;
+  for (let x = -gs * 4 + (shiftX * 2) % (gs * 4); x < 1080; x += gs * 4) {
+    for (let y = -gs * 4 + (shiftY * 2) % (gs * 4); y < 1920; y += gs * 4) {
+      ctx.beginPath();
+      ctx.moveTo(x - 8, y); ctx.lineTo(x + 8, y);
+      ctx.moveTo(x, y - 8); ctx.lineTo(x, y + 8);
+      ctx.stroke();
+    }
+  }
+
+  // Subtle curved background ribbons sweeping across the graph paper
+  ctx.strokeStyle = hexRgba(P.accent_primary, 0.08);
+  ctx.lineWidth = 42;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(-100, 380 + Math.sin(frame * 0.03) * 40);
+  ctx.bezierCurveTo(360, 180, 720, 620, 1180, 340 + Math.cos(frame * 0.03) * 40);
+  ctx.stroke();
+
+  ctx.strokeStyle = hexRgba(P.accent_secondary, 0.09);
+  ctx.lineWidth = 34;
+  ctx.beginPath();
+  ctx.moveTo(-100, 1520 + Math.cos(frame * 0.025) * 45);
+  ctx.bezierCurveTo(380, 1720, 700, 1280, 1180, 1560 + Math.sin(frame * 0.025) * 45);
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ============================================================================
+// SHARED COMPONENT 2: DASHED VECTOR SELECTION BOX WITH 4 CORNER ANCHOR DOTS
+// ============================================================================
+function drawDashedSelectionBox(ctx, x, y, w, h, label, fillHex, textHex, sVal, subLabel = "") {
+  const P = window.PAL;
+  if (sVal <= 0.01) return;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(sVal, sVal);
+
+  // Soft tactile drop shadow
+  ctx.shadowColor = "rgba(20, 20, 20, 0.14)";
+  ctx.shadowBlur = 24;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 12;
+
+  ctx.fillStyle = fillHex || P.bg_elevated;
+  ctx.beginPath();
+  ctx.roundRect(-w / 2, -h / 2, w, h, 10);
+  ctx.fill();
+  ctx.shadowColor = "transparent";
+
+  // Dashed vector border (#141414)
+  ctx.strokeStyle = P.border_dashed_vector || "#141414";
+  ctx.lineWidth = 3.5;
+  ctx.setLineDash([12, 8]);
+  ctx.strokeRect(-w / 2, -h / 2, w, h);
+  ctx.setLineDash([]);
+
+  // 4 Corner Anchor Dots (Vector Handle Nodes)
+  const corners = [
+    [-w / 2, -h / 2],
+    [w / 2, -h / 2],
+    [-w / 2, h / 2],
+    [w / 2, h / 2]
+  ];
+  for (const [cx, cy] of corners) {
+    ctx.fillStyle = P.bg_elevated;
+    ctx.strokeStyle = P.border_dashed_vector;
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = P.accent_primary;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Main label
+  ctx.fillStyle = textHex || P.ink_primary;
+  ctx.font = "900 40px 'Liberation Sans', sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText(label, 0, subLabel ? -4 : 14);
+
+  if (subLabel) {
+    ctx.fillStyle = P.ink_muted;
+    ctx.font = "italic 26px 'Liberation Serif', serif";
+    ctx.fillText(subLabel, 0, 32);
+  }
+
+  ctx.restore();
+}
+
+// ============================================================================
+// SHARED COMPONENT 3: DIRECTIONAL HORIZONTAL MOTION-BLUR WIPE TYPOGRAPHY
+// Mixes Italic Editorial Serif lead with Heavy Sans-Serif Punch Words
+// ============================================================================
+function drawEditorialHeader(ctx, serifLead, boldPunch1, boldPunch2, accentHex, yPos, frame, startF) {
+  const P = window.PAL;
+  const wipe1 = spring(frame, startF, { stiffness: 230, damping: 17 });
+  const wipe2 = spring(frame, startF + 7, { stiffness: 230, damping: 17 });
+
+  ctx.save();
+  ctx.translate(540, yPos);
+  ctx.textAlign = "center";
+
+  // Italic Editorial Serif Lead
+  ctx.save();
+  ctx.globalAlpha = clamp(wipe1, 0, 1);
+  ctx.translate((1 - wipe1) * -90, 0);
+  ctx.font = "italic 52px 'Liberation Serif', 'Times New Roman', serif";
+  ctx.fillStyle = P.ink_primary;
+  ctx.fillText(serifLead, 0, -92);
+  ctx.restore();
+
+  // Directional Motion-Blur Ghost Trail for Bold Sans Punch 1 (only while actively wiping in)
+  const dx1 = Math.abs(1 - wipe1) < 0.03 ? 0 : (1 - wipe1) * 180;
+  if (Math.abs(dx1) > 8) {
+    for (let g = 1; g <= 3; g++) {
+      ctx.save();
+      ctx.globalAlpha = 0.10 * (4 - g);
+      ctx.font = "900 88px 'Liberation Sans', sans-serif";
+      ctx.fillStyle = P.accent_primary;
+      ctx.fillText(boldPunch1, dx1 + g * 18, 0);
+      ctx.restore();
+    }
+  }
+  ctx.save();
+  ctx.globalAlpha = clamp(wipe1, 0, 1);
+  ctx.font = "900 88px 'Liberation Sans', sans-serif";
+  ctx.fillStyle = P.ink_primary;
+  ctx.fillText(boldPunch1, dx1, 0);
+  ctx.restore();
+
+  // Highlighted Lime / Accent Pill behind Punch 2
+  const dx2 = Math.abs(1 - wipe2) < 0.03 ? 0 : (1 - wipe2) * -180;
+  ctx.save();
+  ctx.translate(dx2, 92);
+  ctx.scale(0.9 + 0.1 * wipe2, 0.9 + 0.1 * wipe2);
+
+  // Tactile Lime or Accent highlight bar behind text
+  const tw = Math.max(380, boldPunch2.length * 54);
+  ctx.fillStyle = accentHex === P.accent_highlight_lime ? P.accent_highlight_lime : hexRgba(accentHex, 0.16);
+  ctx.strokeStyle = P.border_dashed_vector;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.roundRect(-tw / 2, -68, tw, 92, 14);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.font = "900 82px 'Liberation Sans', sans-serif";
+  ctx.fillStyle = accentHex === P.accent_highlight_lime ? P.ink_primary : accentHex;
+  ctx.fillText(boldPunch2, 0, 6);
+  ctx.restore();
+
+  ctx.restore();
+}
+
+// ============================================================================
+// SHARED COMPONENT 4: FAST ROLLING ODOMETER COUNTER WITH AMBER (#FF9500) GLOW
+// ============================================================================
+function drawAmberOdometer(ctx, x, y, valStr, labelStr, sVal) {
+  const P = window.PAL;
+  if (sVal <= 0.01) return;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(sVal, sVal);
+
+  // Glowing Orange/Amber (#FF9500) outer glow card
+  ctx.shadowColor = P.accent_secondary || "#FF9500";
+  ctx.shadowBlur = 36;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+  ctx.fillStyle = P.bg_elevated;
+  ctx.strokeStyle = P.accent_secondary;
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.roundRect(-220, -78, 440, 156, 20);
+  ctx.fill();
+  ctx.stroke();
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+
+  // Rolling odometer slot lines
+  ctx.strokeStyle = "rgba(20,20,20,0.08)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-200, -24); ctx.lineTo(200, -24);
+  ctx.moveTo(-200, 24); ctx.lineTo(200, 24);
+  ctx.stroke();
+
+  ctx.fillStyle = P.accent_secondary;
+  ctx.font = "900 68px 'DejaVu Sans Mono', monospace";
+  ctx.textAlign = "center";
+  ctx.fillText(valStr, 0, 8);
+
+  ctx.fillStyle = P.ink_primary;
+  ctx.font = "bold 23px 'DejaVu Sans Mono', monospace";
+  ctx.fillText(labelStr, 0, 54);
+
+  ctx.restore();
+}
+
+// ============================================================================
+// SHARED COMPONENT 5: 2D TACTILE 4-POINT STAR & IRAA MENTOR TOP BAR
+// ============================================================================
+function drawFourPointStar(ctx, x, y, radius, rot, fillHex) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.fillStyle = fillHex;
+  ctx.strokeStyle = "#141414";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let i = 0; i < 8; i++) {
+    const a = (i * Math.PI) / 4;
+    const r = i % 2 === 0 ? radius : radius * 0.32;
+    if (i === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+    else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawIraaMentorBar(ctx, actLabel, frame) {
+  const P = window.PAL;
+  ctx.save();
+  ctx.translate(540, 88);
+
+  ctx.fillStyle = P.bg_elevated;
+  ctx.strokeStyle = P.border_dashed_vector;
+  ctx.lineWidth = 3;
+  ctx.shadowColor = "rgba(20,20,20,0.1)";
+  ctx.shadowBlur = 16;
+  ctx.shadowOffsetY = 6;
+  ctx.beginPath();
+  ctx.roundRect(-460, -38, 920, 76, 38);
+  ctx.fill();
+  ctx.stroke();
+  ctx.shadowColor = "transparent";
+
+  // Female Mentor Avatar Pill (Left)
+  ctx.fillStyle = P.accent_primary;
+  ctx.beginPath();
+  ctx.roundRect(-444, -26, 220, 52, 26);
+  ctx.fill();
+
+  // Pulsing live dot
+  ctx.fillStyle = P.accent_highlight_lime;
+  ctx.beginPath();
+  ctx.arc(-412, 0, 9 + Math.sin(frame * 0.2) * 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = "900 24px 'Liberation Sans', sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillText("IRAA // CRITIC", -390, 8);
+
+  // Act / Section Label (Right)
+  ctx.fillStyle = P.ink_primary;
+  ctx.font = "bold 23px 'DejaVu Sans Mono', monospace";
+  ctx.textAlign = "right";
+  ctx.fillText(actLabel, 430, 8);
+
+  ctx.restore();
+}
+
+// ============================================================================
+// BEAT 1 (f: 0..590): THE HOOK — 90-FRAME COLOR-BLOCK CARD -> LIGHT GRID SNAP
+// ============================================================================
+function renderBeat01_Hook(ctx, frame, f0, dur) {
+  const P = window.PAL;
+  const localF = frame - f0;
+
+  if (localF < 90) {
+    ctx.save();
+    ctx.fillStyle = P.accent_primary;
+    ctx.fillRect(0, 0, 1080, 1920);
+
+    ctx.strokeStyle = "rgba(255,255,255,0.12)";
+    ctx.lineWidth = 2;
+    for (let i = -1080; i < 1920; i += 80) {
+      ctx.beginPath();
+      ctx.moveTo(0, i + (localF * 1.5) % 80);
+      ctx.lineTo(1080, i + 540 + (localF * 1.5) % 80);
+      ctx.stroke();
+    }
+
+    const cardS = spring(localF, 2, { stiffness: 250, damping: 16 });
+    ctx.translate(540, 920);
+    ctx.scale(cardS, cardS);
+
+    ctx.fillStyle = P.accent_highlight_lime;
+    ctx.strokeStyle = "#141414";
+    ctx.lineWidth = 6;
+    ctx.shadowColor = "rgba(0,0,0,0.45)";
+    ctx.shadowBlur = 40;
+    ctx.shadowOffsetY = 18;
+    ctx.beginPath();
+    ctx.roundRect(-440, -340, 880, 680, 28);
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+
+    ctx.fillStyle = "#141414";
+    ctx.font = "italic 48px 'Liberation Serif', serif";
+    ctx.textAlign = "center";
+    ctx.fillText("Iraa's Brutal Reality Check:", 0, -235);
+
+    ctx.font = "900 108px 'Liberation Sans', sans-serif";
+    ctx.fillText("4 HOURS", 0, -110);
+    ctx.font = "900 64px 'Liberation Sans', sans-serif";
+    ctx.fillStyle = P.accent_primary;
+    ctx.fillText("ON A 3-SEC TRANSITION", 0, -22);
+
+    const hrsRoll = Math.min(4.0, (localF / 40) * 4.0).toFixed(1);
+    drawAmberOdometer(ctx, 0, 150, `${hrsRoll} HRS`, "EDITOR TIME INVESTED", 1.0);
+
+    drawFourPointStar(ctx, -370, -260, 38, localF * 0.06, P.accent_secondary);
+    drawFourPointStar(ctx, 370, 260, 42, -localF * 0.06, "#FFFFFF");
+    ctx.restore();
+    return;
+  }
+
+  drawLightGraphPaperCanvas(ctx, frame);
+  drawIraaMentorBar(ctx, "01 // PATTERN INTERRUPT", frame);
+
+  drawEditorialHeader(
+    ctx,
+    "four hours of keyframes...",
+    "SWIPED IN",
+    "0.5 SECONDS",
+    P.accent_highlight_lime,
+    310,
+    frame,
+    92
+  );
+
+  const swipeT = easeInOutCubic(clamp((localF - 210) / 55, 0, 1));
+  const truthS = spring(localF, 340, { stiffness: 220, damping: 15 });
+
+  ctx.save();
+  ctx.translate(540, 960);
+
+  ctx.save();
+  ctx.rotate(frame * 0.008);
+  ctx.strokeStyle = P.border_dashed_vector;
+  ctx.lineWidth = 4;
+  ctx.setLineDash([18, 12]);
+  ctx.beginPath();
+  ctx.arc(0, 0, 310, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  ctx.save();
+  ctx.shadowColor = "rgba(20, 20, 20, 0.22)";
+  ctx.shadowBlur = 35;
+  ctx.shadowOffsetY = 18;
+  const rings = [
+    [250, P.bg_elevated],
+    [190, P.accent_primary],
+    [130, P.bg_elevated],
+    [72, P.accent_secondary]
+  ];
+  for (const [rad, col] of rings) {
+    ctx.fillStyle = col;
+    ctx.strokeStyle = P.ink_primary;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(0, 0, rad, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(swipeT * 380, -swipeT * 680);
+  ctx.rotate(swipeT * 0.35);
+  ctx.globalAlpha = clamp(1 - swipeT * 1.1, 0, 1);
+
+  ctx.fillStyle = P.bg_elevated;
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 4;
+  ctx.shadowColor = "rgba(20,20,20,0.18)";
+  ctx.shadowBlur = 28;
+  ctx.shadowOffsetY = 14;
+  ctx.beginPath();
+  ctx.roundRect(-380, -130, 760, 260, 20);
+  ctx.fill();
+  ctx.stroke();
+  ctx.shadowColor = "transparent";
+
+  ctx.fillStyle = P.ink_primary;
+  ctx.font = "900 32px 'DejaVu Sans Mono', monospace";
+  ctx.textAlign = "left";
+  ctx.fillText("TIMELINE // 3.0s FANCY TRANSITION", -340, -72);
+
+  const gradCols = P.chart_gradients;
+  for (let t = 0; t < 4; t++) {
+    ctx.fillStyle = gradCols[t % gradCols.length];
+    ctx.beginPath();
+    ctx.roundRect(-340 + t * 172, -35 + (t % 2) * 55, 155, 42, 8);
+    ctx.fill();
+  }
+  ctx.fillStyle = P.accent_tertiary;
+  ctx.font = "bold 26px 'DejaVu Sans Mono', monospace";
+  ctx.fillText("480 BEZIER KEYFRAMES + 12 GLOW LAYERS", -340, 95);
+  ctx.restore();
+
+  ctx.restore();
+
+  const odoS = spring(localF, 105, { stiffness: 210, damping: 16 });
+  drawAmberOdometer(ctx, 290, 1470, "4.0 HRS", "YOUR EDITING TIME", odoS);
+  drawAmberOdometer(ctx, 790, 1470, "0.5 SEC", "VIEWER SWIPE SPEED", spring(localF, 170, { stiffness: 210, damping: 16 }));
+
+  if (truthS > 0.01) {
+    drawDashedSelectionBox(
+      ctx,
+      540,
+      1715,
+      820,
+      125,
+      "BURA LAGA? GOOD. AB SACH SUNO.",
+      P.accent_highlight_lime,
+      P.ink_primary,
+      truthS,
+      "The Brutally Honest Truth About Retention"
+    );
+  }
+
+  drawFourPointStar(ctx, 135, 620, 34, frame * 0.04, P.accent_secondary);
+  drawFourPointStar(ctx, 945, 1220, 38, -frame * 0.05, P.accent_tertiary);
+}
+
+// ============================================================================
+// BEAT 2 (f: 590..1535): THE REALITY CHECK — 90% CREATORS & EDITOR FLEX TRAP
+// ============================================================================
+function renderBeat02_RealityCheck(ctx, frame, f0, dur) {
+  const P = window.PAL;
+  const localF = frame - f0;
+
+  drawLightGraphPaperCanvas(ctx, frame);
+  drawIraaMentorBar(ctx, "02 // THE EDITOR FLEX TRAP", frame);
+
+  drawEditorialHeader(
+    ctx,
+    "you edit to impress other editors...",
+    "CINEMATIC GRADE",
+    "BORING STORY",
+    P.accent_secondary,
+    310,
+    frame,
+    f0 + 4
+  );
+
+  const pctVal = Math.min(90, Math.round((localF / 45) * 90));
+  const kfVal = Math.min(35000, Math.round((localF / 70) * 35000)).toLocaleString();
+  drawAmberOdometer(ctx, 295, 610, `${pctVal}%`, "CHASE VIRAL PLUGINS", spring(frame, f0 + 10, { stiffness: 210, damping: 16 }));
+  drawAmberOdometer(ctx, 785, 610, kfVal, "KEYFRAMES IGNORED", spring(frame, f0 + 28, { stiffness: 210, damping: 16 }));
+
+  const b1S = spring(frame, f0 + 160, { stiffness: 210, damping: 15 });
+  const b2S = spring(frame, f0 + 220, { stiffness: 210, damping: 15 });
+  const b3S = spring(frame, f0 + 290, { stiffness: 210, damping: 15 });
+
+  drawDashedSelectionBox(ctx, 295, 845, 430, 118, "CINEMATIC LUTs ✓", P.bg_elevated, P.accent_primary, b1S, "10/10 Visual Polish");
+  drawDashedSelectionBox(ctx, 785, 845, 430, 118, "CRISPY SFX ✓", P.bg_elevated, P.accent_tertiary, b2S, "10/10 Audio Design");
+  drawDashedSelectionBox(ctx, 540, 1005, 920, 124, "PAR VIDEO BORING HAI ✗", P.accent_highlight_lime, P.ink_primary, b3S, "Because You Are Flexing For Other Editors");
+
+  // BOTTOM STAGE: Tactile 2D Bar Chart with clean vertical separation (zero text collision!)
+  const chartS = spring(frame, f0 + 390, { stiffness: 190, damping: 16 });
+  ctx.save();
+  ctx.translate(540, 1465);
+  ctx.scale(chartS, chartS);
+
+  ctx.fillStyle = P.bg_elevated;
+  ctx.strokeStyle = P.border_dashed_vector;
+  ctx.lineWidth = 4;
+  ctx.shadowColor = "rgba(20,20,20,0.14)";
+  ctx.shadowBlur = 28;
+  ctx.shadowOffsetY = 12;
+  ctx.beginPath();
+  ctx.roundRect(-460, -265, 920, 530, 24);
+  ctx.fill();
+  ctx.stroke();
+  ctx.shadowColor = "transparent";
+
+  ctx.fillStyle = P.ink_primary;
+  ctx.font = "900 32px 'DejaVu Sans Mono', monospace";
+  ctx.textAlign = "center";
+  ctx.fillText("REALITY TELEMETRY // WHO ACTUALLY CARES?", 0, -208);
+
+  // Clean subtitle in its own reserved row at y = -158 (well above all bar percentage labels!)
+  ctx.fillStyle = P.accent_primary;
+  ctx.font = "italic bold 30px 'Liberation Serif', serif";
+  ctx.fillText("Audience doesn't care about keyframes!", 0, -158);
+
+  const bars = [
+    { label: "SPEED RAMPS", val: 0.92, col: P.chart_gradients[0], x: -310 },
+    { label: "3D PLUGINS", val: 0.86, col: P.chart_gradients[1], x: -105 },
+    { label: "EDITOR EGO", val: 0.98, col: P.chart_gradients[2], x: 105 },
+    { label: "VIEWER CARE", val: 0.06, col: P.chart_gradients[3], x: 310 }
+  ];
+
+  const baseLineY = 165;
+  const maxH = 220;
+  for (let i = 0; i < bars.length; i++) {
+    const b = bars[i];
+    const barGrow = spring(frame, f0 + 420 + i * 25, { stiffness: 180, damping: 14 });
+    const bh = Math.max(18, b.val * maxH * barGrow);
+
+    ctx.fillStyle = b.col;
+    ctx.strokeStyle = P.ink_primary;
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.roundRect(b.x - 68, baseLineY - bh, 136, bh, 12);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = P.ink_primary;
+    ctx.font = "900 34px 'DejaVu Sans Mono', monospace";
+    ctx.textAlign = "center";
+    ctx.fillText(`${Math.round(b.val * 100)}%`, b.x, baseLineY - bh - 18);
+
+    ctx.font = "bold 22px 'Liberation Sans', sans-serif";
+    ctx.fillText(b.label, b.x, baseLineY + 42);
+  }
+
+  // Curved arrow pointing specifically to the tiny 6% VIEWER CARE bar on the far right
+  ctx.strokeStyle = P.accent_primary;
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(225, -135);
+  ctx.quadraticCurveTo(310, -110, 310, 80);
+  ctx.stroke();
+  // Arrowhead
+  ctx.beginPath();
+  ctx.moveTo(298, 65);
+  ctx.lineTo(310, 84);
+  ctx.lineTo(322, 65);
+  ctx.stroke();
+
+  ctx.restore();
+
+  drawFourPointStar(ctx, 110, 1140, 34, frame * 0.05, P.accent_secondary);
+  drawFourPointStar(ctx, 970, 1140, 34, -frame * 0.05, P.accent_primary);
+}
+
+// ============================================================================
+// BEAT 3 (f: 1535..2858): THE FIX — 3 BRUTAL QUESTIONS + [FASTER, SHARPER, EFFECTIVE]
+// ============================================================================
+function renderBeat03_TheFix(ctx, frame, f0, dur) {
+  const P = window.PAL;
+  const localF = frame - f0;
+
+  drawLightGraphPaperCanvas(ctx, frame);
+  drawIraaMentorBar(ctx, "03 // THE 3-QUESTION AUDIT", frame);
+
+  drawEditorialHeader(
+    ctx,
+    "mute your timeline & ask...",
+    "3 BRUTAL",
+    "QUESTIONS",
+    P.accent_primary,
+    295,
+    frame,
+    f0 + 4
+  );
+
+  const w1 = spring(frame, f0 + 25, { stiffness: 220, damping: 16 });
+  const w2 = spring(frame, f0 + 55, { stiffness: 220, damping: 16 });
+  const w3 = spring(frame, f0 + 85, { stiffness: 220, damping: 16 });
+
+  drawDashedSelectionBox(ctx, 205, 520, 285, 96, "Faster", P.accent_highlight_lime, P.ink_primary, w1);
+  drawDashedSelectionBox(ctx, 540, 520, 285, 96, "Sharper", P.bg_elevated, P.accent_primary, w2);
+  drawDashedSelectionBox(ctx, 875, 520, 285, 96, "Effective", P.bg_elevated, P.accent_tertiary, w3);
+
+  const phase = localF < 520 ? 1 : (localF < 920 ? 2 : 3);
+
+  ctx.save();
+  ctx.translate(540, 965);
+
+  ctx.save();
+  ctx.rotate(frame * 0.01);
+  ctx.strokeStyle = P.border_dashed_vector;
+  ctx.lineWidth = 4.5;
+  ctx.setLineDash([20, 12]);
+  ctx.beginPath();
+  ctx.arc(0, 0, 295, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  ctx.shadowColor = "rgba(20,20,20,0.18)";
+  ctx.shadowBlur = 36;
+  ctx.shadowOffsetY = 16;
+  ctx.fillStyle = P.bg_elevated;
+  ctx.beginPath();
+  ctx.arc(0, 0, 265, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowColor = "transparent";
+
+  if (phase === 1) {
+    const pS = spring(localF, 40, { stiffness: 200, damping: 15 });
+    ctx.scale(pS, pS);
+
+    ctx.fillStyle = P.accent_tertiary;
+    ctx.strokeStyle = P.ink_primary;
+    ctx.lineWidth = 4.5;
+    ctx.beginPath();
+    ctx.arc(-65, -25, 110, 0, Math.PI * 2);
+    ctx.arc(65, -25, 110, 0, Math.PI * 2);
+    ctx.arc(-50, 55, 85, 0, Math.PI * 2);
+    ctx.arc(50, 55, 85, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    const gapOffset = (1 - spring(localF, 140, { stiffness: 180, damping: 13 })) * 130;
+    ctx.save();
+    ctx.translate(0, -15 - gapOffset);
+    ctx.fillStyle = P.accent_secondary;
+    ctx.strokeStyle = P.ink_primary;
+    ctx.lineWidth = 4.5;
+    ctx.shadowColor = P.accent_secondary;
+    ctx.shadowBlur = 28;
+    ctx.beginPath();
+    ctx.roundRect(-58, -58, 116, 116, 18);
+    ctx.arc(0, -68, 24, 0, Math.PI * 2);
+    ctx.arc(68, 0, 24, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = P.ink_primary;
+    ctx.font = "900 58px 'Liberation Sans', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("?", 0, 20);
+    ctx.restore();
+
+    ctx.fillStyle = P.ink_primary;
+    ctx.font = "900 32px 'DejaVu Sans Mono', monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("Q1: 3-SEC CURIOSITY GAP", 0, 195);
+  } else if (phase === 2) {
+    const pS = spring(localF, 525, { stiffness: 210, damping: 15 });
+    ctx.scale(pS, pS);
+
+    ctx.strokeStyle = P.accent_primary;
+    ctx.lineWidth = 28;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.beginPath();
+    ctx.moveTo(-165, 95);
+    ctx.lineTo(-55, -75);
+    ctx.lineTo(55, 65);
+    ctx.lineTo(165, -95);
+    ctx.stroke();
+
+    const nodes = [[-165, 95], [-55, -75], [55, 65], [165, -95]];
+    for (const [nx, ny] of nodes) {
+      ctx.fillStyle = P.accent_secondary;
+      ctx.strokeStyle = P.ink_primary;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(nx, ny, 22, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = P.ink_primary;
+    ctx.font = "900 32px 'DejaVu Sans Mono', monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("Q2: 15-SEC DIRECTION TWIST", 0, 195);
+  } else {
+    const pS = spring(localF, 925, { stiffness: 210, damping: 15 });
+    const ejectT = easeInOutCubic(clamp((localF - 1010) / 50, 0, 1));
+    ctx.scale(pS, pS);
+
+    const pullIn = ejectT * 65;
+    ctx.fillStyle = P.accent_highlight_lime;
+    ctx.strokeStyle = P.ink_primary;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.roundRect(-210 + pullIn, -55, 130, 110, 14);
+    ctx.roundRect(80 - pullIn, -55, 130, 110, 14);
+    ctx.fill();
+    ctx.stroke();
+
+    if (ejectT < 0.95) {
+      ctx.save();
+      ctx.translate(0, -ejectT * 140);
+      ctx.scale(1 - ejectT * 0.5, 1 - ejectT * 0.5);
+      ctx.globalAlpha = clamp(1 - ejectT * 1.1, 0, 1);
+      ctx.fillStyle = P.accent_secondary;
+      ctx.strokeStyle = P.ink_primary;
+      ctx.lineWidth = 4;
+      ctx.setLineDash([8, 6]);
+      ctx.beginPath();
+      ctx.roundRect(-65, -55, 130, 110, 14);
+      ctx.fill();
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = P.ink_primary;
+      ctx.font = "900 24px 'DejaVu Sans Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.fillText("FLUFF", 0, 8);
+      ctx.restore();
+    }
+
+    ctx.fillStyle = P.ink_primary;
+    ctx.font = "900 32px 'DejaVu Sans Mono', monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("Q3: THE RUTHLESS CUT TEST", 0, 195);
+  }
+  ctx.restore();
+
+  const c1 = spring(localF, 60, { stiffness: 210, damping: 16 });
+  const c2 = spring(localF, 530, { stiffness: 210, damping: 16 });
+  const c3 = spring(localF, 930, { stiffness: 210, damping: 16 });
+
+  drawDashedSelectionBox(
+    ctx, 540, 1390, 920, 122,
+    "01 // 3-SECOND CURIOSITY GAP",
+    phase === 1 ? P.accent_highlight_lime : P.bg_elevated,
+    P.ink_primary, c1,
+    "Banned: 'Hey guys, welcome back' -> Instant Swipe!"
+  );
+
+  drawDashedSelectionBox(
+    ctx, 540, 1550, 920, 122,
+    "02 // THE 15-SECOND RULE",
+    phase === 2 ? P.accent_highlight_lime : P.bg_elevated,
+    P.ink_primary, c2,
+    "Every 15s: New Point, Twist, or Visual Pattern Shift"
+  );
+
+  drawDashedSelectionBox(
+    ctx, 540, 1710, 920, 122,
+    "03 // THE 2-HOUR CUT TEST",
+    phase === 3 ? P.accent_highlight_lime : P.bg_elevated,
+    P.ink_primary, c3,
+    "Does deleting the clip break the story? No -> DELETE IT."
+  );
+
+  drawFourPointStar(ctx, 120, 965, 36, frame * 0.04, P.accent_secondary);
+  drawFourPointStar(ctx, 960, 965, 36, -frame * 0.04, P.accent_primary);
+}
+
+// ============================================================================
+// BEAT 4 (f: 2858..3685): THE MIC-DROP OUTRO — -50% FX, +200% SCRIPT, DELETE INTRO!
+// ============================================================================
+function renderBeat04_MicDrop(ctx, frame, f0, dur) {
+  const P = window.PAL;
+  const localF = frame - f0;
+
+  if (frame >= 3675) {
+    ctx.fillStyle = "#141414";
+    ctx.fillRect(0, 0, 1080, 1920);
+    ctx.fillStyle = P.accent_highlight_lime;
+    ctx.font = "900 64px 'Liberation Sans', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("DELETE THAT FANCY INTRO.", 540, 960);
+    return;
+  }
+
+  const delTriggerF = 3503 - f0;
+  // Fast 14-frame vaporize so at f=3525 (delProgress=1.0) the intro block is 100% gone with zero overlap!
+  const delProgress = clamp((localF - delTriggerF) / 14, 0, 1);
+  const shake = (localF >= delTriggerF && localF <= delTriggerF + 18)
+    ? Math.sin(localF * 3.2) * 18 * (1 - (localF - delTriggerF) / 18)
+    : 0;
+
+  ctx.save();
+  ctx.translate(shake, -shake * 0.6);
+
+  drawLightGraphPaperCanvas(ctx, frame);
+  drawIraaMentorBar(ctx, "04 // THE MIC-DROP RULE", frame);
+
+  drawEditorialHeader(
+    ctx,
+    "stop hiding weak writing behind effects...",
+    "-50% EFFECTS",
+    "+200% SCRIPT",
+    P.accent_highlight_lime,
+    305,
+    frame,
+    f0 + 4
+  );
+
+  const fxNum = Math.min(50, Math.round((localF / 50) * 50));
+  const brNum = Math.min(200, Math.round((localF / 65) * 200));
+  drawAmberOdometer(ctx, 295, 610, `-${fxNum}%`, "FLUFF EFFECTS", spring(frame, f0 + 12, { stiffness: 210, damping: 16 }));
+  drawAmberOdometer(ctx, 785, 610, `+${brNum}%`, "HOOK & SCRIPT BRAIN", spring(frame, f0 + 28, { stiffness: 210, damping: 16 }));
+
+  // Interactive NLE Timeline where the bloated [ FANCY INTRO ] chunk is selected and DELETED cleanly
+  ctx.save();
+  ctx.translate(540, 1020);
+
+  ctx.fillStyle = P.bg_elevated;
+  ctx.strokeStyle = P.border_dashed_vector;
+  ctx.lineWidth = 4;
+  ctx.shadowColor = "rgba(20,20,20,0.16)";
+  ctx.shadowBlur = 32;
+  ctx.shadowOffsetY = 14;
+  ctx.beginPath();
+  ctx.roundRect(-460, -210, 920, 420, 24);
+  ctx.fill();
+  ctx.stroke();
+  ctx.shadowColor = "transparent";
+
+  ctx.fillStyle = P.ink_primary;
+  ctx.font = "900 30px 'DejaVu Sans Mono', monospace";
+  ctx.textAlign = "left";
+  ctx.fillText("TIMELINE // FINAL MASTER CUT", -415, -145);
+
+  if (delProgress >= 1.0) {
+    ctx.fillStyle = P.accent_secondary;
+    ctx.font = "900 26px 'DejaVu Sans Mono', monospace";
+    ctx.textAlign = "right";
+    ctx.fillText("FLUFF VAPORIZED ✓", 415, -145);
+  }
+
+  // Before delete completes: show the bloated [ FANCY 3D INTRO ] shrinking in place (never crossing header!)
+  if (delProgress < 0.95) {
+    ctx.save();
+    ctx.translate(-195, 20);
+    ctx.scale(1 - delProgress, 1 - delProgress);
+    ctx.globalAlpha = clamp(1 - delProgress * 1.2, 0, 1);
+
+    drawDashedSelectionBox(
+      ctx, 0, 0, 410, 150,
+      "FANCY 3D INTRO",
+      P.accent_secondary,
+      P.ink_primary,
+      1.0,
+      "0.5s Viewer Swipe Trap"
+    );
+    ctx.restore();
+  }
+
+  // Clean High-Retention Story Track snapping to 00:00 when intro is deleted!
+  const slideLeft = easeOutExpo(delProgress) * 205;
+  ctx.save();
+  ctx.translate(205 - slideLeft, 20);
+  drawDashedSelectionBox(
+    ctx, 0, 0, 420 + slideLeft * 1.6, 150,
+    "00:00 // BRUTAL HOOK + PURE STORY",
+    P.accent_highlight_lime,
+    P.ink_primary,
+    1.0,
+    "100% Pure Signal // Zero Fluff"
+  );
+  ctx.restore();
+
+  // Playhead needle locked at 00:00
+  ctx.strokeStyle = P.accent_primary;
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(-405, -105);
+  ctx.lineTo(-405, 160);
+  ctx.stroke();
+
+  ctx.restore();
+
+  // Giant Tactile 3D [ DELETE ] Mechanical Keycap slamming down at frame 3503!
+  const keyPress = (localF >= delTriggerF)
+    ? spring(localF, delTriggerF, { stiffness: 320, damping: 14 })
+    : 0;
+  const keyY = 1525 + keyPress * 28;
+
+  ctx.save();
+  ctx.translate(540, keyY);
+
+  ctx.fillStyle = P.ink_primary;
+  ctx.beginPath();
+  ctx.roundRect(-290, -70 + (1 - keyPress) * 26, 580, 165, 28);
+  ctx.fill();
+
+  ctx.fillStyle = keyPress > 0.1 ? P.accent_secondary : P.bg_elevated;
+  ctx.strokeStyle = P.ink_primary;
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.roundRect(-290, -85, 580, 160, 26);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = P.ink_primary;
+  ctx.font = "900 68px 'DejaVu Sans Mono', monospace";
+  ctx.textAlign = "center";
+  ctx.fillText(keyPress > 0.1 ? "INTRO DELETED ✓" : "[ DELETE INTRO ]", 0, 16);
+  ctx.restore();
+
+  drawFourPointStar(ctx, 140, 1520, 42, frame * 0.06, P.accent_highlight_lime);
+  drawFourPointStar(ctx, 940, 1520, 42, -frame * 0.06, P.accent_secondary);
+
+  ctx.restore();
+}
+
+window.seekToFrame = function(frame) {
+  if (!window.BEAT_CLOCK) return false;
+  const beats = window.BEAT_CLOCK.beats;
+  const b1 = beats[0]; // 0..590
+  const b2 = beats[1]; // 590..1535
+  const b3 = beats[2]; // 1535..2858
+  const b4 = beats[3]; // 2858..3685
+
+  if (frame < b1.end_frame) {
+    renderBeat01_Hook(ctx, frame, b1.start_frame, b1.duration_frames);
+  } else if (frame < b2.end_frame) {
+    renderBeat02_RealityCheck(ctx, frame, b2.start_frame, b2.duration_frames);
+  } else if (frame < b3.end_frame) {
+    renderBeat03_TheFix(ctx, frame, b3.start_frame, b3.duration_frames);
+  } else {
+    renderBeat04_MicDrop(ctx, frame, b4.start_frame, b4.duration_frames);
+  }
+  return true;
+};
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 {
-  "_howto_edit": "GitHub par seedha niche diye gaye hex codes, fonts, persona ya custom rules edit karo aur commit kar do. Pipeline har run par yehi file live read karegi.",
+  "_howto_edit": "GitHub par seedha values change karo aur commit kar do. Pipeline har run par yehi file live read karegi.",
   "studio_id": "story-shorts-v1",
 
   "1_tech_specs": {
@@ -10,58 +10,78 @@
   },
 
   "2_channel_persona_and_pacing": {
-    "channel_name": "KINETIC ARCHITECT",
-    "host_name": "Kael (Systems Dissector)",
-    "host_tone": "Direct, forensic, high-status, zero fluff",
-    "tts_voice_prompt": "Read in a gripping, brisk, cinematic documentary storyteller voice",
+    "channel_name": "Iraa",
+    "host_name": "Iraa",
+    "host_persona": "The Brutally Honest Critic (Female No-BS Mentor)",
+    "host_gender": "Female",
+    "host_tone": "Brutally honest, sharp, deadpan, contrarian, high-status, zero sugarcoating, zero fluff",
+    "tts_voice_prompt": "Read in a sharp, confident, brisk female voice. Tone is deadpan, brutally honest, and authoritative—like a no-nonsense mentor calling out mistakes without sugarcoating.",
     "voice_speed_atempo": 1.26,
     "hook_deadline_frames": 90,
-    "hook_rule": "First 90 frames (1.5s) must expose a brutal numeric anomaly or visual contradiction.",
+    "hook_rule": "First 90 frames (1.5s) must open with a bold color-block card or brutal reality check before snapping into the light grid canvas.",
     "max_static_dead_frames": 15,
     "max_focal_hold_frames": 75
   },
 
   "3_design_system": {
-    "_palette_source": "PaletteCentral Rooster Folk-Editorial 6-Swatch Theme",
+    "aesthetic_preset": "Light Editorial Graph-Paper & Tactile Motion Graphics",
     "palette": {
-      "bg_obsidian": "#3B2336",
-      "bg_elevated": "#261523",
-      "surface_glass": "rgba(59, 35, 54, 0.88)",
-      "border_subtle": "rgba(231, 228, 221, 0.22)",
-      "ink_primary": "#E7E4DD",
-      "ink_muted": "#F38BA8",
-      "accent_vermilion": "#F24414",
-      "accent_gold": "#FBA40D",
-      "accent_emerald": "#009E83",
-      "accent_pink": "#F38BA8"
+      "bg_obsidian": "#EAEAE6",
+      "bg_elevated": "#FFFFFF",
+      "surface_glass": "rgba(255, 255, 255, 0.88)",
+      "border_subtle": "rgba(17, 17, 17, 0.08)",
+      "border_dashed_vector": "#141414",
+      "ink_primary": "#141414",
+      "ink_muted": "#8E8E93",
+      "accent_primary": "#1D18A8",
+      "accent_secondary": "#FF9500",
+      "accent_tertiary": "#8014D8",
+      "accent_highlight_lime": "#BCE368",
+      "chart_gradients": ["#38A3A5", "#5E60CE", "#E05297", "#FF7B00"]
     },
     "typography": {
-      "font_display": "'Liberation Sans', 'Nimbus Sans', sans-serif",
-      "font_mono": "'DejaVu Sans Mono', 'Liberation Mono', monospace"
+      "font_display": "'Ellak', 'Inter Tight', 'Liberation Sans', sans-serif",
+      "font_display_file": "assets/fonts/Ellak.ttf",
+      "font_editorial_serif": "'Instrument Serif', 'Playfair Display', 'Times New Roman', serif",
+      "font_mono": "'DejaVu Sans Mono', 'Liberation Mono', monospace",
+      "text_pairing_rule": "Mix heavy sans-serif/Ellak display words with italic editorial serif for contrast."
+    },
+    "canvas_and_motion_effects": {
+      "background_pattern": "square_graph_grid_with_subtle_curved_ribbons",
+      "grid_cell_size_px": 64,
+      "text_reveal_fx": "horizontal_directional_motion_blur_wipe",
+      "selection_box_style": "dashed_rectangle_with_corner_anchor_dots",
+      "circular_frame_style": "dashed_circle_around_3d_cutouts",
+      "number_counter_fx": "fast_rolling_odometer_with_amber_outer_glow"
     },
     "post_processing": {
-      "enable_vignette": true,
-      "enable_dust_particles": true,
-      "particle_count": 45,
-      "enable_optical_flash_cuts": true
+      "enable_vignette": false,
+      "enable_dust_particles": false,
+      "particle_count": 0,
+      "enable_optical_flash_cuts": false,
+      "enable_soft_drop_shadows": true
     }
   },
 
   "4_banned_slop_rules": {
-    "min_whitespace_ratio": 0.42,
+    "min_whitespace_ratio": 0.48,
     "max_simultaneous_focal_groups": 2,
     "max_punch_words_per_beat": 4,
     "banned_patterns": [
       "Full spoken sentence subtitles pasted across center screen",
       "Linear easing (must use spring solver or cubic-bezier)",
-      "Default purple/blue neon AI gradients",
-      "Unbounded floating boxes without grid alignment"
+      "Dark obsidian cyberpunk backgrounds or heavy black vignettes",
+      "Unbounded floating boxes without grid alignment",
+      "Polite or generic YouTube intros like 'Hey guys, welcome back'"
     ]
   },
 
   "5_custom_user_rules": [
-    "Har beat mein ek clear physical/visual metaphor hona chahiye, sirf text cards nahi.",
-    "Numbers aur percentages ko hamesha mono font aur glowing accent color mein dikhao.",
-    "Use the 6-swatch Rooster palette (#3B2336 Aubergine, #009E83 Jade Teal, #F24414 Vermilion, #F38BA8 Flamingo Pink, #FBA40D Marigold, #E7E4DD Bone Cream)."
+    "Background hamesha light off-white/warm grey (#EAEAE6) rakho jiske upar subtle square graph-paper grid lines aur faint curved path lines dikhein.",
+    "Typography mein contrast rakho: normal connecting words ko Italic Editorial Serif mein aur main punch words ko Bold Sans/Ellak font mein directional motion-blur wipe ke saath reveal karo.",
+    "Key list words (jaise 'Faster', 'Sharper', 'Effective') ko dashed vector selection boxes (jinme 4 corner anchor dots hon) ke andar dikhao.",
+    "Har beat mein ek clean visual metaphor hona chahiye: 3D cutouts (jaise brain ya target bullseye) ko dashed circle ya soft drop-shadow ke saath rakho, aur 2D vector shapes (puzzle piece, bar charts with arrows, 4-point stars) ko smooth spring physics ke saath animate karo.",
+    "Numbers aur stats (jaise '35,000') ko rolling odometer counter aur glowing orange/amber (#FF9500) outer glow ke saath highlight karo.",
+    "Host (Iraa) female hai—script aur voiceover mein strictly female grammar aur 'Brutally Honest Critic' tone hi use karo."
   ]
 }
