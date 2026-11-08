@@ -27,30 +27,61 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
+import glob
 import websockets
 
 STUDIO_ROOT = Path(__file__).resolve().parents[2]
 ENGINE_TOOLS_DIR = STUDIO_ROOT / "backend" / "engine" / "tools"
-sys.path.insert(0, str(ENGINE_TOOLS_DIR))
+RENDERER_DIR = STUDIO_ROOT / "backend" / "renderer"
+for _p in (ENGINE_TOOLS_DIR, RENDERER_DIR):
+    if str(_p) not in sys.path:
+        sys.path.insert(0, str(_p))
 
 from glow import apply_linear_glow_and_halation  # type: ignore
 from textures import read_png_rgb8, write_png_rgb8  # type: ignore
+from native_canvas_renderer import (  # type: ignore
+    capture_keyframes_native_fallback,
+    render_chunk_native_fallback,
+)
 
 
-def find_chrome_binary() -> str:
-    for cand in [
+def find_chrome_binary() -> str | None:
+    if os.environ.get("FORCE_NATIVE_RENDERER") == "1":
+        return None
+    pw_candidates = sorted(
+        glob.glob(os.path.expanduser("~/.cache/ms-playwright/*/chrome-linux/chrome"))
+        + glob.glob("/root/.cache/ms-playwright/*/chrome-linux/chrome"),
+        reverse=True,
+    )
+    candidates = [
         os.environ.get("CHROME_BIN"),
         shutil.which("google-chrome"),
         shutil.which("google-chrome-stable"),
-        shutil.which("chromium-browser"),
+        "/usr/local/lib/chrome-headless-shell/chrome-headless-shell",
+        *pw_candidates,
         shutil.which("chromium"),
+        shutil.which("chromium-browser"),
         "/usr/bin/google-chrome",
-        "/usr/bin/chromium-browser",
         "/usr/bin/chromium",
-    ]:
-        if cand and os.path.exists(cand):
-            return cand
-    raise RuntimeError("No Chrome/Chromium binary found. Install chromium or google-chrome.")
+        "/usr/bin/chromium-browser",
+    ]
+    for cand in candidates:
+        if not cand or not os.path.exists(cand):
+            continue
+        try:
+            proc = subprocess.run(
+                [cand, "--version"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                timeout=3,
+                text=True,
+            )
+            out_combined = (proc.stdout + proc.stderr).lower()
+            if proc.returncode == 0 and "snap" not in out_combined and "requires the chromium snap" not in out_combined:
+                return cand
+        except Exception:
+            continue
+    return None
 
 
 class QuietStaticServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
@@ -396,15 +427,39 @@ async def execute_render_pipeline(
             )
             for s in script.get("shots", [])
         ]
-        preview_pngs = await capture_single_png_frames(
-            keyframes,
-            stage_url,
-            width,
-            height,
-            preview_dir,
-            active_layer=active_layer,
-            apply_glow=True,
-        )
+
+        chrome_bin = find_chrome_binary()
+        use_native_fallback = chrome_bin is None
+        if not use_native_fallback:
+            try:
+                preview_pngs = await capture_single_png_frames(
+                    keyframes,
+                    stage_url,
+                    width,
+                    height,
+                    preview_dir,
+                    active_layer=active_layer,
+                    apply_glow=True,
+                )
+            except Exception:
+                use_native_fallback = True
+                preview_pngs = capture_keyframes_native_fallback(
+                    keyframes,
+                    script,
+                    width,
+                    height,
+                    preview_dir,
+                    active_layer=active_layer,
+                )
+        else:
+            preview_pngs = capture_keyframes_native_fallback(
+                keyframes,
+                script,
+                width,
+                height,
+                preview_dir,
+                active_layer=active_layer,
+            )
 
         if mode == "preview":
             return {
@@ -412,6 +467,7 @@ async def execute_render_pipeline(
                 "job_id": script.get("job_id"),
                 "keyframes": keyframes,
                 "preview_pngs": preview_pngs,
+                "renderer_engine": "native_numpy_60fps" if use_native_fallback else "chrome_cdp_60fps",
                 "wall_sec": round(time.time() - t_start, 2),
             }
 
@@ -422,8 +478,8 @@ async def execute_render_pipeline(
         actual_workers = min(workers, max(1, total_to_render // 30))
         chunk_size = (total_to_render + actual_workers - 1) // actual_workers
 
-        tasks = []
         chunk_files: list[Path] = []
+        chunk_specs: list[tuple[int, int, int, Path]] = []
         for w_idx in range(actual_workers):
             c_start = start_f + w_idx * chunk_size
             c_end = min(end_f, c_start + chunk_size)
@@ -431,21 +487,47 @@ async def execute_render_pipeline(
                 continue
             c_path = chunks_dir / f"chunk_{c_start:04d}_{c_end:04d}.ts"
             chunk_files.append(c_path)
-            tasks.append(
-                render_worker_chunk(
+            chunk_specs.append((w_idx, c_start, c_end, c_path))
+
+        if not use_native_fallback:
+            try:
+                tasks = [
+                    render_worker_chunk(
+                        w_idx,
+                        c_start,
+                        c_end,
+                        stage_url,
+                        width,
+                        height,
+                        fps,
+                        c_path,
+                        active_layer=active_layer,
+                    )
+                    for (w_idx, c_start, c_end, c_path) in chunk_specs
+                ]
+                worker_stats = await asyncio.gather(*tasks)
+            except Exception:
+                use_native_fallback = True
+
+        if use_native_fallback:
+            loop = asyncio.get_running_loop()
+            native_tasks = [
+                loop.run_in_executor(
+                    None,
+                    render_chunk_native_fallback,
                     w_idx,
                     c_start,
                     c_end,
-                    stage_url,
+                    script,
                     width,
                     height,
                     fps,
                     c_path,
-                    active_layer=active_layer,
+                    active_layer,
                 )
-            )
-
-        worker_stats = await asyncio.gather(*tasks)
+                for (w_idx, c_start, c_end, c_path) in chunk_specs
+            ]
+            worker_stats = list(await asyncio.gather(*native_tasks))
 
         concat_list = chunks_dir / "concat.txt"
         concat_list.write_text("\n".join(f"file '{p.resolve()}'" for p in chunk_files) + "\n", encoding="utf-8")

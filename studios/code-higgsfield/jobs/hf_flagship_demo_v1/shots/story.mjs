@@ -294,7 +294,8 @@ export const SHOT_SPECS = [
         "palette_bg": "#09090B",
         "palette_secondary": "#121318",
         "texture": "brushed_metal",
-        "ray_intensity": 0.47
+        "ray_intensity": 0.47,
+        "accent_color": "#00FF66"
       },
       "L1_Environment": {
         "grid_mode": "perspective_vault",

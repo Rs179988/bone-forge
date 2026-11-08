@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const JOB_DIR = path.resolve(HERE, '..');
-const PARALLEL_RENDERER = '/workspace/studios/code-higgsfield/backend/renderer/parallel_renderer.py';
+const PARALLEL_RENDERER = path.resolve(JOB_DIR, '../../backend/renderer/parallel_renderer.py');
 
 const args = process.argv.slice(2);
 const res = spawnSync('python3', [PARALLEL_RENDERER, JOB_DIR, ...args], { stdio: 'inherit' });
