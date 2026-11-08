@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>The Casino Mind Trap — Cinematic Cut</title>
+<title>The Casino Mind Trap — Studio Lock Live Palette Cut</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
     width: 1080px;
     height: 1920px;
     overflow: hidden;
-    background: #050508;
+    background: #3B2336;
   }
   canvas {
     display: block;
@@ -27,89 +27,130 @@ const ctx = canvas.getContext("2d");
 const { spring, easeOutExpo, easeInOutCubic, clamp } = window.StudioRig;
 
 window.BEAT_CLOCK = null;
-window.initClock = function(clockData) {
+window.STUDIO_LOCK = null;
+
+// Default fallback matches studio_lock.json 6-swatch Rooster Palette
+window.PAL = {
+  bg_obsidian: "#3B2336",      // Swatch 1: Deep Aubergine Plum
+  bg_elevated: "#261523",      // Darker Aubergine Shadow
+  ink_primary: "#E7E4DD",      // Swatch 6: Warm Vintage Bone Cream
+  ink_muted: "#F38BA8",        // Swatch 4: Flamingo Pink
+  accent_vermilion: "#F24414", // Swatch 3: Fiery Vermilion Orange-Red
+  accent_gold: "#FBA40D",      // Swatch 5: Golden Marigold Amber
+  accent_emerald: "#009E83",   // Swatch 2: Vibrant Jade Teal
+  accent_pink: "#F38BA8"       // Swatch 4: Flamingo Pink
+};
+
+window.initClock = function(clockData, studioLockData) {
   window.BEAT_CLOCK = clockData;
+  if (studioLockData) {
+    window.STUDIO_LOCK = studioLockData;
+    const ds = studioLockData["3_design_system"] || studioLockData["design_system"] || {};
+    if (ds.palette) {
+      window.PAL = Object.assign({}, window.PAL, ds.palette);
+      document.body.style.background = window.PAL.bg_obsidian;
+    }
+  }
   window.seekToFrame(0);
   return true;
 };
 
-// Deterministic pseudo-random generator for particles, stars, chips, and film grain
 function hash(n) {
   const x = Math.sin(n * 127.1 + 311.7) * 43758.5453123;
   return x - Math.floor(x);
 }
 
-// Cinematic Post-Processing Pass: Anamorphic Lens Glow + Vignette + Film Grain + Letterbox Bars
+// Convert Hex (#RRGGBB) to rgba(r,g,b,a) dynamically so any hex edited in studio_lock.json works with alpha!
+function hexRgba(hex, alpha) {
+  const h = (hex || "#3B2336").replace("#", "");
+  const r = parseInt(h.substring(0, 2), 16) || 59;
+  const g = parseInt(h.substring(2, 4), 16) || 35;
+  const b = parseInt(h.substring(4, 6), 16) || 54;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+// Cinematic Post-Processing Pass driven by studio_lock.json
 function applyPostProcessing(ctx, frame, flashIntensity = 0) {
-  // Deep cinema vignette
-  const vig = ctx.createRadialGradient(540, 960, 380, 540, 960, 1180);
+  const P = window.PAL;
+  const vig = ctx.createRadialGradient(540, 960, 420, 540, 960, 1180);
   vig.addColorStop(0, "rgba(0,0,0,0)");
-  vig.addColorStop(0.7, "rgba(2,3,6,0.35)");
-  vig.addColorStop(1, "rgba(0,0,0,0.88)");
+  vig.addColorStop(0.7, hexRgba(P.bg_elevated, 0.35));
+  vig.addColorStop(1, hexRgba("#140912", 0.85));
   ctx.fillStyle = vig;
   ctx.fillRect(0, 0, 1080, 1920);
 
-  // Subtle floating dust motes in volumetric light
+  // Floating volumetric motes in Marigold, Flamingo Pink & Bone Cream
   ctx.save();
   for (let i = 0; i < 45; i++) {
     const px = (hash(i * 13) * 1080 + frame * (0.4 + hash(i) * 0.8)) % 1080;
     const py = (hash(i * 29) * 1920 - frame * (0.6 + hash(i * 3) * 1.1) + 19200) % 1920;
-    const r = 1.5 + hash(i * 7) * 3.5;
-    const alpha = 0.08 + 0.18 * Math.sin(frame * 0.08 + i);
-    ctx.fillStyle = i % 3 === 0 ? `rgba(255, 184, 0, ${alpha})` : `rgba(244, 241, 234, ${alpha})`;
+    const r = 1.8 + hash(i * 7) * 3.8;
+    const alpha = 0.12 + 0.22 * Math.sin(frame * 0.08 + i);
+    const colHex = i % 3 === 0 ? P.accent_gold : (i % 3 === 1 ? P.accent_pink : P.ink_primary);
+    ctx.fillStyle = hexRgba(colHex, alpha);
     ctx.beginPath();
     ctx.arc(px, py, r, 0, Math.PI * 2);
     ctx.fill();
   }
   ctx.restore();
 
-  // Impact transition flash on hard cuts
+  // Subtle 6-Swatch Studio Palette Strip at very top edge (8px bar) + impact flash
+  const swatches = [P.bg_obsidian, P.accent_emerald, P.accent_vermilion, P.accent_pink, P.accent_gold, P.ink_primary];
+  for (let s = 0; s < 6; s++) {
+    ctx.fillStyle = swatches[s];
+    ctx.fillRect(s * 180, 0, 180, 10);
+  }
+
   if (flashIntensity > 0.01) {
-    ctx.fillStyle = `rgba(255, 230, 190, ${flashIntensity * 0.65})`;
+    ctx.fillStyle = hexRgba(P.ink_primary, flashIntensity * 0.65);
     ctx.fillRect(0, 0, 1080, 1920);
   }
 }
 
-// Kinetic Editorial Typography Overlay (Integrated into the 3D scene depth, zero dashboard boxes!)
 function drawKineticTitle(ctx, topLabel, mainWord1, mainWord2, accentColor, yPos, enterSpring) {
+  const P = window.PAL;
   ctx.save();
   ctx.translate(540, yPos + (1 - enterSpring) * 70);
   ctx.scale(0.88 + 0.12 * enterSpring, 0.88 + 0.12 * enterSpring);
   ctx.globalAlpha = clamp(enterSpring, 0, 1);
   ctx.textAlign = "center";
 
-  // Subtle glowing tracking label
-  ctx.font = "800 24px 'DejaVu Sans Mono', monospace";
-  ctx.fillStyle = "#FFB800";
-  ctx.shadowColor = "rgba(0,0,0,0.95)";
-  ctx.shadowBlur = 18;
-  ctx.fillText(topLabel, 0, -95);
+  // Pill badge in Flamingo Pink / Gold
+  ctx.fillStyle = hexRgba(P.bg_elevated, 0.88);
+  ctx.strokeStyle = P.accent_pink;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.roundRect(-290, -135, 580, 54, 27);
+  ctx.fill();
+  ctx.stroke();
 
-  // Massive high-contrast cinema typography with deep drop shadow
+  ctx.font = "800 24px 'DejaVu Sans Mono', monospace";
+  ctx.fillStyle = P.accent_gold;
+  ctx.fillText(topLabel, 0, -100);
+
   ctx.font = "900 94px 'Liberation Sans', sans-serif";
-  ctx.fillStyle = "#F4F1EA";
-  ctx.shadowColor = "rgba(0,0,0,0.95)";
-  ctx.shadowBlur = 36;
+  ctx.fillStyle = P.ink_primary;
+  ctx.shadowColor = "rgba(20, 8, 18, 0.95)";
+  ctx.shadowBlur = 32;
   ctx.fillText(mainWord1, 0, 0);
 
-  ctx.font = "900 102px 'Liberation Sans', sans-serif";
+  ctx.font = "900 104px 'Liberation Sans', sans-serif";
   ctx.fillStyle = accentColor;
   ctx.shadowColor = accentColor;
-  ctx.shadowBlur = 32;
-  ctx.fillText(mainWord2, 0, 102);
+  ctx.shadowBlur = 30;
+  ctx.fillText(mainWord2, 0, 104);
 
   ctx.restore();
 }
 
 // ============================================================================
 // SHOT 1 (f: 0..175): MACRO MECHANICAL CLOCK SHATTERING IN 3D SPACE
-// "Walk into any Vegas casino and look at the walls..."
 // ============================================================================
 function renderShot01_ClockShatter(ctx, frame, f0, dur) {
+  const P = window.PAL;
   const localF = frame - f0;
   const prog = clamp(localF / dur, 0, 1);
 
-  // Camera pushes relentlessly into the clock face, then violent shake when it shatters at localF=85
   const shatterT = clamp((localF - 82) / 55, 0, 1);
   const impactShake = (localF >= 82 && localF <= 105) ? Math.sin(localF * 2.8) * 18 * (1 - (localF - 82) / 23) : 0;
   const camZoom = 1.0 + easeInOutCubic(prog) * 0.42;
@@ -118,19 +159,20 @@ function renderShot01_ClockShatter(ctx, frame, f0, dur) {
   ctx.translate(540 + impactShake, 980 - impactShake * 0.6);
   ctx.scale(camZoom, camZoom);
 
-  // Volumetric crimson/gold spotlight behind clock
-  const bgGlow = ctx.createRadialGradient(0, 0, 30, 0, 0, 720);
-  bgGlow.addColorStop(0, shatterT > 0 ? "rgba(255, 45, 32, 0.42)" : "rgba(255, 184, 0, 0.25)");
-  bgGlow.addColorStop(0.55, "rgba(20, 12, 28, 0.85)");
-  bgGlow.addColorStop(1, "#050508");
+  // Aubergine base + Vermilion/Marigold radial spotlight
+  const bgGlow = ctx.createRadialGradient(0, 0, 30, 0, 0, 760);
+  bgGlow.addColorStop(0, shatterT > 0 ? hexRgba(P.accent_vermilion, 0.52) : hexRgba(P.accent_gold, 0.35));
+  bgGlow.addColorStop(0.55, P.bg_obsidian);
+  bgGlow.addColorStop(1, P.bg_elevated);
   ctx.fillStyle = bgGlow;
   ctx.fillRect(-700, -1100, 1400, 2200);
 
-  // Draw rotating 3D concentric brass gear rings in background
+  // Rotating 3D concentric rings in Jade Teal, Flamingo Pink, and Marigold
+  const ringColors = [P.accent_emerald, P.accent_pink, P.accent_gold];
   for (let g = 0; g < 3; g++) {
     ctx.save();
     ctx.rotate((frame * (0.008 - g * 0.005)) * (g % 2 === 0 ? 1 : -1));
-    ctx.strokeStyle = `rgba(255, 184, 0, ${0.12 - g * 0.03})`;
+    ctx.strokeStyle = hexRgba(ringColors[g], 0.38 - g * 0.06);
     ctx.lineWidth = 18 - g * 4;
     ctx.setLineDash([28, 18]);
     ctx.beginPath();
@@ -153,36 +195,36 @@ function renderShot01_ClockShatter(ctx, frame, f0, dur) {
     ctx.translate(Math.cos(midA) * explodeDist, Math.sin(midA) * explodeDist);
     ctx.rotate(rotShard);
 
-    // Clip to wedge shard
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.arc(0, 0, 290, a1, a2);
     ctx.closePath();
     ctx.clip();
 
-    // Dark obsidian dial face
+    // Warm Vintage Bone Cream & Deep Aubergine Dial
     const dialGrad = ctx.createRadialGradient(0, 0, 20, 0, 0, 285);
-    dialGrad.addColorStop(0, "#191D2C");
-    dialGrad.addColorStop(1, "#0B0D14");
+    dialGrad.addColorStop(0, P.bg_obsidian);
+    dialGrad.addColorStop(0.75, P.bg_elevated);
+    dialGrad.addColorStop(1, P.accent_emerald);
     ctx.fillStyle = dialGrad;
     ctx.beginPath();
     ctx.arc(0, 0, 280, 0, Math.PI * 2);
     ctx.fill();
 
-    // Metallic Gold Bezel
-    ctx.strokeStyle = shatterT > 0 ? "#FF3B30" : "#FFB800";
-    ctx.lineWidth = 16;
+    // Bezel in Marigold -> Vermilion on shatter
+    ctx.strokeStyle = shatterT > 0 ? P.accent_vermilion : P.accent_gold;
+    ctx.lineWidth = 18;
     ctx.beginPath();
-    ctx.arc(0, 0, 272, 0, Math.PI * 2);
+    ctx.arc(0, 0, 270, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Hour Tick Marks & Roman Numerals
+    // Tick marks in Bone Cream & Flamingo Pink
     for (let h = 0; h < 12; h++) {
       const ha = (h / 12) * Math.PI * 2 - Math.PI / 2;
-      ctx.strokeStyle = "#F4F1EA";
-      ctx.lineWidth = h % 3 === 0 ? 8 : 4;
+      ctx.strokeStyle = h % 3 === 0 ? P.ink_primary : P.accent_pink;
+      ctx.lineWidth = h % 3 === 0 ? 9 : 5;
       ctx.beginPath();
-      ctx.moveTo(Math.cos(ha) * 215, Math.sin(ha) * 215);
+      ctx.moveTo(Math.cos(ha) * 212, Math.sin(ha) * 212);
       ctx.lineTo(Math.cos(ha) * 248, Math.sin(ha) * 248);
       ctx.stroke();
     }
@@ -190,15 +232,15 @@ function renderShot01_ClockShatter(ctx, frame, f0, dur) {
     ctx.restore();
   }
 
-  // Clock Hands spinning frantically then snapping apart
+  // Clock Hands
   const minAngle = localF < 82 ? localF * 0.25 : 82 * 0.25 + shatterT * 2.5;
   const hrAngle = localF < 82 ? localF * 0.04 : 82 * 0.04 - shatterT * 1.2;
 
   ctx.save();
   ctx.translate(shatterT * 60, -shatterT * 90);
   ctx.rotate(minAngle);
-  ctx.strokeStyle = "#FFB800";
-  ctx.shadowColor = "#FFB800";
+  ctx.strokeStyle = P.accent_gold;
+  ctx.shadowColor = P.accent_gold;
   ctx.shadowBlur = 20;
   ctx.lineWidth = 10;
   ctx.lineCap = "round";
@@ -211,8 +253,8 @@ function renderShot01_ClockShatter(ctx, frame, f0, dur) {
   ctx.save();
   ctx.translate(-shatterT * 75, shatterT * 50);
   ctx.rotate(hrAngle);
-  ctx.strokeStyle = "#FF3B30";
-  ctx.shadowColor = "#FF3B30";
+  ctx.strokeStyle = P.accent_vermilion;
+  ctx.shadowColor = P.accent_vermilion;
   ctx.shadowBlur = 20;
   ctx.lineWidth = 14;
   ctx.lineCap = "round";
@@ -222,14 +264,13 @@ function renderShot01_ClockShatter(ctx, frame, f0, dur) {
   ctx.stroke();
   ctx.restore();
 
-  // Glowing Red Fracture Lightning / Void Core exposed when clock shatters
   if (shatterT > 0) {
     ctx.save();
     ctx.globalAlpha = clamp(shatterT * 1.3, 0, 1);
-    ctx.fillStyle = "#FF3B30";
-    ctx.shadowColor = "#FF3B30";
+    ctx.fillStyle = P.ink_primary;
+    ctx.shadowColor = P.accent_vermilion;
     ctx.shadowBlur = 45;
-    ctx.font = "900 72px 'DejaVu Sans Mono', monospace";
+    ctx.font = "900 76px 'DejaVu Sans Mono', monospace";
     ctx.textAlign = "center";
     ctx.fillText("00:00:00", 0, 24);
     ctx.restore();
@@ -238,31 +279,30 @@ function renderShot01_ClockShatter(ctx, frame, f0, dur) {
   ctx.restore();
 
   const titleS = spring(frame, f0 + 4, { stiffness: 220, damping: 16 });
-  drawKineticTitle(ctx, "VEGAS SENSORY BLACKOUT", "TIME IS", "DELETED", "#FF3B30", 310, titleS);
+  drawKineticTitle(ctx, "VEGAS SENSORY BLACKOUT", "TIME IS", "DELETED", P.accent_vermilion, 310, titleS);
 }
 
 // ============================================================================
-// SHOT 2 (f: 175..308): FIRST-PERSON CASINO NEON TUNNEL & ETERNAL TWILIGHT
-// "...No clocks. No windows."
+// SHOT 2 (f: 175..297): FIRST-PERSON CASINO NEON TUNNEL & ETERNAL TWILIGHT
 // ============================================================================
 function renderShot02_NeonVault(ctx, frame, f0, dur) {
+  const P = window.PAL;
   const localF = frame - f0;
   const prog = clamp(localF / dur, 0, 1);
 
   ctx.save();
-  // Deep purple-crimson casino vault atmosphere
   const bg = ctx.createRadialGradient(540, 960, 40, 540, 960, 1050);
-  bg.addColorStop(0, "#240B18");
-  bg.addColorStop(0.6, "#0D0612");
-  bg.addColorStop(1, "#040307");
+  bg.addColorStop(0, P.bg_obsidian);
+  bg.addColorStop(0.65, P.bg_elevated);
+  bg.addColorStop(1, "#160B14");
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, 1080, 1920);
 
-  // 3D Perspective Neon Archways rushing toward the viewer (Infinite Windowless Vault)
   const numArches = 9;
   const speed = (localF * 0.032) % 1;
+  const archCols = [P.accent_vermilion, P.accent_gold, P.accent_pink, P.accent_emerald];
   for (let i = numArches - 1; i >= 0; i--) {
-    const depth = ((i + 1 - speed) / numArches); // 1 = far, 0 = camera plane
+    const depth = ((i + 1 - speed) / numArches);
     const scale = 0.12 / Math.max(0.06, depth);
     const alpha = clamp((1 - depth) * 1.4, 0, 1) * clamp(scale < 3.2 ? 1 : 4.0 - scale, 0, 1);
 
@@ -270,35 +310,33 @@ function renderShot02_NeonVault(ctx, frame, f0, dur) {
     ctx.translate(540, 1040);
     ctx.scale(scale, scale);
 
-    ctx.strokeStyle = i % 2 === 0 ? `rgba(255, 59, 48, ${alpha * 0.85})` : `rgba(255, 184, 0, ${alpha * 0.85})`;
-    ctx.shadowColor = i % 2 === 0 ? "#FF3B30" : "#FFB800";
+    const cHex = archCols[i % archCols.length];
+    ctx.strokeStyle = hexRgba(cHex, alpha * 0.9);
+    ctx.shadowColor = cHex;
     ctx.shadowBlur = 28;
-    ctx.lineWidth = 8;
+    ctx.lineWidth = 9;
 
-    // Archway corridor frame
     ctx.beginPath();
     ctx.roundRect(-340, -520, 680, 1040, 60);
     ctx.stroke();
 
-    // Side slot machine light banks along the tunnel walls
-    ctx.fillStyle = `rgba(16, 185, 129, ${alpha * 0.55})`;
+    ctx.fillStyle = hexRgba(P.accent_emerald, alpha * 0.65);
     ctx.fillRect(-325, -180, 24, 360);
     ctx.fillRect(301, -180, 24, 360);
 
     ctx.restore();
   }
 
-  // Center Floating Holographic "777" Jackpot Monolith pulling the eye into the tunnel
   const monoS = spring(frame, f0 + 6, { stiffness: 200, damping: 15 });
   ctx.save();
   ctx.translate(540, 1040);
   ctx.scale(monoS * (1 + prog * 0.18), monoS * (1 + prog * 0.18));
 
-  ctx.fillStyle = "rgba(10, 12, 20, 0.92)";
-  ctx.strokeStyle = "#FFB800";
-  ctx.shadowColor = "#FFB800";
+  ctx.fillStyle = hexRgba(P.bg_elevated, 0.95);
+  ctx.strokeStyle = P.accent_gold;
+  ctx.shadowColor = P.accent_gold;
   ctx.shadowBlur = 40;
-  ctx.lineWidth = 6;
+  ctx.lineWidth = 7;
   ctx.beginPath();
   ctx.roundRect(-260, -160, 520, 320, 32);
   ctx.fill();
@@ -307,16 +345,16 @@ function renderShot02_NeonVault(ctx, frame, f0, dur) {
 
   for (let r = 0; r < 3; r++) {
     const rx = -195 + r * 135;
-    ctx.fillStyle = "#05060A";
-    ctx.strokeStyle = "rgba(255, 184, 0, 0.4)";
-    ctx.lineWidth = 3;
+    ctx.fillStyle = P.bg_obsidian;
+    ctx.strokeStyle = P.accent_pink;
+    ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.roundRect(rx, -110, 115, 175, 16);
     ctx.fill();
     ctx.stroke();
 
     const reelY = Math.sin(frame * 0.35 + r) * 8;
-    ctx.fillStyle = r === 1 ? "#FF3B30" : "#FFB800";
+    ctx.fillStyle = r === 1 ? P.accent_vermilion : P.accent_gold;
     ctx.shadowColor = ctx.fillStyle;
     ctx.shadowBlur = 22;
     ctx.font = "900 105px 'Liberation Sans', sans-serif";
@@ -325,7 +363,7 @@ function renderShot02_NeonVault(ctx, frame, f0, dur) {
     ctx.shadowBlur = 0;
   }
 
-  ctx.fillStyle = "#F4F1EA";
+  ctx.fillStyle = P.ink_primary;
   ctx.font = "bold 24px 'DejaVu Sans Mono', monospace";
   ctx.textAlign = "center";
   ctx.fillText("SEALED BUNKER // ETERNAL 7:00 PM", 0, 118);
@@ -334,47 +372,42 @@ function renderShot02_NeonVault(ctx, frame, f0, dur) {
   ctx.restore();
 
   const titleS = spring(frame, f0 + 3, { stiffness: 240, damping: 16 });
-  drawKineticTitle(ctx, "SENSORY ISOLATION CHAMBER", "ZERO", "WINDOWS", "#FFB800", 310, titleS);
+  drawKineticTitle(ctx, "SENSORY ISOLATION CHAMBER", "ZERO", "WINDOWS", P.accent_gold, 310, titleS);
 }
 
 // ============================================================================
-// SHOT 3 (f: 308..658): 3D ISOMETRIC LABYRINTH — CURVED DOPAMINE MAZE
-// "Architects banned ninety degree corners, curving every walkway so your brain never hits a decision point to leave."
+// SHOT 3 (f: 297..655): 3D ISOMETRIC LABYRINTH — CURVED DOPAMINE MAZE
 // ============================================================================
 function renderShot03_CurvedLabyrinth(ctx, frame, f0, dur) {
+  const P = window.PAL;
   const localF = frame - f0;
   const prog = clamp(localF / dur, 0, 1);
 
   ctx.save();
-  // Deep architectural blueprint void
   const bg = ctx.createRadialGradient(540, 1060, 50, 540, 1060, 1000);
-  bg.addColorStop(0, "#0B2126");
-  bg.addColorStop(0.65, "#070D14");
-  bg.addColorStop(1, "#04060A");
+  bg.addColorStop(0, hexRgba(P.accent_emerald, 0.32));
+  bg.addColorStop(0.55, P.bg_obsidian);
+  bg.addColorStop(1, P.bg_elevated);
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, 1080, 1920);
 
-  // Camera tracks and rotates across the 3D isometric floor plane
   ctx.save();
   ctx.translate(540, 1140);
-  const camTilt = 0.68; // Isometric vertical foreshortening
+  const camTilt = 0.68;
   ctx.scale(1.0 + prog * 0.18, (1.0 + prog * 0.18) * camTilt);
   ctx.rotate(prog * 0.45 - 0.22);
 
-  // Perspective Blueprint Grid on the Floor
-  ctx.strokeStyle = "rgba(16, 185, 129, 0.14)";
-  ctx.lineWidth = 2;
+  // Jade Teal Perspective Blueprint Grid
+  ctx.strokeStyle = hexRgba(P.accent_emerald, 0.26);
+  ctx.lineWidth = 2.5;
   for (let g = -700; g <= 700; g += 70) {
     ctx.beginPath(); ctx.moveTo(g, -700); ctx.lineTo(g, 700); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(-700, g); ctx.lineTo(700, g); ctx.stroke();
   }
 
-  // PHASE 1 (localF < 110): Show the 90-degree straight exit vector getting shattered/bent into a curve
-  const bendT = easeInOutCubic(clamp((localF - 35) / 75, 0, 1));
-
-  // Draw the glowing S-Curve / Spiral Casino Walkway on the 3D Floor
+  // Spiral Casino Walkway in Marigold & Flamingo Pink
   ctx.save();
-  ctx.strokeStyle = "rgba(255, 184, 0, 0.22)";
+  ctx.strokeStyle = hexRgba(P.accent_pink, 0.28);
   ctx.lineWidth = 115;
   ctx.lineCap = "round";
   ctx.beginPath();
@@ -388,17 +421,17 @@ function renderShot03_CurvedLabyrinth(ctx, frame, f0, dur) {
   }
   ctx.stroke();
 
-  // Neon Golden Center Line along the Spiral Labyrinth
-  ctx.strokeStyle = "#FFB800";
-  ctx.shadowColor = "#FFB800";
+  ctx.strokeStyle = P.accent_gold;
+  ctx.shadowColor = P.accent_gold;
   ctx.shadowBlur = 25;
-  ctx.lineWidth = 10;
+  ctx.lineWidth = 12;
   ctx.stroke();
   ctx.shadowBlur = 0;
   ctx.restore();
 
-  // 3D Extruded Slot Machine Pillars lining the curved walkway
+  // 3D Extruded Slot Machine Pillars in Vermilion, Jade Teal & Flamingo Pink
   const totalPillars = 22;
+  const pCols = [P.accent_vermilion, P.accent_emerald, P.accent_pink, P.accent_gold];
   for (let p = 0; p < totalPillars; p++) {
     const pt = (p + 0.5) / totalPillars;
     const pang = pt * Math.PI * 3.4;
@@ -406,36 +439,33 @@ function renderShot03_CurvedLabyrinth(ctx, frame, f0, dur) {
     const px = Math.cos(pang) * prad;
     const py = Math.sin(pang) * prad;
 
-    // 3D vertical extrusion upward from the tilted floor
-    ctx.fillStyle = p % 3 === 0 ? "#FF3B30" : "#10B981";
+    ctx.fillStyle = pCols[p % pCols.length];
     ctx.shadowColor = ctx.fillStyle;
     ctx.shadowBlur = 18;
     ctx.beginPath();
-    ctx.arc(px, py, 16, 0, Math.PI * 2);
+    ctx.arc(px, py, 17, 0, Math.PI * 2);
     ctx.fill();
     ctx.shadowBlur = 0;
   }
 
-  // Animated Subject (Glowing White/Red Target with Vision Cone) walking endlessly along the spiral
+  // Subject walking along the spiral
   const walkT = clamp(0.92 - prog * 0.78, 0.08, 0.95);
   const wAng = walkT * Math.PI * 3.4;
   const wRad = 80 + walkT * 440;
   const wx = Math.cos(wAng) * wRad;
   const wy = Math.sin(wAng) * wRad;
 
-  // Tangent direction of travel (inward along spiral)
   const nextT = Math.max(0.01, walkT - 0.02);
   const nAng = nextT * Math.PI * 3.4;
   const nRad = 80 + nextT * 440;
   const dirA = Math.atan2(Math.sin(nAng) * nRad - wy, Math.cos(nAng) * nRad - wx);
 
-  // Vision Cone showing the eye is constantly pulled 15° around the next curve
   ctx.save();
   ctx.translate(wx, wy);
   ctx.rotate(dirA);
   const coneGrad = ctx.createLinearGradient(0, 0, 260, 0);
-  coneGrad.addColorStop(0, "rgba(255, 59, 48, 0.65)");
-  coneGrad.addColorStop(1, "rgba(255, 59, 48, 0)");
+  coneGrad.addColorStop(0, hexRgba(P.accent_vermilion, 0.72));
+  coneGrad.addColorStop(1, hexRgba(P.accent_vermilion, 0));
   ctx.fillStyle = coneGrad;
   ctx.beginPath();
   ctx.moveTo(0, 0);
@@ -444,9 +474,8 @@ function renderShot03_CurvedLabyrinth(ctx, frame, f0, dur) {
   ctx.closePath();
   ctx.fill();
 
-  // Traveler Core Dot
-  ctx.fillStyle = "#F4F1EA";
-  ctx.shadowColor = "#FF3B30";
+  ctx.fillStyle = P.ink_primary;
+  ctx.shadowColor = P.accent_vermilion;
   ctx.shadowBlur = 30;
   ctx.beginPath();
   ctx.arc(0, 0, 24, 0, Math.PI * 2);
@@ -454,26 +483,25 @@ function renderShot03_CurvedLabyrinth(ctx, frame, f0, dur) {
   ctx.shadowBlur = 0;
   ctx.restore();
 
-  ctx.restore(); // end 3D floor plane
+  ctx.restore();
 
-  // Floating HUD Callout on the upper-mid left showing "90° EXIT CORNERS: BANNED"
   const badgeS = spring(frame, f0 + 18, { stiffness: 210, damping: 15 });
   ctx.save();
   ctx.translate(540, 620);
   ctx.scale(badgeS, badgeS);
-  ctx.fillStyle = "rgba(10, 14, 22, 0.88)";
-  ctx.strokeStyle = "#FF3B30";
-  ctx.lineWidth = 4;
+  ctx.fillStyle = hexRgba(P.bg_elevated, 0.92);
+  ctx.strokeStyle = P.accent_vermilion;
+  ctx.lineWidth = 5;
   ctx.beginPath();
-  ctx.roundRect(-360, -65, 720, 130, 22);
+  ctx.roundRect(-370, -68, 740, 136, 24);
   ctx.fill();
   ctx.stroke();
 
-  ctx.fillStyle = "#FF3B30";
+  ctx.fillStyle = P.accent_vermilion;
   ctx.font = "900 34px 'DejaVu Sans Mono', monospace";
   ctx.textAlign = "center";
   ctx.fillText("90° CORNERS TRIGGER EXIT DECISIONS", 0, -8);
-  ctx.fillStyle = "#10B981";
+  ctx.fillStyle = P.accent_emerald;
   ctx.font = "bold 26px 'DejaVu Sans Mono', monospace";
   ctx.fillText("CURVED PATHS KEEP THE BRAIN ON AUTOPILOT", 0, 36);
   ctx.restore();
@@ -481,31 +509,29 @@ function renderShot03_CurvedLabyrinth(ctx, frame, f0, dur) {
   ctx.restore();
 
   const titleS = spring(frame, f0 + 4, { stiffness: 220, damping: 16 });
-  drawKineticTitle(ctx, "FRIEDMAN'S LABYRINTH RULE", "ZERO 90°", "CORNERS", "#10B981", 310, titleS);
+  drawKineticTitle(ctx, "FRIEDMAN'S LABYRINTH RULE", "ZERO 90°", "CORNERS", P.accent_emerald, 310, titleS);
 }
 
 // ============================================================================
-// SHOT 4 (f: 658..985): $100 BILL DISINTEGRATING INTO 3D CASINO CHIP VORTEX + NEURAL SCAN
-// "Even your cash is swapped for weightless plastic chips, numbing the neural pain of losing real money."
+// SHOT 4 (f: 655..985): $100 BILL DISINTEGRATING INTO 3D CASINO CHIP VORTEX
 // ============================================================================
 function renderShot04_ChipVortex(ctx, frame, f0, dur) {
+  const P = window.PAL;
   const localF = frame - f0;
   const prog = clamp(localF / dur, 0, 1);
   const morphT = easeInOutCubic(clamp((localF - 35) / 55, 0, 1));
 
   ctx.save();
   const bg = ctx.createRadialGradient(540, 920, 40, 540, 920, 1050);
-  bg.addColorStop(0, morphT > 0.5 ? "#260B12" : "#0B261C");
-  bg.addColorStop(0.65, "#090B12");
-  bg.addColorStop(1, "#040508");
+  bg.addColorStop(0, morphT > 0.5 ? hexRgba(P.accent_vermilion, 0.28) : hexRgba(P.accent_emerald, 0.32));
+  bg.addColorStop(0.6, P.bg_obsidian);
+  bg.addColorStop(1, P.bg_elevated);
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, 1080, 1920);
 
-  // STAGE CENTER (Y=880): $100 Bill shattering into a 3D physics swarm of plastic casino chips
   ctx.save();
   ctx.translate(540, 880);
 
-  // Phase 1: Crisp 3D Perspective $100 Bill before it disintegrates
   if (morphT < 0.95) {
     const billS = spring(frame, f0 + 4, { stiffness: 210, damping: 15 });
     ctx.save();
@@ -513,9 +539,9 @@ function renderShot04_ChipVortex(ctx, frame, f0, dur) {
     ctx.rotate(morphT * 0.25);
     ctx.globalAlpha = clamp(1 - morphT * 1.15, 0, 1);
 
-    ctx.fillStyle = "#0D3323";
-    ctx.strokeStyle = "#10B981";
-    ctx.shadowColor = "#10B981";
+    ctx.fillStyle = P.bg_elevated;
+    ctx.strokeStyle = P.accent_emerald;
+    ctx.shadowColor = P.accent_emerald;
     ctx.shadowBlur = 35;
     ctx.lineWidth = 10;
     ctx.beginPath();
@@ -524,23 +550,23 @@ function renderShot04_ChipVortex(ctx, frame, f0, dur) {
     ctx.stroke();
     ctx.shadowBlur = 0;
 
-    ctx.strokeStyle = "rgba(16, 185, 129, 0.4)";
+    ctx.strokeStyle = P.accent_gold;
     ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.roundRect(-315, -140, 630, 280, 18);
     ctx.stroke();
 
-    ctx.fillStyle = "#10B981";
+    ctx.fillStyle = P.ink_primary;
     ctx.font = "900 138px 'DejaVu Sans Mono', monospace";
     ctx.textAlign = "center";
     ctx.fillText("$100", 0, 48);
     ctx.restore();
   }
 
-  // Phase 2: 14 3D Casino Chips erupting outward with gravity & spin physics
+  // 14 3D Casino Chips in the exact 6-Swatch Rooster Palette!
   if (morphT > 0.02) {
     const numChips = 14;
-    const colors = ["#FF3B30", "#FFB800", "#10B981", "#38BDF8"];
+    const colors = [P.accent_vermilion, P.accent_gold, P.accent_emerald, P.accent_pink];
     const values = ["100", "500", "25", "1K"];
 
     for (let c = 0; c < numChips; c++) {
@@ -562,14 +588,12 @@ function renderShot04_ChipVortex(ctx, frame, f0, dur) {
       ctx.scale(scaleChip, scaleChip * tiltY);
 
       const col = colors[c % colors.length];
-      // 3D Chip Side Thickness
-      ctx.fillStyle = "#080A10";
+      ctx.fillStyle = P.bg_elevated;
       ctx.beginPath();
       ctx.arc(0, 14, 105, 0, Math.PI * 2);
       ctx.fill();
 
-      // Main Chip Face
-      ctx.shadowColor = "rgba(0,0,0,0.85)";
+      ctx.shadowColor = "rgba(18, 6, 15, 0.85)";
       ctx.shadowBlur = 30;
       ctx.fillStyle = col;
       ctx.beginPath();
@@ -577,8 +601,7 @@ function renderShot04_ChipVortex(ctx, frame, f0, dur) {
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      // Dashed White Rim Stripes
-      ctx.strokeStyle = "#F4F1EA";
+      ctx.strokeStyle = P.ink_primary;
       ctx.lineWidth = 14;
       ctx.setLineDash([22, 22]);
       ctx.beginPath();
@@ -586,13 +609,12 @@ function renderShot04_ChipVortex(ctx, frame, f0, dur) {
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Center Recess
-      ctx.fillStyle = "#0B0E17";
+      ctx.fillStyle = P.bg_obsidian;
       ctx.beginPath();
       ctx.arc(0, 0, 64, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = "#F4F1EA";
+      ctx.fillStyle = P.ink_primary;
       ctx.font = "900 44px 'DejaVu Sans Mono', monospace";
       ctx.textAlign = "center";
       ctx.fillText(values[c % values.length], 0, 16);
@@ -602,16 +624,14 @@ function renderShot04_ChipVortex(ctx, frame, f0, dur) {
   }
   ctx.restore();
 
-  // BOTTOM STAGE (Y=1500): LIVE NEURAL WAVEFORM & INSULA CORTEX PAIN DROP (92% -> 8%)
   const painVal = Math.round(92 - 84 * morphT);
   ctx.save();
   ctx.translate(540, 1520);
 
-  // Live Oscilloscope Waveform (High jagged red spikes when cash -> flat calm line when plastic chips!)
-  ctx.strokeStyle = painVal > 35 ? "#10B981" : "#FF3B30";
+  ctx.strokeStyle = painVal > 35 ? P.accent_emerald : P.accent_vermilion;
   ctx.shadowColor = ctx.strokeStyle;
   ctx.shadowBlur = 22;
-  ctx.lineWidth = 6;
+  ctx.lineWidth = 7;
   ctx.beginPath();
   const amp = 10 + (painVal / 100) * 85;
   for (let x = -420; x <= 420; x += 12) {
@@ -622,12 +642,12 @@ function renderShot04_ChipVortex(ctx, frame, f0, dur) {
   ctx.stroke();
   ctx.shadowBlur = 0;
 
-  ctx.fillStyle = "#F4F1EA";
+  ctx.fillStyle = P.ink_primary;
   ctx.font = "900 96px 'Liberation Sans', sans-serif";
   ctx.textAlign = "center";
   ctx.fillText(`PAIN OF PAYING: ${painVal}%`, 0, 35);
 
-  ctx.fillStyle = "#FFB800";
+  ctx.fillStyle = P.accent_pink;
   ctx.font = "bold 28px 'DejaVu Sans Mono', monospace";
   ctx.fillText(painVal < 30 ? "BRAIN ANESTHETIZED BY PLASTIC TOKENS" : "NATURAL LOSS AVERSION ACTIVE", 0, 92);
   ctx.restore();
@@ -635,17 +655,16 @@ function renderShot04_ChipVortex(ctx, frame, f0, dur) {
   ctx.restore();
 
   const titleS = spring(frame, f0 + 4, { stiffness: 220, damping: 16 });
-  drawKineticTitle(ctx, "NEURAL ANESTHESIA", "CASH TO", "PLASTIC", "#FF3B30", 310, titleS);
+  drawKineticTitle(ctx, "NEURAL ANESTHESIA", "CASH TO", "PLASTIC", P.accent_pink, 310, titleS);
 }
 
 window.seekToFrame = function(frame) {
   if (!window.BEAT_CLOCK) return false;
   const beats = window.BEAT_CLOCK.beats;
-  const b1 = beats[0]; // 0..308
-  const b2 = beats[1]; // 308..658
-  const b3 = beats[2]; // 658..985
+  const b1 = beats[0];
+  const b2 = beats[1];
+  const b3 = beats[2];
 
-  // Split Beat 1 into two dynamic camera shots at frame 175 ("No clocks. No windows.")
   const splitB1 = 175;
   let flash = 0;
 

@@ -13,6 +13,12 @@ async def render_frames_via_cdp(html_path, clock_path, out_mp4):
     with open(clock_path, "r") as f:
         clock = json.load(f)
 
+    studio_lock_path = os.path.abspath(os.path.join(os.path.dirname(clock_path), "../../studio_lock.json"))
+    studio_lock = {}
+    if os.path.exists(studio_lock_path):
+        with open(studio_lock_path, "r") as f:
+            studio_lock = json.load(f)
+
     total_frames = clock["total_frames"]
     fps = clock["fps"]
     audio_file = clock["audio_file"]
@@ -92,8 +98,9 @@ async def render_frames_via_cdp(html_path, clock_path, out_mp4):
 
             await asyncio.sleep(0.25)
             clock_json_str = json.dumps(clock)
+            lock_json_str = json.dumps(studio_lock)
             await cdp_call("Runtime.evaluate", {
-                "expression": f"window.initClock({clock_json_str});",
+                "expression": f"window.initClock({clock_json_str}, {lock_json_str});",
                 "returnByValue": True
             })
 

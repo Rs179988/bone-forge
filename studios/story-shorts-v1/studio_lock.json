@@ -1,39 +1,67 @@
 {
+  "_howto_edit": "GitHub par seedha niche diye gaye hex codes, fonts, persona ya custom rules edit karo aur commit kar do. Pipeline har run par yehi file live read karegi.",
   "studio_id": "story-shorts-v1",
-  "channel_name": "KINETIC ARCHITECT",
-  "resolution": { "width": 1080, "height": 1920, "fps": 60 },
-  "persona": {
-    "name": "Kael (Systems Dissector)",
-    "tone": "Direct, forensic, high-status, zero fluff",
-    "hook_rule": "First 90 frames (1.5s) must expose a brutal numeric anomaly or visual contradiction.",
-    "pacing_rule": "No visual element may remain static for more than 75 frames (1.25s). Camera or focal state must shift."
+
+  "1_tech_specs": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 60,
+    "audio_sample_rate": 44100
   },
-  "design_system": {
+
+  "2_channel_persona_and_pacing": {
+    "channel_name": "KINETIC ARCHITECT",
+    "host_name": "Kael (Systems Dissector)",
+    "host_tone": "Direct, forensic, high-status, zero fluff",
+    "tts_voice_prompt": "Read in a gripping, brisk, cinematic documentary storyteller voice",
+    "voice_speed_atempo": 1.26,
+    "hook_deadline_frames": 90,
+    "hook_rule": "First 90 frames (1.5s) must expose a brutal numeric anomaly or visual contradiction.",
+    "max_static_dead_frames": 15,
+    "max_focal_hold_frames": 75
+  },
+
+  "3_design_system": {
+    "_palette_source": "PaletteCentral Rooster Folk-Editorial 6-Swatch Theme",
     "palette": {
-      "bg_obsidian": "#08090D",
-      "bg_elevated": "#11141D",
-      "surface_glass": "rgba(22, 26, 38, 0.86)",
-      "border_subtle": "rgba(244, 241, 234, 0.14)",
-      "ink_primary": "#F4F1EA",
-      "ink_muted": "#8E95A8",
-      "accent_vermilion": "#FF3B30",
-      "accent_gold": "#FFB800",
-      "accent_emerald": "#10B981"
+      "bg_obsidian": "#3B2336",
+      "bg_elevated": "#261523",
+      "surface_glass": "rgba(59, 35, 54, 0.88)",
+      "border_subtle": "rgba(231, 228, 221, 0.22)",
+      "ink_primary": "#E7E4DD",
+      "ink_muted": "#F38BA8",
+      "accent_vermilion": "#F24414",
+      "accent_gold": "#FBA40D",
+      "accent_emerald": "#009E83",
+      "accent_pink": "#F38BA8"
     },
     "typography": {
       "font_display": "'Liberation Sans', 'Nimbus Sans', sans-serif",
       "font_mono": "'DejaVu Sans Mono', 'Liberation Mono', monospace"
     },
-    "hard_constraints": {
-      "min_whitespace_ratio": 0.42,
-      "max_simultaneous_focal_groups": 2,
-      "max_punch_words_per_beat": 4,
-      "banned_patterns": [
-        "Full spoken sentence subtitles pasted across center screen",
-        "Linear easing (must use spring solver or cubic-bezier)",
-        "Default purple/blue neon AI gradients",
-        "Unbounded floating boxes without grid alignment"
-      ]
+    "post_processing": {
+      "enable_vignette": true,
+      "enable_dust_particles": true,
+      "particle_count": 45,
+      "enable_optical_flash_cuts": true
     }
-  }
+  },
+
+  "4_banned_slop_rules": {
+    "min_whitespace_ratio": 0.42,
+    "max_simultaneous_focal_groups": 2,
+    "max_punch_words_per_beat": 4,
+    "banned_patterns": [
+      "Full spoken sentence subtitles pasted across center screen",
+      "Linear easing (must use spring solver or cubic-bezier)",
+      "Default purple/blue neon AI gradients",
+      "Unbounded floating boxes without grid alignment"
+    ]
+  },
+
+  "5_custom_user_rules": [
+    "Har beat mein ek clear physical/visual metaphor hona chahiye, sirf text cards nahi.",
+    "Numbers aur percentages ko hamesha mono font aur glowing accent color mein dikhao.",
+    "Use the 6-swatch Rooster palette (#3B2336 Aubergine, #009E83 Jade Teal, #F24414 Vermilion, #F38BA8 Flamingo Pink, #FBA40D Marigold, #E7E4DD Bone Cream)."
+  ]
 }

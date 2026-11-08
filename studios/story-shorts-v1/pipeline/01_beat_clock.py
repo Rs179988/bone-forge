@@ -7,8 +7,16 @@ import numpy as np
 from google import genai
 from google.genai import types
 
-SR = 44100
-FPS = 60
+STUDIO_LOCK_PATH = "/workspace/studios/story-shorts-v1/studio_lock.json"
+with open(STUDIO_LOCK_PATH, "r") as _f:
+    STUDIO_LOCK = json.load(_f)
+
+_TECH = STUDIO_LOCK.get("1_tech_specs", {})
+_PERSONA = STUDIO_LOCK.get("2_channel_persona_and_pacing", {})
+
+SR = _TECH.get("audio_sample_rate", 44100)
+FPS = _TECH.get("fps", 60)
+TTS_PROMPT = _PERSONA.get("tts_voice_prompt", "Read in a gripping, brisk, cinematic documentary storyteller voice")
 
 def load_wav_stereo(path):
     with wave.open(path, 'r') as wf:
@@ -33,7 +41,7 @@ def generate_tts_segment(client, text, out_wav_44k):
     raw_24k = out_wav_44k + ".24k.wav"
     resp = client.models.generate_content(
         model="gemini-2.5-flash-preview-tts",
-        contents=f"Read in a gripping, brisk, cinematic documentary storyteller voice: {text}",
+        contents=f"{TTS_PROMPT}: {text}",
         config={"response_modalities": ["AUDIO"]}
     )
     pcm_bytes = resp.candidates[0].content.parts[0].inline_data.data
