@@ -38,6 +38,32 @@ BACKEND_DIR = STUDIO_ROOT / "backend"
 JOBS_DIR = STUDIO_ROOT / "jobs"
 FRONTEND_DIR = STUDIO_ROOT / "frontend"
 
+
+def _ensure_runtime_dependencies() -> None:
+    """Auto-install required Python packages if missing in fresh GitHub Codespaces."""
+    import importlib.util
+    import subprocess
+
+    required = [
+        ("numpy", "numpy"),
+        ("websockets", "websockets"),
+    ]
+    missing = [pip_name for mod_name, pip_name in required if importlib.util.find_spec(mod_name) is None]
+    if not missing:
+        return
+    print(f"[CODE-HIGGSFIELD] Auto-installing missing runtime packages: {', '.join(missing)} ...", flush=True)
+    cmd = [sys.executable, "-m", "pip", "install", "--quiet", *missing]
+    res = subprocess.run(cmd, stderr=subprocess.DEVNULL)
+    if res.returncode != 0:
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install", "--break-system-packages", "--quiet", *missing],
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+
+
+_ensure_runtime_dependencies()
+
 for sub in ["compiler", "engine/tools", "audio", "renderer", "patcher", "qa", "vault"]:
     sys.path.insert(0, str(BACKEND_DIR / sub))
 

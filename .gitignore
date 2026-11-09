@@ -3,9 +3,3 @@
 __pycache__/
 *.pyc
 .DS_Store
-
-# Third-party reference clones
-vendor/
-studios/code-higgsfield/frontend/node_modules/
-studios/code-higgsfield/jobs/*/frames_raw/
-

@@ -28,7 +28,10 @@ from pathlib import Path
 from typing import Any
 
 import glob
-import websockets
+try:
+    import websockets
+except ImportError:
+    websockets = None  # type: ignore
 
 STUDIO_ROOT = Path(__file__).resolve().parents[2]
 ENGINE_TOOLS_DIR = STUDIO_ROOT / "backend" / "engine" / "tools"
@@ -46,7 +49,7 @@ from native_canvas_renderer import (  # type: ignore
 
 
 def find_chrome_binary() -> str | None:
-    if os.environ.get("FORCE_NATIVE_RENDERER") == "1":
+    if os.environ.get("FORCE_NATIVE_RENDERER") == "1" or websockets is None:
         return None
     pw_candidates = sorted(
         glob.glob(os.path.expanduser("~/.cache/ms-playwright/*/chrome-linux/chrome"))

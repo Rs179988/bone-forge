@@ -45,7 +45,7 @@ GITEORES
     git remote remove origin 2>/dev/null || true
     git remote add origin "$GITHUB_REPO_URL"
 
-    git add .gitignore .hermes memory studios hermes-agent bin
+    git add .gitignore .hermes memory studios hermes-agent bin mcp-server
     if ! git diff --cached --quiet; then
       git commit -m "$MSG"
     fi
